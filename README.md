@@ -1,4 +1,4 @@
-# Gutlog (便记)
+# loglog (便记)
 
 A privacy-first, offline-ready Progressive Web App (PWA) for bowel movement timing, stool health tracking, and personalized medical trend analysis.
 
@@ -37,8 +37,9 @@ No build tools, Node modules, or compilation required — runs natively in any m
 
 ```bash
 # Clone the repository
-git clone https://github.com/davidy1402/gutlog.git
-cd gutlog
+git clone https://github.com/davidy1402/loglog.git
+cd loglog
+
 
 # Serve locally (required for Service Worker HTTPS/localhost security requirement)
 python3 -m http.server 8080 --bind 127.0.0.1
