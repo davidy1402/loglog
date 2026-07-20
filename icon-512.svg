@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" rx="113" fill="#a97452"/>
+  <!-- Outer timer ring -->
+  <circle cx="256" cy="256" r="163.84" fill="none" stroke="#f0e2d6" stroke-width="26" stroke-linecap="round" stroke-dasharray="772.0778105462276 257.3592701820759" transform="rotate(-90 256 256)"/>
+  <!-- Inner clock hands / checkmark -->
+  <path d="M 198.656 264.192 L 247.808 313.344 L 329.728 198.656" fill="none" stroke="#ffffff" stroke-width="31" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

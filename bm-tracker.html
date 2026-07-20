@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>便记 · 排便追踪</title>
+
+<!-- PWA Manifest & Theme -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#a97452">
+
+<!-- iOS Home Screen Support -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="便记">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+<style>
+  :root{
+    --bg:#f6f4f0;
+    --card:#ffffff;
+    --ink:#2b2b28;
+    --sub:#8a8578;
+    --accent:#a97452;
+    --accent-light:#f0e2d6;
+    --line:#eae6df;
+    --good:#7a9b6e;
+    --warn:#c48a4a;
+    --bad:#b5654f;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    padding:24px 16px 60px;
+  }
+  .wrap{max-width:520px;margin:0 auto;}
+  h1{font-size:20px;font-weight:600;margin:0 0 4px;}
+  .sub{color:var(--sub);font-size:13px;margin-bottom:20px;}
+
+  .card{
+    background:var(--card);
+    border-radius:16px;
+    padding:20px;
+    margin-bottom:16px;
+    box-shadow:0 1px 3px rgba(0,0,0,0.04);
+  }
+
+  .since-label{font-size:13px;color:var(--sub);}
+  .since-value{font-size:32px;font-weight:700;margin:4px 0 2px;}
+  .since-time{font-size:12px;color:var(--sub);}
+
+  /* timer */
+  .timer-box{text-align:center;padding:10px 0 4px;}
+  .timer-display{font-size:40px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:1px;}
+  .timer-hint{font-size:12px;color:var(--sub);margin-top:2px;}
+
+  .log-btn{
+    width:100%;
+    padding:16px;
+    background:var(--accent);
+    color:#fff;
+    border:none;
+    border-radius:12px;
+    font-size:17px;
+    font-weight:600;
+    cursor:pointer;
+    margin-top:16px;
+  }
+  .log-btn.stop{background:var(--bad);}
+  .log-btn:active{opacity:0.85;}
+
+  .manual-link{
+    display:block;
+    text-align:center;
+    font-size:12px;
+    color:var(--sub);
+    margin-top:10px;
+    cursor:pointer;
+    text-decoration:underline;
+  }
+
+  .panel{display:none;margin-top:16px;}
+  .panel.open{display:block;}
+  .field-label{font-size:12px;color:var(--sub);margin-bottom:6px;display:block;margin-top:14px;}
+  .field-label:first-child{margin-top:0;}
+
+  .duration-banner{
+    background:var(--accent-light);
+    border-radius:10px;
+    padding:10px 14px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-size:13px;
+  }
+  .duration-banner b{font-size:16px;color:var(--accent);}
+
+  .bristol-list{display:flex;flex-direction:column;gap:6px;}
+  .bristol-card{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:9px 12px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    cursor:pointer;
+    background:#fff;
+  }
+  .bristol-card.selected{background:var(--accent-light);border-color:var(--accent);}
+  .bristol-emoji{font-size:22px;flex-shrink:0;width:26px;text-align:center;}
+  .bristol-text{display:flex;flex-direction:column;line-height:1.3;}
+  .bristol-title{font-size:13px;font-weight:600;}
+  .bristol-desc{font-size:11px;color:var(--sub);}
+
+  .chip-row{display:flex;flex-wrap:wrap;gap:6px;}
+  .chip{
+    padding:7px 12px;
+    border:1px solid var(--line);
+    border-radius:20px;
+    font-size:12.5px;
+    cursor:pointer;
+    background:#fff;
+    color:var(--ink);
+  }
+  .chip.selected{background:var(--ink);color:#fff;border-color:var(--ink);}
+  .chip.warn-chip.selected{background:var(--bad);border-color:var(--bad);}
+
+  textarea{
+    width:100%;
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:10px;
+    font-size:14px;
+    font-family:inherit;
+    resize:none;
+  }
+
+  .row-btns{display:flex;gap:8px;margin-top:18px;}
+  .row-btns button{
+    flex:1;
+    padding:12px;
+    border-radius:10px;
+    border:none;
+    font-size:14px;
+    cursor:pointer;
+  }
+  .save-btn{background:var(--ink);color:#fff;}
+  .cancel-btn{background:var(--line);color:var(--ink);}
+  .skip-btn{background:none;color:var(--sub);font-size:12px;text-decoration:underline;padding:6px;}
+
+  .stats-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+  .stat-box{
+    background:var(--accent-light);
+    border-radius:12px;
+    padding:12px 8px;
+    text-align:center;
+  }
+  .stat-num{font-size:19px;font-weight:700;}
+  .stat-label{font-size:10.5px;color:var(--sub);margin-top:2px;}
+
+  .chart{display:flex;align-items:flex-end;gap:4px;height:70px;margin-top:14px;}
+  .chart .bar{
+    flex:1;
+    background:var(--accent);
+    border-radius:3px 3px 0 0;
+    min-height:2px;
+    position:relative;
+  }
+  .chart-labels{display:flex;gap:4px;margin-top:4px;}
+  .chart-labels span{flex:1;text-align:center;font-size:9px;color:var(--sub);}
+
+  .history-item{
+    padding:12px 0;
+    border-bottom:1px solid var(--line);
+    font-size:13px;
+  }
+  .history-item:last-child{border-bottom:none;}
+  .hist-top{display:flex;justify-content:space-between;align-items:center;}
+  .hist-time{font-weight:600;}
+  .hist-meta{color:var(--sub);font-size:11px;margin-top:2px;}
+  .hist-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;}
+  .hist-tag{
+    font-size:10.5px;
+    padding:2px 8px;
+    border-radius:20px;
+    background:var(--accent-light);
+    color:var(--accent);
+  }
+  .hist-tag.warn{background:#f6dcd6;color:var(--bad);}
+  .hist-note{color:var(--sub);font-size:12px;margin-top:4px;}
+  .del-btn{
+    background:none;border:none;color:var(--sub);font-size:16px;cursor:pointer;margin-left:8px;
+  }
+
+  .section-title{font-size:14px;font-weight:600;margin-bottom:10px;}
+  .empty{color:var(--sub);font-size:13px;text-align:center;padding:20px 0;}
+
+  .toolbar{display:flex;gap:8px;margin-bottom:16px;}
+  .toolbar button{
+    flex:1;
+    padding:10px;
+    border-radius:10px;
+    border:1px solid var(--line);
+    background:#fff;
+    font-size:12px;
+    color:var(--sub);
+    cursor:pointer;
+  }
+  .toolbar button.install-btn{
+    border-color:var(--accent);
+    color:var(--accent);
+    font-weight:600;
+    background:var(--accent-light);
+  }
+
+  .insight-banner{
+    padding:12px 14px;
+    border-radius:10px;
+    font-size:15px;
+    font-weight:700;
+    margin-bottom:14px;
+  }
+  .insight-banner.good{background:#e8f0e4;color:var(--good);}
+  .insight-banner.warn{background:#faf0e0;color:var(--warn);}
+  .insight-banner.bad{background:#f6dcd6;color:var(--bad);}
+
+  .insight-notes{margin:0 0 14px;padding-left:18px;}
+  .insight-notes li{font-size:13.5px;line-height:1.6;margin-bottom:8px;color:var(--ink);}
+
+  .insight-disclaimer{font-size:11px;color:var(--sub);line-height:1.5;}
+
+  .field-hint{font-size:11px;color:var(--sub);line-height:1.45;margin:2px 0 8px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>便记</h1>
+  <div class="sub">排便计时 + 追踪</div>
+
+  <div class="card">
+    <div class="since-label">距离上次</div>
+    <div class="since-value" id="sinceValue">—</div>
+    <div class="since-time" id="sinceTime"></div>
+
+    <div class="timer-box" id="timerBox" style="display:none;">
+      <div class="timer-display" id="timerDisplay">00:00</div>
+      <div class="timer-hint">计时中…</div>
+    </div>
+
+    <button class="log-btn" id="startBtn">开始</button>
+    <span class="manual-link" id="manualLink">没计时?手动补录一笔</span>
+
+    <div class="panel" id="logPanel">
+      <div class="duration-banner" id="durationBanner" style="display:none;">
+        <span>本次用时</span>
+        <b id="durationText">0分钟</b>
+      </div>
+
+      <span class="field-label">形状</span>
+      <div class="bristol-list" id="bristolGrid"></div>
+
+      <span class="field-label">分量</span>
+      <div class="field-hint">参考:健康成人单次排便约100–250克、长10–20厘米,大致接近一根香蕉的量;明显少于或多于平时可选少/多。</div>
+      <div class="chip-row" id="amountRow"></div>
+
+      <span class="field-label">颜色</span>
+      <div class="field-hint">黄褐色到深褐色最常见,通常正常;灰白/陶土色、黑色、鲜红色相对少见,更值得留意(除非近期吃了红菜头、蓝莓或补铁剂等)。</div>
+      <div class="chip-row" id="colorRow"></div>
+
+      <span class="field-label">气味</span>
+      <div class="chip-row" id="smellRow"></div>
+
+      <span class="field-label">排便感觉</span>
+      <div class="field-hint">费力=需要明显用力或蹲较久;不尽感=排完仍觉得没排干净。偶尔一次通常没什么,但经常出现(超过约四分之一的次数)更值得关注。</div>
+      <div class="chip-row" id="feelRow"></div>
+
+      <span class="field-label">伴随情况(可多选)</span>
+      <div class="chip-row" id="symptomRow"></div>
+
+      <span class="field-label">心情</span>
+      <div class="chip-row" id="moodRow"></div>
+
+      <span class="field-label">地点</span>
+      <div class="chip-row" id="placeRow"></div>
+
+      <span class="field-label">备注</span>
+      <textarea id="noteInput" rows="2" placeholder="其他想记的"></textarea>
+
+      <div class="row-btns">
+        <button class="cancel-btn" id="cancelBtn">取消</button>
+        <button class="save-btn" id="saveBtn">保存</button>
+      </div>
+    </div>
+
+    <div class="panel" id="insightPanel">
+      <div class="insight-banner" id="insightBanner"></div>
+      <ul class="insight-notes" id="insightNotes"></ul>
+      <div class="insight-disclaimer">以上提示基于你自己的记录和趋势,并参考 Bristol Stool Scale、Rome IV 功能性肠道疾病诊断标准、Mayo Clinic / Cleveland Clinic 患者卫教资料生成,仅供个人参考,不能替代医生诊断。如有持续或严重症状,请及时就医。</div>
+      <button class="log-btn" id="insightDoneBtn" style="margin-top:16px;">完成</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">本周概览</div>
+    <div class="stats-grid">
+      <div class="stat-box">
+        <div class="stat-num" id="statCount7">0</div>
+        <div class="stat-label">近7天次数</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" id="statAvgInterval">—</div>
+        <div class="stat-label">平均间隔</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" id="statAvgDuration">—</div>
+        <div class="stat-label">平均用时</div>
+      </div>
+    </div>
+    <div class="chart" id="chart"></div>
+    <div class="chart-labels" id="chartLabels"></div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">最近记录</div>
+    <div id="historyList"></div>
+  </div>
+
+  <div class="toolbar">
+    <button id="installBtn" class="install-btn" style="display:none;">安装应用</button>
+    <button id="exportBtn">导出 CSV</button>
+    <button id="clearBtn">清空数据</button>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = 'bm_tracker_records_v2';
+const TIMER_KEY = 'bm_tracker_active_timer';
+
+const BRISTOL = [
+  {n:1, emoji:'🪨', title:'分离硬块', desc:'像坚果一样的硬球,干硬难排出'},
+  {n:2, emoji:'🌰', title:'结块香肠状', desc:'香肠状但凹凸不平、偏硬'},
+  {n:3, emoji:'🌭', title:'表面带裂纹', desc:'香肠状,表面有裂痕'},
+  {n:4, emoji:'🍌', title:'光滑柔软', desc:'香肠或蛇状,光滑易排出(理想状态)'},
+  {n:5, emoji:'🍥', title:'软块边缘清晰', desc:'柔软块状,容易排出'},
+  {n:6, emoji:'🥣', title:'糊状蓬松', desc:'边缘不清晰,质地偏软碎'},
+  {n:7, emoji:'💧', title:'完全水状', desc:'没有固体块,呈水状'}
+];
+const BRISTOL_MAP = Object.fromEntries(BRISTOL.map(b=>[b.n,b]));
+const AMOUNT_OPTS = ['少','适中','多'];
+const COLOR_OPTS = ['黄褐色','深褐色','绿色','黄色偏油亮','灰白/陶土色','黑色','鲜红/带血'];
+const WARN_COLORS = ['灰白/陶土色','黑色','鲜红/带血'];
+const SMELL_OPTS = ['轻微','正常','强烈'];
+const FEEL_OPTS = ['顺畅','费力','不尽感','急迫'];
+const SYMPTOM_OPTS = ['厕纸带血','马桶挂壁','腹胀','打嗝','腹部绞痛'];
+const WARN_SYMPTOMS = ['厕纸带血']; // highlighted in red
+const MOOD_OPTS = ['平静','放松','焦虑','烦躁'];
+const PLACE_OPTS = ['家','公司','外出'];
+
+// 颜色对应的健康参考信息(参考 Mayo Clinic / Cleveland Clinic 患者卫教资料)
+const COLOR_INFO = {
+  '黄褐色': {level:'good'},
+  '深褐色': {level:'good'},
+  '绿色': {level:'normal', tip:'绿色多数与蔬菜摄入较多或肠道蠕动偏快有关,通常问题不大;如果持续多天出现可以留意。'},
+  '黄色偏油亮': {level:'warn', tip:'偏油亮发黄可能提示脂肪吸收不太好,如果持续出现,建议留意饮食并考虑咨询医生。'},
+  '灰白/陶土色': {level:'bad', tip:'灰白或陶土色可能与胆道、肝脏功能有关,如果持续出现,建议尽快就医检查。'},
+  '黑色': {level:'warn', tip:'黑色可能来自铁剂、含铋药物或大量蓝莓等食物;如果没有这些原因,也可能提示上消化道出血,持续出现建议就医。'},
+  '鲜红/带血': {level:'bad', tip:'鲜红或带血可能是痔疮等常见原因,但也可能提示下消化道出血,如果持续或量较大,建议尽快就医。'}
+};
+
+let records = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+let activeTimer = JSON.parse(localStorage.getItem(TIMER_KEY) || 'null');
+let timerInterval = null;
+
+// current form state
+let form = {};
+
+function resetForm(){
+  form = {
+    bristol:null, amount:null, color:null, smell:null,
+    feel:null, symptoms:[], mood:null, place:null, note:''
+  };
+}
+resetForm();
+
+function saveRecords(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(records)); }
+function saveTimer(){ localStorage.setItem(TIMER_KEY, JSON.stringify(activeTimer)); }
+
+function fmtDuration(ms){
+  const mins = Math.floor(ms/60000);
+  const h = Math.floor(mins/60);
+  const d = Math.floor(h/24);
+  if(d > 0) return `${d}天${h%24}小时`;
+  if(h > 0) return `${h}小时${mins%60}分`;
+  if(mins > 0) return `${mins}分钟`;
+  return `${Math.floor(ms/1000)}秒`;
+}
+
+function fmtClock(ms){
+  const totalSec = Math.floor(ms/1000);
+  const m = String(Math.floor(totalSec/60)).padStart(2,'0');
+  const s = String(totalSec%60).padStart(2,'0');
+  return `${m}:${s}`;
+}
+
+function fmtDate(ts){
+  const d = new Date(ts);
+  const now = new Date();
+  const sameDay = d.toDateString() === now.toDateString();
+  const y = d.toDateString() === new Date(now-86400000).toDateString();
+  const time = d.toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'});
+  if(sameDay) return `今天 ${time}`;
+  if(y) return `昨天 ${time}`;
+  return `${d.getMonth()+1}/${d.getDate()} ${time}`;
+}
+
+function escapeHtml(str){
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+/* ---------- timer ---------- */
+function renderTimerUI(){
+  const startBtn = document.getElementById('startBtn');
+  const timerBox = document.getElementById('timerBox');
+  const manualLink = document.getElementById('manualLink');
+  if(activeTimer){
+    timerBox.style.display = 'block';
+    startBtn.textContent = '结束';
+    startBtn.classList.add('stop');
+    manualLink.style.display = 'none';
+    updateTimerDisplay();
+    if(!timerInterval){
+      timerInterval = setInterval(updateTimerDisplay, 1000);
+    }
+  } else {
+    timerBox.style.display = 'none';
+    startBtn.textContent = '开始';
+    startBtn.classList.remove('stop');
+    manualLink.style.display = 'block';
+    if(timerInterval){ clearInterval(timerInterval); timerInterval = null; }
+  }
+}
+
+function updateTimerDisplay(){
+  if(!activeTimer) return;
+  document.getElementById('timerDisplay').textContent = fmtClock(Date.now() - activeTimer.startTs);
+}
+
+document.getElementById('startBtn').onclick = ()=>{
+  if(activeTimer){
+    // stop -> open detail panel
+    const duration = Date.now() - activeTimer.startTs;
+    resetForm();
+    form._startTs = activeTimer.startTs;
+    form._duration = duration;
+    activeTimer = null;
+    saveTimer();
+    renderTimerUI();
+    openLogPanel();
+  } else {
+    activeTimer = { startTs: Date.now() };
+    saveTimer();
+    renderTimerUI();
+  }
+};
+
+document.getElementById('manualLink').onclick = ()=>{
+  resetForm();
+  form._startTs = Date.now();
+  form._duration = null;
+  openLogPanel();
+};
+
+/* ---------- log panel ---------- */
+function openLogPanel(){
+  const banner = document.getElementById('durationBanner');
+  if(form._duration != null){
+    banner.style.display = 'flex';
+    document.getElementById('durationText').textContent = fmtDuration(form._duration);
+  } else {
+    banner.style.display = 'none';
+  }
+  document.getElementById('noteInput').value = '';
+  renderAllChipGroups();
+  document.getElementById('logPanel').classList.add('open');
+  document.getElementById('logPanel').scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+function makeChipRow(containerId, options, field, multi, warnList){
+  warnList = warnList || [];
+  const el = document.getElementById(containerId);
+  el.innerHTML = '';
+  options.forEach(opt=>{
+    const chip = document.createElement('div');
+    const isSelected = multi ? form[field].includes(opt) : form[field] === opt;
+    const isWarn = warnList.includes(opt);
+    chip.className = 'chip' + (isSelected?' selected':'') + (isWarn?' warn-chip':'');
+    chip.textContent = opt;
+    chip.onclick = ()=>{
+      if(multi){
+        const idx = form[field].indexOf(opt);
+        if(idx>=0) form[field].splice(idx,1); else form[field].push(opt);
+      } else {
+        form[field] = (form[field]===opt) ? null : opt;
+      }
+      makeChipRow(containerId, options, field, multi, warnList);
+    };
+    el.appendChild(chip);
+  });
+}
+
+function renderBristolGrid(){
+  const grid = document.getElementById('bristolGrid');
+  grid.innerHTML = '';
+  BRISTOL.forEach(b=>{
+    const el = document.createElement('div');
+    el.className = 'bristol-card' + (form.bristol===b.n ? ' selected':'');
+    el.innerHTML = `
+      <span class="bristol-emoji">${b.emoji}</span>
+      <span class="bristol-text">
+        <span class="bristol-title">${b.title}</span>
+        <span class="bristol-desc">${b.desc}</span>
+      </span>
+    `;
+    el.onclick = ()=>{
+      form.bristol = (form.bristol===b.n) ? null : b.n;
+      renderBristolGrid();
+    };
+    grid.appendChild(el);
+  });
+}
+
+function renderAllChipGroups(){
+  renderBristolGrid();
+  makeChipRow('amountRow', AMOUNT_OPTS, 'amount', false);
+  makeChipRow('colorRow', COLOR_OPTS, 'color', false, WARN_COLORS);
+  makeChipRow('smellRow', SMELL_OPTS, 'smell', false);
+  makeChipRow('feelRow', FEEL_OPTS, 'feel', false);
+  makeChipRow('symptomRow', SYMPTOM_OPTS, 'symptoms', true, WARN_SYMPTOMS);
+  makeChipRow('moodRow', MOOD_OPTS, 'mood', false);
+  makeChipRow('placeRow', PLACE_OPTS, 'place', false);
+}
+
+document.getElementById('cancelBtn').onclick = ()=>{
+  document.getElementById('logPanel').classList.remove('open');
+};
+
+document.getElementById('saveBtn').onclick = ()=>{
+  const note = document.getElementById('noteInput').value.trim();
+  const newRec = {
+    id: Date.now() + '_' + Math.random().toString(36).slice(2,7),
+    ts: form._startTs || Date.now(),
+    duration: form._duration,
+    bristol: form.bristol,
+    amount: form.amount,
+    color: form.color,
+    smell: form.smell,
+    feel: form.feel,
+    symptoms: form.symptoms.slice(),
+    mood: form.mood,
+    place: form.place,
+    note: note
+  };
+  const priorRecords = records.slice();
+  records.push(newRec);
+  saveRecords();
+  renderAll();
+  const analysis = analyzeRecord(newRec, priorRecords);
+  showInsight(analysis);
+};
+
+/* ---------- analysis / advice ---------- */
+const SHAPE_INFO = {
+  1:{label:'分离硬块', tip:'偏干偏硬,建议增加饮水量和膳食纤维摄入(蔬菜、全谷物、水果),适当增加活动量。', level:'warn'},
+  2:{label:'结块偏硬', tip:'偏硬,可以多喝水、增加纤维摄入,留意接下来几天是否持续。', level:'warn'},
+  3:{label:'基本正常', tip:'在正常范围内。', level:'good'},
+  4:{label:'理想状态', tip:'这是比较理想的状态,继续保持目前的饮食和作息。', level:'good'},
+  5:{label:'正常偏软', tip:'在正常范围内。', level:'good'},
+  6:{label:'偏稀', tip:'留意近期饮食(油腻、辛辣、乳制品)或压力状态,注意补水。', level:'warn'},
+  7:{label:'水状', tip:'注意补水和电解质,如持续超过1-2天或伴随其他不适,建议就医。', level:'bad'}
+};
+
+// 参考 Rome IV 功能性便秘诊断标准中的部分指标(费力、硬块便、排便不尽感均超过25%的次数,
+// 或每周排便少于3次;临床诊断需满足其中至少2项)。这里只做粗略的个人趋势提示,不是诊断。
+function checkRomeConstipationPattern(rec, priorRecords){
+  const windowRecords = [...priorRecords.filter(r => rec.ts - r.ts <= 30*86400000), rec];
+  if(windowRecords.length < 4) return null;
+
+  const total = windowRecords.length;
+  const hardPct = windowRecords.filter(r=>r.bristol && r.bristol<=2).length / total;
+  const strainPct = windowRecords.filter(r=>r.feel==='费力').length / total;
+  const incompletePct = windowRecords.filter(r=>r.feel==='不尽感').length / total;
+  const sevenDaysAgo = rec.ts - 7*86400000;
+  const weeklyCount = windowRecords.filter(r=>r.ts>=sevenDaysAgo).length;
+
+  let criteriaMet = 0;
+  if(hardPct > 0.25) criteriaMet++;
+  if(strainPct > 0.25) criteriaMet++;
+  if(incompletePct > 0.25) criteriaMet++;
+  if(weeklyCount < 3) criteriaMet++;
+
+  if(criteriaMet >= 2){
+    return `参考Rome IV功能性便秘诊断标准(排便费力、硬块便、排便不尽感超过25%的次数,或每周排便少于3次,满足其中≥2项),你近30天的记录符合了${criteriaMet}项。这不是诊断,但可以作为一个信号,建议留意并考虑咨询医生。`;
+  }
+  return null;
+}
+
+function analyzeRecord(rec, priorRecords){
+  const notes = [];
+  let status = 'good';
+  const escalate = (lvl)=>{
+    if(lvl==='bad') status='bad';
+    else if(lvl==='warn' && status!=='bad') status='warn';
+  };
+
+  if(rec.bristol){
+    const s = SHAPE_INFO[rec.bristol];
+    notes.push(`本次形状:${s.label}。${s.tip}`);
+    escalate(s.level);
+  }
+
+  if(rec.color && COLOR_INFO[rec.color] && COLOR_INFO[rec.color].tip){
+    const c = COLOR_INFO[rec.color];
+    notes.push(c.tip);
+    escalate(c.level==='bad' ? 'bad' : 'warn');
+  }
+
+  const symptoms = rec.symptoms || [];
+  if(symptoms.includes('厕纸带血')){
+    notes.push('本次记录了厕纸带血。偶尔出现可能与痔疮等常见情况有关,但如果反复出现或伴随其他不适,建议尽快就医检查。');
+    escalate('bad');
+  }
+  if(symptoms.includes('腹部绞痛')){
+    notes.push('伴随腹部绞痛,留意是否与近期饮食或压力有关,如持续加重请就医。');
+    escalate('warn');
+  }
+  if(symptoms.includes('腹胀') || symptoms.includes('打嗝')){
+    notes.push('伴随腹胀或打嗝,可能与进食速度、产气食物或消化状态有关。');
+  }
+
+  const sorted = [...priorRecords].sort((a,b)=>a.ts-b.ts);
+  if(sorted.length>0){
+    const lastPrior = sorted[sorted.length-1];
+    const interval = rec.ts - lastPrior.ts;
+    const priorIntervals = [];
+    for(let i=1;i<sorted.length;i++) priorIntervals.push(sorted[i].ts - sorted[i-1].ts);
+    const recentIntervals = priorIntervals.slice(-14);
+    if(recentIntervals.length>=3){
+      const avg = recentIntervals.reduce((a,b)=>a+b,0)/recentIntervals.length;
+      if(interval > avg*1.8){
+        notes.push(`这次间隔比平时长(${fmtDuration(interval)},平时约${fmtDuration(avg)}),留意是否有便秘迹象。`);
+        escalate('warn');
+      } else if(interval < avg*0.4 && interval < 6*3600000){
+        notes.push(`这次间隔比平时短很多(${fmtDuration(interval)},平时约${fmtDuration(avg)}),留意排便频率是否突然增加。`);
+        escalate('warn');
+      }
+    }
+  }
+
+  const sevenDaysAgo = rec.ts - 7*86400000;
+  const recentWindow = [...priorRecords.filter(r=>r.ts>=sevenDaysAgo), rec];
+  const hardCount = recentWindow.filter(r=>r.bristol && r.bristol<=2).length;
+  const looseCount = recentWindow.filter(r=>r.bristol && r.bristol>=6).length;
+  if(hardCount>=3){
+    notes.push(`过去7天有${hardCount}次记录偏硬,可能是持续性偏干,建议关注饮水量和膳食纤维摄入。`);
+    escalate('warn');
+  }
+  if(looseCount>=3){
+    notes.push(`过去7天有${looseCount}次记录偏稀,如果持续,建议留意饮食和压力状态,必要时就医。`);
+    escalate('warn');
+  }
+
+  const bloodCountRecent = recentWindow.filter(r=>(r.symptoms||[]).includes('厕纸带血')).length;
+  if(bloodCountRecent>=2){
+    notes.push(`过去7天有${bloodCountRecent}次记录厕纸带血,反复出现建议尽快就医检查。`);
+    escalate('bad');
+  }
+
+  const romeNote = checkRomeConstipationPattern(rec, priorRecords);
+  if(romeNote){
+    notes.push(romeNote);
+    escalate('warn');
+  }
+
+  if(notes.length===0){
+    notes.push('这次记录看起来在正常范围内,继续保持目前的习惯。');
+  }
+
+  return {status, notes};
+}
+
+function showInsight(analysis){
+  document.getElementById('logPanel').classList.remove('open');
+  const banner = document.getElementById('insightBanner');
+  banner.className = 'insight-banner ' + analysis.status;
+  const statusText = {good:'👍 状态良好', warn:'⚠️ 建议留意', bad:'❗ 需要关注'}[analysis.status];
+  banner.textContent = statusText;
+
+  const notesEl = document.getElementById('insightNotes');
+  notesEl.innerHTML = '';
+  analysis.notes.forEach(n=>{
+    const li = document.createElement('li');
+    li.textContent = n;
+    notesEl.appendChild(li);
+  });
+
+  document.getElementById('insightPanel').classList.add('open');
+  document.getElementById('insightPanel').scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+document.getElementById('insightDoneBtn').onclick = ()=>{
+  document.getElementById('insightPanel').classList.remove('open');
+};
+
+/* ---------- rendering: since / stats / history ---------- */
+function renderSince(){
+  const sinceValue = document.getElementById('sinceValue');
+  const sinceTime = document.getElementById('sinceTime');
+  if(records.length===0){
+    sinceValue.textContent = '暂无记录';
+    sinceTime.textContent = '';
+    return;
+  }
+  const last = [...records].sort((a,b)=>b.ts-a.ts)[0];
+  const diff = Date.now() - last.ts;
+  sinceValue.textContent = fmtDuration(diff);
+  sinceTime.textContent = '上次: ' + fmtDate(last.ts);
+}
+
+function renderStats(){
+  const now = Date.now();
+  const sevenDaysAgo = now - 7*86400000;
+  const recent7 = records.filter(r=>r.ts >= sevenDaysAgo);
+  document.getElementById('statCount7').textContent = recent7.length;
+
+  const sorted = [...records].sort((a,b)=>a.ts-b.ts);
+  let intervals = [];
+  for(let i=1;i<sorted.length;i++){
+    intervals.push(sorted[i].ts - sorted[i-1].ts);
+  }
+  const last14 = intervals.slice(-14);
+  document.getElementById('statAvgInterval').textContent =
+    last14.length>0 ? fmtDuration(last14.reduce((a,b)=>a+b,0)/last14.length) : '—';
+
+  const durations = records.filter(r=>r.duration!=null).map(r=>r.duration);
+  document.getElementById('statAvgDuration').textContent =
+    durations.length>0 ? fmtDuration(durations.reduce((a,b)=>a+b,0)/durations.length) : '—';
+
+  const days = [];
+  for(let i=13;i>=0;i--){
+    const dayStart = new Date();
+    dayStart.setHours(0,0,0,0);
+    dayStart.setDate(dayStart.getDate()-i);
+    const dayEnd = dayStart.getTime() + 86400000;
+    const count = records.filter(r=>r.ts>=dayStart.getTime() && r.ts<dayEnd).length;
+    days.push({date:dayStart, count});
+  }
+  const max = Math.max(1, ...days.map(d=>d.count));
+  const chart = document.getElementById('chart');
+  const labels = document.getElementById('chartLabels');
+  chart.innerHTML = '';
+  labels.innerHTML = '';
+  days.forEach(d=>{
+    const bar = document.createElement('div');
+    bar.className = 'bar';
+    bar.style.height = (d.count/max*60 + (d.count>0?4:0)) + 'px';
+    bar.title = d.count + '次';
+    chart.appendChild(bar);
+    const lab = document.createElement('span');
+    lab.textContent = d.date.getDate();
+    labels.appendChild(lab);
+  });
+}
+
+function renderHistory(){
+  const list = document.getElementById('historyList');
+  list.innerHTML = '';
+  const sorted = [...records].sort((a,b)=>b.ts-a.ts).slice(0,20);
+  if(sorted.length===0){
+    list.innerHTML = '<div class="empty">还没有记录,点上面的"开始"计时吧</div>';
+    return;
+  }
+  sorted.forEach(r=>{
+    const item = document.createElement('div');
+    item.className = 'history-item';
+    let tags = '';
+    if(r.bristol) tags += `<span class="hist-tag">${BRISTOL_MAP[r.bristol] ? BRISTOL_MAP[r.bristol].emoji+' '+BRISTOL_MAP[r.bristol].title : 'Bristol '+r.bristol}</span>`;
+    if(r.amount) tags += `<span class="hist-tag">${r.amount}</span>`;
+    if(r.color) tags += `<span class="hist-tag${WARN_COLORS.includes(r.color)?' warn':''}">${r.color}</span>`;
+    if(r.smell) tags += `<span class="hist-tag">气味${r.smell}</span>`;
+    if(r.feel) tags += `<span class="hist-tag">${r.feel}</span>`;
+    if(r.mood) tags += `<span class="hist-tag">${r.mood}</span>`;
+    if(r.place) tags += `<span class="hist-tag">${r.place}</span>`;
+    (r.symptoms||[]).forEach(s=>{
+      const warn = WARN_SYMPTOMS.includes(s);
+      tags += `<span class="hist-tag${warn?' warn':''}">${s}</span>`;
+    });
+    item.innerHTML = `
+      <div class="hist-top">
+        <div>
+          <span class="hist-time">${fmtDate(r.ts)}</span>
+          ${r.duration!=null ? `<span class="hist-meta"> · 用时 ${fmtDuration(r.duration)}</span>` : ''}
+        </div>
+        <button class="del-btn" data-id="${r.id}">×</button>
+      </div>
+      ${tags ? `<div class="hist-tags">${tags}</div>` : ''}
+      ${r.note ? `<div class="hist-note">${escapeHtml(r.note)}</div>` : ''}
+    `;
+    list.appendChild(item);
+  });
+  list.querySelectorAll('.del-btn').forEach(btn=>{
+    btn.onclick = ()=>{
+      const id = btn.getAttribute('data-id');
+      records = records.filter(r=>String(r.id)!==id);
+      saveRecords();
+      renderAll();
+    };
+  });
+}
+
+function renderAll(){
+  renderSince();
+  renderStats();
+  renderHistory();
+}
+
+/* ---------- export / clear ---------- */
+document.getElementById('exportBtn').onclick = ()=>{
+  let csv = 'time,duration_min,bristol,amount,color,smell,feel,symptoms,mood,place,note\n';
+  [...records].sort((a,b)=>a.ts-b.ts).forEach(r=>{
+    const t = new Date(r.ts).toISOString();
+    const dur = r.duration!=null ? (r.duration/60000).toFixed(1) : '';
+    const note = (r.note||'').replace(/"/g,'""');
+    const symptoms = (r.symptoms||[]).join('|');
+    csv += `"${t}","${dur}","${r.bristol||''}","${r.amount||''}","${r.color||''}","${r.smell||''}","${r.feel||''}","${symptoms}","${r.mood||''}","${r.place||''}","${note}"\n`;
+  });
+  const blob = new Blob([csv], {type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'bm_records_' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+};
+
+document.getElementById('clearBtn').onclick = ()=>{
+  if(confirm('确定要清空所有记录吗?此操作无法撤销,建议先导出备份。')){
+    records = [];
+    saveRecords();
+    renderAll();
+  }
+};
+
+setInterval(renderSince, 30000);
+
+renderTimerUI();
+renderAll();
+
+/* ---------- PWA: Service Worker & Install Prompt ---------- */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('service-worker.js')
+      .then((reg) => console.log('ServiceWorker registered:', reg.scope))
+      .catch((err) => console.warn('ServiceWorker registration failed:', err));
+  });
+}
+
+let deferredPrompt = null;
+const installBtn = document.getElementById('installBtn');
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  if (installBtn) {
+    installBtn.style.display = 'block';
+  }
+});
+
+if (installBtn) {
+  installBtn.addEventListener('click', async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      console.log('User accepted PWA installation');
+    }
+    deferredPrompt = null;
+    installBtn.style.display = 'none';
+  });
+}
+
+window.addEventListener('appinstalled', () => {
+  deferredPrompt = null;
+  if (installBtn) {
+    installBtn.style.display = 'none';
+  }
+});
+</script>
+</body>
+</html>
