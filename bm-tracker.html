@@ -465,6 +465,65 @@
   .area-x{display:flex;margin-top:4px;}
   .area-x span{flex:1;text-align:center;font-size:9.5px;color:var(--sub);}
 
+  /* ---------- reminder banner (home) ---------- */
+  .reminder-banner{
+    display:flex;align-items:center;gap:10px;
+    background:var(--banner-warn);color:var(--warn);
+    border-radius:12px;padding:12px 14px;margin-bottom:14px;
+    font-size:13.5px;font-weight:600;line-height:1.4;
+    animation:popIn .42s var(--ease-spring) both;
+  }
+  .reminder-banner span{flex:1;}
+  .reminder-x{background:none;border:none;color:inherit;font-size:19px;cursor:pointer;line-height:1;opacity:.65;padding:0 2px;}
+  .reminder-x:active{opacity:.3;}
+
+  /* ---------- datetime input ---------- */
+  .dt-input{
+    width:100%;border:1.5px solid var(--line);border-radius:12px;padding:10px 11px;
+    font-size:14px;font-family:inherit;background:var(--card);color:var(--ink);
+  }
+  .dt-input:focus{outline:none;border-color:var(--accent);}
+
+  /* ---------- data management card ---------- */
+  .data-hint{font-size:11.5px;color:var(--sub);line-height:1.5;margin-bottom:10px;}
+  .data-btns{display:flex;gap:8px;margin-bottom:8px;}
+  .data-btns button{
+    flex:1;padding:11px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);
+    font-size:13px;color:var(--ink);cursor:pointer;font-weight:500;
+    transition:transform .16s var(--ease-spring), background .2s var(--ease-out);
+  }
+  .data-btns button:active{transform:scale(0.96);}
+  .data-btns button.data-primary{background:var(--accent);color:#fff;border-color:var(--accent);}
+  .data-btns button.data-danger{color:var(--bad);border-color:color-mix(in srgb,var(--bad) 42%, var(--line));}
+  .install-btn{
+    width:100%;padding:11px;border-radius:12px;border:1.5px solid var(--accent);
+    background:var(--accent-light);color:var(--accent-strong);font-weight:600;font-size:13px;cursor:pointer;
+  }
+
+  /* ---------- reminder settings ---------- */
+  .reminder-set{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px;}
+  .reminder-set select{
+    border:1.5px solid var(--line);border-radius:10px;padding:8px 10px;font-size:13px;
+    background:var(--card);color:var(--ink);font-family:inherit;
+  }
+  .switch{position:relative;display:inline-flex;align-items:center;gap:10px;font-size:13.5px;cursor:pointer;}
+  .switch input{position:absolute;opacity:0;width:0;height:0;}
+  .switch .track{width:44px;height:26px;border-radius:13px;background:var(--line);transition:background .22s var(--ease-out);flex-shrink:0;position:relative;}
+  .switch .track::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.28);transition:transform .24s var(--ease-spring);}
+  .switch input:checked + .track{background:var(--accent);}
+  .switch input:checked + .track::after{transform:translateX(18px);}
+
+  /* ---------- history actions (edit + delete) ---------- */
+  .hist-actions{display:flex;align-items:center;gap:2px;flex-shrink:0;}
+  .edit-btn{
+    background:none;border:none;color:var(--sub);cursor:pointer;
+    width:30px;height:30px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;
+    transition:background .2s var(--ease-out), color .2s var(--ease-out), transform .16s var(--ease-spring);
+  }
+  .edit-btn:hover{background:var(--accent-light);color:var(--accent);}
+  .edit-btn:active{transform:scale(0.85);}
+  .edit-btn svg{width:15px;height:15px;}
+
   /* ---------- keyframes ---------- */
   @keyframes cardIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
   @keyframes viewIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
@@ -495,6 +554,11 @@
     <h1>顺便记</h1>
     <div class="sub">排便计时 + 追踪</div>
 
+    <div class="reminder-banner" id="reminderBanner" style="display:none;">
+      <span id="reminderText"></span>
+      <button class="reminder-x" id="reminderDismiss" aria-label="关闭">×</button>
+    </div>
+
     <div class="card">
       <div class="since-label">距离上次</div>
       <div class="since-value" id="sinceValue">—</div>
@@ -513,6 +577,9 @@
           <span>本次用时</span>
           <b id="durationText">0分钟</b>
         </div>
+
+        <span class="field-label">时间</span>
+        <input type="datetime-local" id="timeInput" class="dt-input">
 
         <span class="field-label">形状</span>
         <div class="bristol-list" id="bristolGrid"></div>
@@ -584,10 +651,38 @@
       <a class="view-all-link" id="homeViewAll" style="display:none;">在日历里查看全部 →</a>
     </div>
 
-    <div class="toolbar">
-      <button id="installBtn" class="install-btn" style="display:none;">安装应用</button>
-      <button id="exportBtn">导出 CSV</button>
-      <button id="clearBtn">清空数据</button>
+    <div class="card">
+      <div class="section-title">久未排便提醒</div>
+      <div class="field-hint">当距离上次超过所选时长,打开 app 时会提醒你。注意:iOS 网页应用无法在后台定时提醒,只在你打开时检查。</div>
+      <div class="reminder-set">
+        <label class="switch">
+          <input type="checkbox" id="reminderToggle">
+          <span class="track"></span>
+          <span>开启提醒</span>
+        </label>
+        <select id="reminderThreshold">
+          <option value="24">超过 1 天</option>
+          <option value="48">超过 2 天</option>
+          <option value="72">超过 3 天</option>
+          <option value="96">超过 4 天</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">数据管理</div>
+      <div class="data-hint" id="backupHint"></div>
+      <div class="data-hint" id="persistHint"></div>
+      <div class="data-btns">
+        <button id="backupBtn" class="data-primary">备份(JSON)</button>
+        <button id="restoreBtn">恢复备份</button>
+      </div>
+      <div class="data-btns">
+        <button id="exportBtn">导出 CSV</button>
+        <button id="clearBtn" class="data-danger">清空数据</button>
+      </div>
+      <button id="installBtn" class="install-btn" style="display:none;margin-top:6px;">安装到主屏</button>
+      <input type="file" id="restoreInput" accept="application/json,.json" style="display:none;">
     </div>
   </div>
 
@@ -660,6 +755,11 @@
     <div class="card">
       <div class="section-title">间隔时间分布</div>
       <div id="intervalStats"></div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">排便时段 <span class="st-sub">一天中的分布</span></div>
+      <div id="timeOfDayStats"></div>
     </div>
 
     <div class="card">
@@ -745,6 +845,18 @@ const COLOR_INFO = {
 let records = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
 let activeTimer = JSON.parse(localStorage.getItem(TIMER_KEY) || 'null');
 let timerInterval = null;
+
+const LAST_BACKUP_KEY = 'bm_last_backup';
+const REMINDER_KEY = 'bm_reminder_cfg';
+let reminderCfg = Object.assign({enabled:false, hours:48}, JSON.parse(localStorage.getItem(REMINDER_KEY) || '{}'));
+let reminderDismissed = false;
+
+// datetime-local <-> timestamp (local time)
+function toLocalInput(ts){
+  const d = new Date(ts); const p = n => String(n).padStart(2,'0');
+  return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+function fromLocalInput(v){ const t = v ? new Date(v).getTime() : NaN; return isNaN(t) ? Date.now() : t; }
 
 // current form state
 let form = {};
@@ -865,7 +977,8 @@ function openLogPanel(){
   } else {
     banner.style.display = 'none';
   }
-  document.getElementById('noteInput').value = '';
+  document.getElementById('noteInput').value = form.note || '';
+  document.getElementById('timeInput').value = toLocalInput(form._startTs || Date.now());
   renderAllChipGroups();
   document.getElementById('logPanel').classList.add('open');
   document.getElementById('logPanel').scrollIntoView({behavior:'smooth', block:'nearest'});
@@ -930,22 +1043,34 @@ document.getElementById('cancelBtn').onclick = ()=>{
   document.getElementById('logPanel').classList.remove('open');
 };
 
+function startEdit(r){
+  resetForm();
+  form.bristol = r.bristol; form.amount = r.amount; form.color = r.color; form.smell = r.smell;
+  form.feel = r.feel; form.symptoms = (r.symptoms||[]).slice(); form.mood = r.mood;
+  form.place = r.place; form.note = r.note || '';
+  form._editId = r.id; form._startTs = r.ts; form._duration = r.duration;
+  openLogPanel();
+}
+
 document.getElementById('saveBtn').onclick = ()=>{
   const note = document.getElementById('noteInput').value.trim();
-  const newRec = {
-    id: Date.now() + '_' + Math.random().toString(36).slice(2,7),
-    ts: form._startTs || Date.now(),
-    duration: form._duration,
-    bristol: form.bristol,
-    amount: form.amount,
-    color: form.color,
-    smell: form.smell,
-    feel: form.feel,
-    symptoms: form.symptoms.slice(),
-    mood: form.mood,
-    place: form.place,
-    note: note
+  const ts = fromLocalInput(document.getElementById('timeInput').value);
+  const fields = {
+    ts, duration: form._duration,
+    bristol: form.bristol, amount: form.amount, color: form.color, smell: form.smell,
+    feel: form.feel, symptoms: form.symptoms.slice(), mood: form.mood, place: form.place, note
   };
+
+  if(form._editId){
+    const idx = records.findIndex(r=>String(r.id)===String(form._editId));
+    if(idx>=0) records[idx] = Object.assign({}, records[idx], fields);
+    saveRecords();
+    renderAll();
+    document.getElementById('logPanel').classList.remove('open');
+    return;
+  }
+
+  const newRec = Object.assign({ id: Date.now() + '_' + Math.random().toString(36).slice(2,7) }, fields);
   const priorRecords = records.slice();
   records.push(newRec);
   saveRecords();
@@ -1099,6 +1224,7 @@ document.getElementById('insightDoneBtn').onclick = ()=>{
 
 /* ---------- rendering: since / stats / history ---------- */
 function renderSince(){
+  checkReminder();
   const sinceValue = document.getElementById('sinceValue');
   const sinceTime = document.getElementById('sinceTime');
   if(records.length===0){
@@ -1185,11 +1311,17 @@ function buildHistoryItem(r, timeLabel){
         <span class="hist-time">${timeLabel}</span>
         ${r.duration!=null ? `<span class="hist-meta"> · 用时 ${fmtDuration(r.duration)}</span>` : ''}
       </div>
-      <button class="del-btn" data-id="${r.id}">×</button>
+      <div class="hist-actions">
+        <button class="edit-btn" aria-label="编辑">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 5.5l4 4M4 20l4.5-1L19 8.5a2.1 2.1 0 0 0-3-3L5 16 4 20z"/></svg>
+        </button>
+        <button class="del-btn" data-id="${r.id}">×</button>
+      </div>
     </div>
     ${tags ? `<div class="hist-tags">${tags}</div>` : ''}
     ${r.note ? `<div class="hist-note">${escapeHtml(r.note)}</div>` : ''}
   `;
+  item.querySelector('.edit-btn').onclick = ()=>{ startEdit(r); };
   item.querySelector('.del-btn').onclick = ()=>{ deleteRecord(r.id); };
   return item;
 }
@@ -1452,6 +1584,21 @@ function renderStatsView(){
   });
   makeHistogram('intervalStats', null, ibuckets);
 
+  // time-of-day distribution
+  const tod = [
+    {label:'清晨', value:0}, {label:'上午', value:0}, {label:'午后', value:0},
+    {label:'傍晚', value:0}, {label:'夜间', value:0}
+  ];
+  records.forEach(r=>{
+    const h = new Date(r.ts).getHours();
+    if(h>=5 && h<8) tod[0].value++;
+    else if(h>=8 && h<12) tod[1].value++;
+    else if(h>=12 && h<17) tod[2].value++;
+    else if(h>=17 && h<21) tod[3].value++;
+    else tod[4].value++;
+  });
+  makeHistogram('timeOfDayStats', null, tod);
+
   // duration min/max + distribution
   document.getElementById('sMaxDuration').textContent =
     durations.length ? fmtDuration(Math.max(...durations)) : '—';
@@ -1532,10 +1679,137 @@ document.getElementById('clearBtn').onclick = ()=>{
   }
 };
 
+/* ---------- data: backup / restore / persistent storage ---------- */
+function downloadFile(filename, text, type){
+  const blob = new Blob([text], {type});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename; a.click();
+  URL.revokeObjectURL(url);
+}
+
+function updateBackupHint(){
+  const el = document.getElementById('backupHint');
+  const last = parseInt(localStorage.getItem(LAST_BACKUP_KEY) || '0', 10);
+  if(!last){
+    el.textContent = '还没有备份过。建议导出一次 JSON 备份,存到「文件 / iCloud 云盘」,以防误删应用后数据丢失。';
+  } else {
+    const days = Math.floor((Date.now()-last)/86400000);
+    const ago = days<=0 ? '今天' : days+' 天前';
+    el.textContent = '上次备份:' + ago + (days>=14 ? ' · 距上次备份较久,建议再备份一次。' : '');
+  }
+}
+
+document.getElementById('backupBtn').onclick = ()=>{
+  const payload = { app:'shunbianji', schema:2, exportedAt:new Date().toISOString(), count:records.length, records };
+  downloadFile('shunbianji_backup_' + new Date().toISOString().slice(0,10) + '.json', JSON.stringify(payload, null, 2), 'application/json');
+  localStorage.setItem(LAST_BACKUP_KEY, String(Date.now()));
+  updateBackupHint();
+};
+
+document.getElementById('restoreBtn').onclick = ()=> document.getElementById('restoreInput').click();
+document.getElementById('restoreInput').onchange = (e)=>{
+  const file = e.target.files && e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ()=>{
+    try{
+      const data = JSON.parse(reader.result);
+      const incoming = Array.isArray(data) ? data : (data && Array.isArray(data.records) ? data.records : null);
+      if(!incoming) throw new Error('格式不对');
+      const valid = incoming.filter(r=>r && typeof r.ts === 'number');
+      if(valid.length===0) throw new Error('没有可导入的记录');
+      const byId = {};
+      records.forEach(r=> byId[String(r.id)] = r);
+      let added = 0;
+      valid.forEach(r=>{
+        const id = r.id != null ? String(r.id) : (r.ts + '_' + Math.random().toString(36).slice(2,7));
+        if(!byId[id]){ byId[id] = Object.assign({}, r, {id}); added++; }
+      });
+      records = Object.values(byId);
+      saveRecords();
+      renderAll();
+      alert('导入完成:新增 ' + added + ' 条,当前共 ' + records.length + ' 条。\n(合并导入,不会覆盖已有记录)');
+    }catch(err){
+      alert('导入失败:文件不是有效的备份。' + (err && err.message ? '(' + err.message + ')' : ''));
+    }
+    document.getElementById('restoreInput').value = '';
+  };
+  reader.readAsText(file);
+};
+
+async function requestPersist(){
+  const el = document.getElementById('persistHint');
+  if(!(navigator.storage && navigator.storage.persist)){
+    el.textContent = '此浏览器不支持持久化存储,请务必定期备份。';
+    return;
+  }
+  try{
+    let persisted = false;
+    if(navigator.storage.persisted) persisted = await navigator.storage.persisted();
+    const ok = persisted || await navigator.storage.persist();
+    el.textContent = ok
+      ? '已开启持久化存储,数据不易被系统自动清理(但删除应用仍会清空,请定期备份)。'
+      : '浏览器暂未授予持久化存储,长期不使用可能被系统清理,请定期备份。';
+  }catch(_){
+    el.textContent = '无法确认持久化状态,请定期备份。';
+  }
+}
+
+/* ---------- reminder ---------- */
+function saveReminderCfg(){ localStorage.setItem(REMINDER_KEY, JSON.stringify(reminderCfg)); }
+
+function checkReminder(){
+  const banner = document.getElementById('reminderBanner');
+  if(!banner) return;
+  if(!reminderCfg.enabled || reminderDismissed || records.length===0){
+    banner.style.display = 'none';
+    return;
+  }
+  const last = [...records].sort((a,b)=>b.ts-a.ts)[0];
+  const diff = Date.now() - last.ts;
+  if(diff >= reminderCfg.hours*3600000){
+    document.getElementById('reminderText').textContent =
+      '距离上次已 ' + fmtDuration(diff) + ',超过你设定的提醒时长,记得留意排便情况。';
+    banner.style.display = 'flex';
+  } else {
+    banner.style.display = 'none';
+  }
+}
+
+function setupReminderUI(){
+  const toggle = document.getElementById('reminderToggle');
+  const sel = document.getElementById('reminderThreshold');
+  toggle.checked = !!reminderCfg.enabled;
+  sel.value = String(reminderCfg.hours);
+  toggle.onchange = ()=>{
+    reminderCfg.enabled = toggle.checked;
+    saveReminderCfg();
+    if(toggle.checked && 'Notification' in window && Notification.permission === 'default'){
+      Notification.requestPermission();
+    }
+    reminderDismissed = false;
+    checkReminder();
+  };
+  sel.onchange = ()=>{
+    reminderCfg.hours = parseInt(sel.value, 10) || 48;
+    saveReminderCfg();
+    reminderDismissed = false;
+    checkReminder();
+  };
+  document.getElementById('reminderDismiss').onclick = ()=>{
+    reminderDismissed = true;
+    document.getElementById('reminderBanner').style.display = 'none';
+  };
+}
+
 setInterval(renderSince, 30000);
 
 renderTimerUI();
 renderAll();
+updateBackupHint();
+setupReminderUI();
+requestPersist();
 
 /* ---------- PWA: Service Worker & Install Prompt ---------- */
 if ('serviceWorker' in navigator) {
