@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
-  <rect width="192" height="192" rx="42" fill="#a97452"/>
-  <!-- Outer timer ring -->
-  <circle cx="96" cy="96" r="61.44" fill="none" stroke="#f0e2d6" stroke-width="10" stroke-linecap="round" stroke-dasharray="289.5291789548353 96.50972631827844" transform="rotate(-90 96 96)"/>
-  <!-- Inner clock hands / checkmark -->
-  <path d="M 74.49600000000001 99.072 L 92.928 117.50399999999999 L 123.648 74.49600000000001" fill="none" stroke="#ffffff" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  <defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2c2c31"/><stop offset="1" stop-color="#161619"/></linearGradient></defs><rect width="192" height="192" rx="43" fill="url(#g)"/>
+  <g transform="translate(96 96) scale(1) translate(-96 -96)">
+    <circle cx="96" cy="96" r="56.26" fill="none" stroke="#a1a1a8" stroke-width="12" stroke-linecap="round" stroke-dasharray="265.100 88.367" transform="rotate(-90 96 96)"/>
+    <path d="M 55.50 97.69 L 79.12 120.75 L 120.75 76.31" fill="none" stroke="#0a84ff" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
 </svg>
