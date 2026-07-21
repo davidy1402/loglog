@@ -7,8 +7,8 @@
 
 <!-- PWA Manifest & Theme -->
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#f6f4f0" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#1c1b19" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#fafafa" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
 <meta name="color-scheme" content="light dark">
 
 <!-- iOS Home Screen Support -->
@@ -19,54 +19,58 @@
 
 <style>
   :root{
-    --bg:#f4f1ec;
+    --bg:#fafafa;
     --card:#ffffff;
-    --ink:#2b2b28;
-    --sub:#8a8578;
-    --accent:#a97452;
-    --accent-strong:#95623f;
-    --accent-light:#f0e2d6;
-    --line:#e9e4dc;
-    --good:#6f9463;
-    --warn:#c48a4a;
-    --bad:#b5654f;
-    --cell:#faf8f5;
-    --tabbar-bg:rgba(250,248,245,0.82);
-    --banner-good:#e8f0e4;
-    --banner-warn:#faf0e0;
-    --banner-bad:#f6dcd6;
-    --tag-warn-bg:#f6dcd6;
+    --ink:#111113;
+    --sub:#8a8a8e;
+    --accent:#0a84ff;
+    --accent-strong:#0069d9;
+    --accent-light:#eef0f2;   /* neutral fill */
+    --line:#e5e5e7;
+    --bar:#48484c;            /* monochrome data fills */
+    --good:#34a853;
+    --warn:#d68a1f;
+    --bad:#e5484d;
+    --cell:#f4f4f6;
+    --tabbar-bg:rgba(250,250,250,0.80);
+    --banner-good:#eaf5ec;
+    --banner-warn:#fbf1e2;
+    --banner-bad:#fdeceb;
+    --tag-warn-bg:#fdeceb;
+    --area-fill:rgba(0,0,0,0.06);
 
-    --radius-lg:20px;
-    --radius-md:14px;
+    --radius-lg:18px;
+    --radius-md:13px;
     --radius-sm:10px;
-    --shadow-card:0 1px 2px rgba(60,45,30,0.04), 0 6px 18px rgba(60,45,30,0.05);
-    --shadow-btn:0 4px 14px rgba(169,116,82,0.32);
+    --shadow-card:0 1px 2px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.05);
+    --shadow-btn:0 2px 10px rgba(10,132,255,0.28);
     --ease-spring:cubic-bezier(0.34,1.4,0.5,1);
     --ease-out:cubic-bezier(0.22,0.61,0.36,1);
   }
 
   @media (prefers-color-scheme: dark){
     :root{
-      --bg:#1c1b19;
-      --card:#262421;
-      --ink:#ece8e1;
-      --sub:#9a9488;
-      --accent:#cf9a70;
-      --accent-strong:#e0ab80;
-      --accent-light:#3a2f27;
-      --line:#34302a;
-      --good:#8fb182;
-      --warn:#d6a262;
-      --bad:#d5836c;
-      --cell:#2e2a25;
-      --tabbar-bg:rgba(30,28,25,0.78);
-      --banner-good:rgba(122,155,110,0.20);
-      --banner-warn:rgba(196,138,74,0.18);
-      --banner-bad:rgba(181,101,79,0.22);
-      --tag-warn-bg:rgba(181,101,79,0.24);
-      --shadow-card:0 1px 2px rgba(0,0,0,0.30), 0 6px 20px rgba(0,0,0,0.28);
-      --shadow-btn:0 4px 16px rgba(0,0,0,0.40);
+      --bg:#000000;
+      --card:#1c1c1e;
+      --ink:#f2f2f7;
+      --sub:#8e8e93;
+      --accent:#0a84ff;
+      --accent-strong:#409cff;
+      --accent-light:#2c2c2e;
+      --line:#38383a;
+      --bar:#8e8e93;
+      --good:#5bcb70;
+      --warn:#e0a34a;
+      --bad:#ff6961;
+      --cell:#242426;
+      --tabbar-bg:rgba(20,20,22,0.78);
+      --banner-good:rgba(52,168,83,0.16);
+      --banner-warn:rgba(214,138,31,0.16);
+      --banner-bad:rgba(229,72,77,0.18);
+      --tag-warn-bg:rgba(229,72,77,0.20);
+      --area-fill:rgba(255,255,255,0.08);
+      --shadow-card:0 1px 2px rgba(0,0,0,0.4), 0 1px 3px rgba(0,0,0,0.35);
+      --shadow-btn:0 2px 12px rgba(0,0,0,0.5);
     }
   }
 
@@ -106,7 +110,7 @@
   .timer-box{text-align:center;padding:14px 0 4px;}
   .timer-display{
     font-size:46px;font-weight:700;font-variant-numeric:tabular-nums;
-    letter-spacing:0.02em;color:var(--accent-strong);
+    letter-spacing:0.02em;color:var(--ink);
     animation:breathe 3.4s var(--ease-out) infinite;
   }
   .timer-hint{
@@ -122,7 +126,6 @@
     width:100%;
     padding:16px;
     background:var(--accent);
-    background:linear-gradient(180deg, color-mix(in srgb,var(--accent) 92%, #fff) 0%, var(--accent) 100%);
     color:#fff;
     border:none;
     border-radius:var(--radius-md);
@@ -136,11 +139,10 @@
   }
   .log-btn.stop{
     background:var(--bad);
-    background:linear-gradient(180deg, color-mix(in srgb,var(--bad) 92%, #fff) 0%, var(--bad) 100%);
-    box-shadow:0 4px 14px rgba(181,101,79,0.34);
+    box-shadow:0 2px 10px rgba(229,72,77,0.3);
   }
   .log-btn:hover{filter:brightness(1.03);}
-  .log-btn:active{transform:scale(0.97);box-shadow:0 2px 8px rgba(169,116,82,0.28);}
+  .log-btn:active{transform:scale(0.97);box-shadow:0 1px 5px rgba(10,132,255,0.22);}
 
   .manual-link{
     display:block;
@@ -170,14 +172,14 @@
     font-size:13px;
     animation:popIn .4s var(--ease-spring) both;
   }
-  .duration-banner b{font-size:17px;color:var(--accent-strong);font-variant-numeric:tabular-nums;}
+  .duration-banner b{font-size:17px;color:var(--ink);font-variant-numeric:tabular-nums;}
 
   .bristol-list{display:flex;flex-direction:column;gap:7px;}
   .bristol-card{
     display:flex;
     align-items:center;
-    gap:12px;
-    padding:10px 12px;
+    gap:13px;
+    padding:10px 13px;
     border:1.5px solid var(--line);
     border-radius:12px;
     cursor:pointer;
@@ -186,8 +188,14 @@
   }
   .bristol-card:active{transform:scale(0.985);}
   .bristol-card.selected{background:var(--accent-light);border-color:var(--accent);}
-  .bristol-emoji{font-size:23px;flex-shrink:0;width:26px;text-align:center;transition:transform .2s var(--ease-spring);}
-  .bristol-card.selected .bristol-emoji{transform:scale(1.18);}
+  .bristol-num{
+    flex-shrink:0;width:28px;height:28px;border-radius:8px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:14px;font-weight:700;font-variant-numeric:tabular-nums;
+    background:var(--accent-light);color:var(--sub);
+    transition:background .2s var(--ease-out), color .2s var(--ease-out);
+  }
+  .bristol-card.selected .bristol-num{background:var(--accent);color:#fff;}
   .bristol-text{display:flex;flex-direction:column;line-height:1.3;}
   .bristol-title{font-size:13px;font-weight:600;}
   .bristol-desc{font-size:11px;color:var(--sub);}
@@ -250,8 +258,7 @@
   .chart{display:flex;align-items:flex-end;gap:4px;height:70px;margin-top:16px;}
   .chart .bar{
     flex:1;
-    background:var(--accent);
-    background:linear-gradient(180deg, var(--accent) 0%, color-mix(in srgb,var(--accent) 80%, transparent) 100%);
+    background:var(--bar);
     border-radius:4px 4px 2px 2px;
     min-height:2px;
     position:relative;
@@ -277,7 +284,7 @@
     padding:3px 9px;
     border-radius:20px;
     background:var(--accent-light);
-    color:var(--accent-strong);
+    color:var(--sub);
   }
   .hist-tag.warn{background:var(--tag-warn-bg);color:var(--bad);}
   .hist-note{color:var(--sub);font-size:12px;margin-top:5px;}
@@ -319,7 +326,12 @@
     font-size:15px;
     font-weight:700;
     margin-bottom:14px;
+    display:flex;align-items:center;gap:9px;
     animation:popIn .45s var(--ease-spring) both;
+  }
+  .insight-banner::before{
+    content:'';width:9px;height:9px;border-radius:50%;
+    background:currentColor;flex-shrink:0;
   }
   .insight-banner.good{background:var(--banner-good);color:var(--good);}
   .insight-banner.warn{background:var(--banner-warn);color:var(--warn);}
@@ -359,10 +371,10 @@
     color:var(--sub);font-size:10.5px;padding:4px 0;
     transition:color .22s var(--ease-out);
   }
-  .tabbar button .tab-ico{font-size:20px;line-height:1;transition:transform .3s var(--ease-spring);}
+  .tabbar button .tab-ico{width:24px;height:24px;line-height:1;transition:transform .3s var(--ease-spring);}
   .tabbar button:active .tab-ico{transform:scale(0.85);}
-  .tabbar button.active{color:var(--accent-strong);font-weight:600;}
-  .tabbar button.active .tab-ico{transform:translateY(-1px) scale(1.08);}
+  .tabbar button.active{color:var(--accent);font-weight:600;}
+  .tabbar button.active .tab-ico{transform:translateY(-1px) scale(1.05);}
 
   /* ---------- calendar ---------- */
   .cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
@@ -393,14 +405,17 @@
   .cal-daynum{font-weight:600;line-height:1.1;}
   .cal-marks{font-size:11px;line-height:1.05;margin-top:1px;display:flex;flex-direction:column;align-items:center;}
   .cal-count{
-    position:absolute;top:3px;right:5px;font-size:9px;color:var(--accent-strong);font-weight:700;
+    position:absolute;top:3px;right:5px;font-size:9px;color:var(--sub);font-weight:700;
   }
+  .cal-dot{width:7px;height:7px;border-radius:50%;background:var(--bar);display:block;}
+  .cal-dot.warn{background:var(--warn);}
+  .cal-dot.bad{background:var(--bad);}
   .day-detail{margin-top:18px;}
   .day-detail-title{font-size:13px;font-weight:700;margin-bottom:8px;}
 
   /* ---------- stats analytics ---------- */
   .duo-stat{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-  .duo-stat .big{font-size:23px;font-weight:700;letter-spacing:-0.02em;color:var(--accent-strong);font-variant-numeric:tabular-nums;}
+  .duo-stat .big{font-size:23px;font-weight:700;letter-spacing:-0.02em;color:var(--ink);font-variant-numeric:tabular-nums;}
   .duo-stat .lbl{font-size:12px;color:var(--sub);margin-top:3px;}
   .duo-stat > div{text-align:center;}
   .duo-stat > div + div{border-left:1px solid var(--line);}
@@ -425,7 +440,7 @@
   .meter-track{height:9px;background:var(--accent-light);border-radius:6px;overflow:hidden;}
   .meter-fill{
     height:100%;
-    background:linear-gradient(90deg, var(--accent) 0%, var(--accent-strong) 100%);
+    background:var(--bar);
     border-radius:6px;
     transform-origin:left;
     animation:growRight .7s var(--ease-out) both;
@@ -435,8 +450,7 @@
   .histo .hcol{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;}
   .histo .hbar{
     width:70%;max-width:26px;
-    background:var(--accent);
-    background:linear-gradient(180deg, var(--accent) 0%, color-mix(in srgb,var(--accent) 78%, transparent) 100%);
+    background:var(--bar);
     border-radius:5px 5px 2px 2px;min-height:2px;
     transform-origin:bottom;animation:growUp .55s var(--ease-out) both;
   }
@@ -668,9 +682,18 @@
 
 <!-- ============ BOTTOM TAB BAR ============ -->
 <nav class="tabbar">
-  <button data-view="viewHome" class="active"><span class="tab-ico">🚽</span>首页</button>
-  <button data-view="viewCalendar"><span class="tab-ico">📅</span>日历记录</button>
-  <button data-view="viewStats"><span class="tab-ico">📊</span>统计分析</button>
+  <button data-view="viewHome" class="active">
+    <svg class="tab-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3.5l9 7"/><path d="M5.5 9.5V20h13V9.5"/><path d="M9.5 20v-5h5v5"/></svg>
+    首页
+  </button>
+  <button data-view="viewCalendar">
+    <svg class="tab-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 9.5h17M8 3.5v3M16 3.5v3"/></svg>
+    日历记录
+  </button>
+  <button data-view="viewStats">
+    <svg class="tab-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20V13M12 20V4M19 20v-9"/></svg>
+    统计分析
+  </button>
 </nav>
 
 <script>
@@ -696,7 +719,6 @@ const SYMPTOM_OPTS = ['厕纸带血','马桶挂壁','腹胀','打嗝','腹部绞
 const WARN_SYMPTOMS = ['厕纸带血']; // highlighted in red
 const MOOD_OPTS = ['平静','放松','焦虑','烦躁'];
 const PLACE_OPTS = ['家','公司','外出'];
-const PLACE_EMOJI = {'家':'🏠','公司':'🏢','外出':'📍'};
 
 // 分量 -> 估算克数(仅用于趋势展示,非精确测量)
 const AMOUNT_GRAMS = {'少':100,'适中':200,'多':300};
@@ -879,7 +901,7 @@ function renderBristolGrid(){
     const el = document.createElement('div');
     el.className = 'bristol-card' + (form.bristol===b.n ? ' selected':'');
     el.innerHTML = `
-      <span class="bristol-emoji">${b.emoji}</span>
+      <span class="bristol-num">${b.n}</span>
       <span class="bristol-text">
         <span class="bristol-title">${b.title}</span>
         <span class="bristol-desc">${b.desc}</span>
@@ -1056,7 +1078,7 @@ function showInsight(analysis){
   document.getElementById('logPanel').classList.remove('open');
   const banner = document.getElementById('insightBanner');
   banner.className = 'insight-banner ' + analysis.status;
-  const statusText = {good:'👍 状态良好', warn:'⚠️ 建议留意', bad:'❗ 需要关注'}[analysis.status];
+  const statusText = {good:'状态良好', warn:'建议留意', bad:'需要关注'}[analysis.status];
   banner.textContent = statusText;
 
   const notesEl = document.getElementById('insightNotes');
@@ -1139,7 +1161,7 @@ function renderStats(){
 // build the inner HTML for one record's tags (shared by history + calendar)
 function recordTagsHtml(r){
   let tags = '';
-  if(r.bristol) tags += `<span class="hist-tag">${BRISTOL_MAP[r.bristol] ? BRISTOL_MAP[r.bristol].emoji+' '+BRISTOL_MAP[r.bristol].title : 'Bristol '+r.bristol}</span>`;
+  if(r.bristol) tags += `<span class="hist-tag">${BRISTOL_MAP[r.bristol] ? '型'+r.bristol+' · '+BRISTOL_MAP[r.bristol].title : 'Bristol '+r.bristol}</span>`;
   if(r.amount) tags += `<span class="hist-tag">${r.amount}</span>`;
   if(r.color) tags += `<span class="hist-tag${WARN_COLORS.includes(r.color)?' warn':''}">${r.color}</span>`;
   if(r.smell) tags += `<span class="hist-tag">气味${r.smell}</span>`;
@@ -1256,10 +1278,12 @@ function renderCalendar(){
       (k===todayKey?' today':'') + (k===selectedDayKey?' sel':'');
     let marks = '';
     if(dayRecs.length){
-      const top = [...dayRecs].sort((a,b)=>a.ts-b.ts)[0];
-      const shapeEmoji = top.bristol ? BRISTOL_MAP[top.bristol].emoji : '🟢';
-      const placeEmoji = top.place ? (PLACE_EMOJI[top.place]||'') : '';
-      marks = `<span>${shapeEmoji}</span>${placeEmoji?`<span>${placeEmoji}</span>`:''}`;
+      let level = '';
+      dayRecs.forEach(r=>{
+        if((r.symptoms||[]).includes('厕纸带血') || WARN_COLORS.includes(r.color)) level = 'bad';
+        else if(r.bristol && (r.bristol<=2 || r.bristol>=6) && level!=='bad') level = 'warn';
+      });
+      marks = `<span class="cal-dot ${level}"></span>`;
     }
     cell.innerHTML = `
       <span class="cal-daynum">${d}</span>
@@ -1393,7 +1417,7 @@ function renderStatsView(){
 
   // shape distribution
   const shapeData = BRISTOL.map(b=>({
-    label:`${b.emoji} ${b.title}`,
+    label:`型${b.n} ${b.title}`,
     value: records.filter(r=>r.bristol===b.n).length,
     color: SHAPE_COLORS[b.n]
   }));
@@ -1472,10 +1496,10 @@ function renderVolume(){
   const area = `${pad},${Hh} ${line} ${(W-pad)},${Hh}`;
   el.innerHTML = `
     <svg class="area-chart" viewBox="0 0 ${W} ${Hh}" preserveAspectRatio="none">
-      <polygon points="${area}" fill="rgba(169,116,82,0.16)"></polygon>
-      <polyline points="${line}" fill="none" stroke="var(--accent)" stroke-width="2.5"
+      <polygon points="${area}" fill="var(--area-fill)"></polygon>
+      <polyline points="${line}" fill="none" stroke="var(--ink)" stroke-width="2.5"
         stroke-linejoin="round" stroke-linecap="round"></polyline>
-      ${pts.map(p=>`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="3.5" fill="var(--accent)"></circle>`).join('')}
+      ${pts.map(p=>`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="3.5" fill="var(--ink)"></circle>`).join('')}
     </svg>
     <div class="area-x">${labels.map(l=>`<span>${l}</span>`).join('')}</div>
     <div class="field-hint" style="margin-top:8px;">分量按 少≈100克 / 适中≈200克 / 多≈300克 估算,仅供趋势参考。</div>`;
