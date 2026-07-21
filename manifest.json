@@ -1,6 +1,6 @@
 {
-  "name": "便记",
-  "short_name": "便记",
+  "name": "顺便记",
+  "short_name": "顺便记",
   "description": "排便计时与健康趋势追踪",
   "start_url": "./bm-tracker.html",
   "display": "standalone",

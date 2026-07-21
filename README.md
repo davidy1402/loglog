@@ -1,4 +1,4 @@
-# loglog (便记)
+# loglog (顺便记)
 
 A privacy-first, offline-ready Progressive Web App (PWA) for bowel movement timing, stool health tracking, and personalized medical trend analysis.
 
