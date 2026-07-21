@@ -34,7 +34,7 @@
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
     background:var(--bg);
     color:var(--ink);
-    padding:24px 16px 60px;
+    padding:24px 16px calc(72px + env(safe-area-inset-bottom,0px));
   }
   .wrap{max-width:520px;margin:0 auto;}
   h1{font-size:20px;font-weight:600;margin:0 0 4px;}
@@ -196,6 +196,7 @@
   }
 
   .section-title{font-size:14px;font-weight:600;margin-bottom:10px;}
+  .section-title .st-sub{font-weight:400;color:var(--sub);font-size:11px;margin-left:6px;}
   .empty{color:var(--sub);font-size:13px;text-align:center;padding:20px 0;}
 
   .toolbar{display:flex;gap:8px;margin-bottom:16px;}
@@ -233,107 +234,301 @@
   .insight-disclaimer{font-size:11px;color:var(--sub);line-height:1.5;}
 
   .field-hint{font-size:11px;color:var(--sub);line-height:1.45;margin:2px 0 8px;}
+
+  .view-all-link{
+    display:block;text-align:center;font-size:12px;color:var(--accent);
+    margin-top:12px;cursor:pointer;text-decoration:none;font-weight:600;
+  }
+
+  /* ---------- views & tab bar ---------- */
+  .view{display:none;}
+  .view.active{display:block;}
+
+  .tabbar{
+    position:fixed;left:0;right:0;bottom:0;
+    display:flex;
+    background:rgba(255,255,255,0.94);
+    backdrop-filter:saturate(1.4) blur(8px);
+    -webkit-backdrop-filter:saturate(1.4) blur(8px);
+    border-top:1px solid var(--line);
+    padding:6px 0 calc(4px + env(safe-area-inset-bottom,0px));
+    z-index:50;
+  }
+  .tabbar button{
+    flex:1;background:none;border:none;cursor:pointer;
+    display:flex;flex-direction:column;align-items:center;gap:2px;
+    color:var(--sub);font-size:10.5px;padding:4px 0;
+  }
+  .tabbar button .tab-ico{font-size:19px;line-height:1;}
+  .tabbar button.active{color:var(--accent);font-weight:600;}
+
+  /* ---------- calendar ---------- */
+  .cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+  .cal-title{font-size:16px;font-weight:600;}
+  .cal-nav{display:flex;gap:6px;}
+  .cal-nav button, .cal-today{
+    border:1px solid var(--line);background:#fff;border-radius:8px;
+    padding:6px 10px;font-size:13px;color:var(--ink);cursor:pointer;
+  }
+  .cal-today{font-size:12px;color:var(--accent);border-color:var(--accent-light);}
+  .cal-weekdays{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:4px;}
+  .cal-weekdays span{text-align:center;font-size:11px;color:var(--sub);padding:2px 0;}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
+  .cal-cell{
+    aspect-ratio:1/1;border-radius:9px;padding:4px 0 0;
+    display:flex;flex-direction:column;align-items:center;
+    font-size:12px;color:var(--ink);cursor:pointer;position:relative;
+    border:1.5px solid transparent;background:#faf8f5;
+  }
+  .cal-cell.blank{background:none;cursor:default;}
+  .cal-cell.has{background:var(--accent-light);}
+  .cal-cell.today{border-color:var(--accent);}
+  .cal-cell.sel{border-color:var(--ink);}
+  .cal-daynum{font-weight:600;line-height:1.1;}
+  .cal-marks{font-size:11px;line-height:1.05;margin-top:1px;display:flex;flex-direction:column;align-items:center;}
+  .cal-count{
+    position:absolute;top:2px;right:4px;font-size:9px;color:var(--accent);font-weight:700;
+  }
+  .day-detail{margin-top:16px;}
+  .day-detail-title{font-size:13px;font-weight:600;margin-bottom:8px;}
+
+  /* ---------- stats analytics ---------- */
+  .duo-stat{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .duo-stat .big{font-size:22px;font-weight:700;color:var(--accent);}
+  .duo-stat .lbl{font-size:12px;color:var(--sub);margin-top:2px;}
+  .duo-stat > div{text-align:center;}
+  .duo-stat > div + div{border-left:1px solid var(--line);}
+
+  .donut-wrap{display:flex;align-items:center;gap:18px;flex-wrap:wrap;}
+  .donut{
+    width:120px;height:120px;border-radius:50%;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .donut::after{content:'';width:62px;height:62px;background:var(--card);border-radius:50%;}
+  .legend{flex:1;min-width:150px;display:flex;flex-direction:column;gap:6px;}
+  .legend-row{display:flex;align-items:center;gap:8px;font-size:12.5px;}
+  .legend-dot{width:11px;height:11px;border-radius:3px;flex-shrink:0;}
+  .legend-name{flex:1;color:var(--ink);}
+  .legend-val{color:var(--sub);font-variant-numeric:tabular-nums;}
+
+  .meter-row{margin-bottom:12px;}
+  .meter-row:last-child{margin-bottom:0;}
+  .meter-top{display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px;}
+  .meter-top .pct{color:var(--sub);font-variant-numeric:tabular-nums;}
+  .meter-track{height:8px;background:var(--accent-light);border-radius:6px;overflow:hidden;}
+  .meter-fill{height:100%;background:var(--accent);border-radius:6px;}
+
+  .histo{display:flex;align-items:flex-end;gap:8px;height:120px;margin-top:8px;}
+  .histo .hcol{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;}
+  .histo .hbar{width:70%;max-width:26px;background:var(--accent);border-radius:4px 4px 0 0;min-height:2px;}
+  .histo .hval{font-size:10px;color:var(--sub);margin-bottom:2px;font-variant-numeric:tabular-nums;}
+  .histo-labels{display:flex;gap:8px;margin-top:5px;}
+  .histo-labels span{flex:1;text-align:center;font-size:9.5px;color:var(--sub);}
+
+  .area-chart{width:100%;height:130px;display:block;margin-top:6px;}
+  .area-x{display:flex;margin-top:4px;}
+  .area-x span{flex:1;text-align:center;font-size:9.5px;color:var(--sub);}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>便记</h1>
-  <div class="sub">排便计时 + 追踪</div>
 
-  <div class="card">
-    <div class="since-label">距离上次</div>
-    <div class="since-value" id="sinceValue">—</div>
-    <div class="since-time" id="sinceTime"></div>
+  <!-- ============ HOME VIEW ============ -->
+  <div class="view active" id="viewHome">
+    <h1>便记</h1>
+    <div class="sub">排便计时 + 追踪</div>
 
-    <div class="timer-box" id="timerBox" style="display:none;">
-      <div class="timer-display" id="timerDisplay">00:00</div>
-      <div class="timer-hint">计时中…</div>
-    </div>
+    <div class="card">
+      <div class="since-label">距离上次</div>
+      <div class="since-value" id="sinceValue">—</div>
+      <div class="since-time" id="sinceTime"></div>
 
-    <button class="log-btn" id="startBtn">开始</button>
-    <span class="manual-link" id="manualLink">没计时?手动补录一笔</span>
-
-    <div class="panel" id="logPanel">
-      <div class="duration-banner" id="durationBanner" style="display:none;">
-        <span>本次用时</span>
-        <b id="durationText">0分钟</b>
+      <div class="timer-box" id="timerBox" style="display:none;">
+        <div class="timer-display" id="timerDisplay">00:00</div>
+        <div class="timer-hint">计时中…</div>
       </div>
 
-      <span class="field-label">形状</span>
-      <div class="bristol-list" id="bristolGrid"></div>
+      <button class="log-btn" id="startBtn">开始</button>
+      <span class="manual-link" id="manualLink">没计时?手动补录一笔</span>
 
-      <span class="field-label">分量</span>
-      <div class="field-hint">参考:健康成人单次排便约100–250克、长10–20厘米,大致接近一根香蕉的量;明显少于或多于平时可选少/多。</div>
-      <div class="chip-row" id="amountRow"></div>
+      <div class="panel" id="logPanel">
+        <div class="duration-banner" id="durationBanner" style="display:none;">
+          <span>本次用时</span>
+          <b id="durationText">0分钟</b>
+        </div>
 
-      <span class="field-label">颜色</span>
-      <div class="field-hint">黄褐色到深褐色最常见,通常正常;灰白/陶土色、黑色、鲜红色相对少见,更值得留意(除非近期吃了红菜头、蓝莓或补铁剂等)。</div>
-      <div class="chip-row" id="colorRow"></div>
+        <span class="field-label">形状</span>
+        <div class="bristol-list" id="bristolGrid"></div>
 
-      <span class="field-label">气味</span>
-      <div class="chip-row" id="smellRow"></div>
+        <span class="field-label">分量</span>
+        <div class="field-hint">参考:健康成人单次排便约100–250克、长10–20厘米,大致接近一根香蕉的量;明显少于或多于平时可选少/多。</div>
+        <div class="chip-row" id="amountRow"></div>
 
-      <span class="field-label">排便感觉</span>
-      <div class="field-hint">费力=需要明显用力或蹲较久;不尽感=排完仍觉得没排干净。偶尔一次通常没什么,但经常出现(超过约四分之一的次数)更值得关注。</div>
-      <div class="chip-row" id="feelRow"></div>
+        <span class="field-label">颜色</span>
+        <div class="field-hint">黄褐色到深褐色最常见,通常正常;灰白/陶土色、黑色、鲜红色相对少见,更值得留意(除非近期吃了红菜头、蓝莓或补铁剂等)。</div>
+        <div class="chip-row" id="colorRow"></div>
 
-      <span class="field-label">伴随情况(可多选)</span>
-      <div class="chip-row" id="symptomRow"></div>
+        <span class="field-label">气味</span>
+        <div class="chip-row" id="smellRow"></div>
 
-      <span class="field-label">心情</span>
-      <div class="chip-row" id="moodRow"></div>
+        <span class="field-label">排便感觉</span>
+        <div class="field-hint">费力=需要明显用力或蹲较久;不尽感=排完仍觉得没排干净。偶尔一次通常没什么,但经常出现(超过约四分之一的次数)更值得关注。</div>
+        <div class="chip-row" id="feelRow"></div>
 
-      <span class="field-label">地点</span>
-      <div class="chip-row" id="placeRow"></div>
+        <span class="field-label">伴随情况(可多选)</span>
+        <div class="chip-row" id="symptomRow"></div>
 
-      <span class="field-label">备注</span>
-      <textarea id="noteInput" rows="2" placeholder="其他想记的"></textarea>
+        <span class="field-label">心情</span>
+        <div class="chip-row" id="moodRow"></div>
 
-      <div class="row-btns">
-        <button class="cancel-btn" id="cancelBtn">取消</button>
-        <button class="save-btn" id="saveBtn">保存</button>
+        <span class="field-label">地点</span>
+        <div class="chip-row" id="placeRow"></div>
+
+        <span class="field-label">备注</span>
+        <textarea id="noteInput" rows="2" placeholder="其他想记的"></textarea>
+
+        <div class="row-btns">
+          <button class="cancel-btn" id="cancelBtn">取消</button>
+          <button class="save-btn" id="saveBtn">保存</button>
+        </div>
+      </div>
+
+      <div class="panel" id="insightPanel">
+        <div class="insight-banner" id="insightBanner"></div>
+        <ul class="insight-notes" id="insightNotes"></ul>
+        <div class="insight-disclaimer">以上提示基于你自己的记录和趋势,并参考 Bristol Stool Scale、Rome IV 功能性肠道疾病诊断标准、Mayo Clinic / Cleveland Clinic 患者卫教资料生成,仅供个人参考,不能替代医生诊断。如有持续或严重症状,请及时就医。</div>
+        <button class="log-btn" id="insightDoneBtn" style="margin-top:16px;">完成</button>
       </div>
     </div>
 
-    <div class="panel" id="insightPanel">
-      <div class="insight-banner" id="insightBanner"></div>
-      <ul class="insight-notes" id="insightNotes"></ul>
-      <div class="insight-disclaimer">以上提示基于你自己的记录和趋势,并参考 Bristol Stool Scale、Rome IV 功能性肠道疾病诊断标准、Mayo Clinic / Cleveland Clinic 患者卫教资料生成,仅供个人参考,不能替代医生诊断。如有持续或严重症状,请及时就医。</div>
-      <button class="log-btn" id="insightDoneBtn" style="margin-top:16px;">完成</button>
+    <div class="card">
+      <div class="section-title">本周概览</div>
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div class="stat-num" id="statCount7">0</div>
+          <div class="stat-label">近7天次数</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" id="statAvgInterval">—</div>
+          <div class="stat-label">平均间隔</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" id="statAvgDuration">—</div>
+          <div class="stat-label">平均用时</div>
+        </div>
+      </div>
+      <div class="chart" id="chart"></div>
+      <div class="chart-labels" id="chartLabels"></div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">最近记录</div>
+      <div id="historyList"></div>
+      <a class="view-all-link" id="homeViewAll" style="display:none;">在日历里查看全部 →</a>
+    </div>
+
+    <div class="toolbar">
+      <button id="installBtn" class="install-btn" style="display:none;">安装应用</button>
+      <button id="exportBtn">导出 CSV</button>
+      <button id="clearBtn">清空数据</button>
     </div>
   </div>
 
-  <div class="card">
-    <div class="section-title">本周概览</div>
-    <div class="stats-grid">
-      <div class="stat-box">
-        <div class="stat-num" id="statCount7">0</div>
-        <div class="stat-label">近7天次数</div>
+  <!-- ============ CALENDAR VIEW ============ -->
+  <div class="view" id="viewCalendar">
+    <h1>日历记录</h1>
+    <div class="sub">按天回看每一次记录</div>
+
+    <div class="card">
+      <div class="cal-head">
+        <div class="cal-title" id="calTitle">—</div>
+        <div class="cal-nav">
+          <button id="calPrev" aria-label="上个月">‹</button>
+          <button class="cal-today" id="calToday">今天</button>
+          <button id="calNext" aria-label="下个月">›</button>
+        </div>
       </div>
-      <div class="stat-box">
-        <div class="stat-num" id="statAvgInterval">—</div>
-        <div class="stat-label">平均间隔</div>
+      <div class="cal-weekdays">
+        <span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span>
       </div>
-      <div class="stat-box">
-        <div class="stat-num" id="statAvgDuration">—</div>
-        <div class="stat-label">平均用时</div>
+      <div class="cal-grid" id="calGrid"></div>
+
+      <div class="day-detail" id="dayDetail"></div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">全部记录 <span class="st-sub" id="timelineCount"></span></div>
+      <div id="timelineList"></div>
+    </div>
+  </div>
+
+  <!-- ============ STATS VIEW ============ -->
+  <div class="view" id="viewStats">
+    <h1>统计分析</h1>
+    <div class="sub">全部基于你自己的真实记录</div>
+
+    <div class="card">
+      <div class="duo-stat">
+        <div>
+          <div class="big" id="sAvgInterval">—</div>
+          <div class="lbl">平均间隔时间</div>
+        </div>
+        <div>
+          <div class="big" id="sAvgDuration">—</div>
+          <div class="lbl">平均便便时长</div>
+        </div>
       </div>
     </div>
-    <div class="chart" id="chart"></div>
-    <div class="chart-labels" id="chartLabels"></div>
+
+    <div class="card">
+      <div class="section-title">形状分析 <span class="st-sub">Bristol 分型</span></div>
+      <div id="shapeStats"></div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">颜色分析</div>
+      <div id="colorStats"></div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">本周便便分量 <span class="st-sub">近7天 · 估算</span></div>
+      <div id="volumeStats"></div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">排便感觉</div>
+      <div id="feelStats"></div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">间隔时间分布</div>
+      <div id="intervalStats"></div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">便便时长</div>
+      <div class="duo-stat" style="margin-bottom:16px;">
+        <div>
+          <div class="big" id="sMaxDuration">—</div>
+          <div class="lbl">最长时长</div>
+        </div>
+        <div>
+          <div class="big" id="sMinDuration">—</div>
+          <div class="lbl">最短时长</div>
+        </div>
+      </div>
+      <div id="durationStats"></div>
+    </div>
   </div>
 
-  <div class="card">
-    <div class="section-title">最近记录</div>
-    <div id="historyList"></div>
-  </div>
-
-  <div class="toolbar">
-    <button id="installBtn" class="install-btn" style="display:none;">安装应用</button>
-    <button id="exportBtn">导出 CSV</button>
-    <button id="clearBtn">清空数据</button>
-  </div>
 </div>
+
+<!-- ============ BOTTOM TAB BAR ============ -->
+<nav class="tabbar">
+  <button data-view="viewHome" class="active"><span class="tab-ico">🚽</span>首页</button>
+  <button data-view="viewCalendar"><span class="tab-ico">📅</span>日历记录</button>
+  <button data-view="viewStats"><span class="tab-ico">📊</span>统计分析</button>
+</nav>
 
 <script>
 const STORAGE_KEY = 'bm_tracker_records_v2';
@@ -358,6 +553,18 @@ const SYMPTOM_OPTS = ['厕纸带血','马桶挂壁','腹胀','打嗝','腹部绞
 const WARN_SYMPTOMS = ['厕纸带血']; // highlighted in red
 const MOOD_OPTS = ['平静','放松','焦虑','烦躁'];
 const PLACE_OPTS = ['家','公司','外出'];
+const PLACE_EMOJI = {'家':'🏠','公司':'🏢','外出':'📍'};
+
+// 分量 -> 估算克数(仅用于趋势展示,非精确测量)
+const AMOUNT_GRAMS = {'少':100,'适中':200,'多':300};
+
+// 形状分型配色(用于统计图)
+const SHAPE_COLORS = {1:'#7d5a44',2:'#a1887f',3:'#c9a06a',4:'#7a9b6e',5:'#9ccc65',6:'#c48a4a',7:'#6ea6c4'};
+// 颜色选项对应的示意色块
+const STOOL_SWATCH = {
+  '黄褐色':'#b5834a','深褐色':'#5d4037','绿色':'#6b8e23','黄色偏油亮':'#d4a017',
+  '灰白/陶土色':'#cfc7bd','黑色':'#2b2b28','鲜红/带血':'#b5654f'
+};
 
 // 颜色对应的健康参考信息(参考 Mayo Clinic / Cleveland Clinic 患者卫教资料)
 const COLOR_INFO = {
@@ -414,6 +621,15 @@ function fmtDate(ts){
   if(sameDay) return `今天 ${time}`;
   if(y) return `昨天 ${time}`;
   return `${d.getMonth()+1}/${d.getDate()} ${time}`;
+}
+
+function fmtHM(ts){
+  return new Date(ts).toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'});
+}
+
+function dayKey(ts){
+  const d = new Date(ts);
+  return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
 }
 
 function escapeHtml(str){
@@ -776,56 +992,347 @@ function renderStats(){
   });
 }
 
+// build the inner HTML for one record's tags (shared by history + calendar)
+function recordTagsHtml(r){
+  let tags = '';
+  if(r.bristol) tags += `<span class="hist-tag">${BRISTOL_MAP[r.bristol] ? BRISTOL_MAP[r.bristol].emoji+' '+BRISTOL_MAP[r.bristol].title : 'Bristol '+r.bristol}</span>`;
+  if(r.amount) tags += `<span class="hist-tag">${r.amount}</span>`;
+  if(r.color) tags += `<span class="hist-tag${WARN_COLORS.includes(r.color)?' warn':''}">${r.color}</span>`;
+  if(r.smell) tags += `<span class="hist-tag">气味${r.smell}</span>`;
+  if(r.feel) tags += `<span class="hist-tag">${r.feel}</span>`;
+  if(r.mood) tags += `<span class="hist-tag">${r.mood}</span>`;
+  if(r.place) tags += `<span class="hist-tag">${r.place}</span>`;
+  (r.symptoms||[]).forEach(s=>{
+    const warn = WARN_SYMPTOMS.includes(s);
+    tags += `<span class="hist-tag${warn?' warn':''}">${s}</span>`;
+  });
+  return tags;
+}
+
+function buildHistoryItem(r, timeLabel){
+  const item = document.createElement('div');
+  item.className = 'history-item';
+  const tags = recordTagsHtml(r);
+  item.innerHTML = `
+    <div class="hist-top">
+      <div>
+        <span class="hist-time">${timeLabel}</span>
+        ${r.duration!=null ? `<span class="hist-meta"> · 用时 ${fmtDuration(r.duration)}</span>` : ''}
+      </div>
+      <button class="del-btn" data-id="${r.id}">×</button>
+    </div>
+    ${tags ? `<div class="hist-tags">${tags}</div>` : ''}
+    ${r.note ? `<div class="hist-note">${escapeHtml(r.note)}</div>` : ''}
+  `;
+  item.querySelector('.del-btn').onclick = ()=>{ deleteRecord(r.id); };
+  return item;
+}
+
+function deleteRecord(id){
+  records = records.filter(r=>String(r.id)!==String(id));
+  saveRecords();
+  renderAll();
+}
+
 function renderHistory(){
   const list = document.getElementById('historyList');
   list.innerHTML = '';
-  const sorted = [...records].sort((a,b)=>b.ts-a.ts).slice(0,20);
+  const sorted = [...records].sort((a,b)=>b.ts-a.ts);
+  const viewAll = document.getElementById('homeViewAll');
   if(sorted.length===0){
     list.innerHTML = '<div class="empty">还没有记录,点上面的"开始"计时吧</div>';
+    viewAll.style.display = 'none';
     return;
   }
-  sorted.forEach(r=>{
-    const item = document.createElement('div');
-    item.className = 'history-item';
-    let tags = '';
-    if(r.bristol) tags += `<span class="hist-tag">${BRISTOL_MAP[r.bristol] ? BRISTOL_MAP[r.bristol].emoji+' '+BRISTOL_MAP[r.bristol].title : 'Bristol '+r.bristol}</span>`;
-    if(r.amount) tags += `<span class="hist-tag">${r.amount}</span>`;
-    if(r.color) tags += `<span class="hist-tag${WARN_COLORS.includes(r.color)?' warn':''}">${r.color}</span>`;
-    if(r.smell) tags += `<span class="hist-tag">气味${r.smell}</span>`;
-    if(r.feel) tags += `<span class="hist-tag">${r.feel}</span>`;
-    if(r.mood) tags += `<span class="hist-tag">${r.mood}</span>`;
-    if(r.place) tags += `<span class="hist-tag">${r.place}</span>`;
-    (r.symptoms||[]).forEach(s=>{
-      const warn = WARN_SYMPTOMS.includes(s);
-      tags += `<span class="hist-tag${warn?' warn':''}">${s}</span>`;
-    });
-    item.innerHTML = `
-      <div class="hist-top">
-        <div>
-          <span class="hist-time">${fmtDate(r.ts)}</span>
-          ${r.duration!=null ? `<span class="hist-meta"> · 用时 ${fmtDuration(r.duration)}</span>` : ''}
-        </div>
-        <button class="del-btn" data-id="${r.id}">×</button>
-      </div>
-      ${tags ? `<div class="hist-tags">${tags}</div>` : ''}
-      ${r.note ? `<div class="hist-note">${escapeHtml(r.note)}</div>` : ''}
-    `;
-    list.appendChild(item);
+  sorted.slice(0,5).forEach(r=>{
+    list.appendChild(buildHistoryItem(r, fmtDate(r.ts)));
   });
-  list.querySelectorAll('.del-btn').forEach(btn=>{
-    btn.onclick = ()=>{
-      const id = btn.getAttribute('data-id');
-      records = records.filter(r=>String(r.id)!==id);
-      saveRecords();
-      renderAll();
-    };
-  });
+  viewAll.style.display = sorted.length > 5 ? 'block' : 'none';
 }
 
 function renderAll(){
   renderSince();
   renderStats();
   renderHistory();
+  if(document.getElementById('viewCalendar').classList.contains('active')) renderCalendar();
+  if(document.getElementById('viewStats').classList.contains('active')) renderStatsView();
+}
+
+/* ---------- view switching ---------- */
+function showView(name){
+  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active', v.id===name));
+  document.querySelectorAll('.tabbar button').forEach(b=>b.classList.toggle('active', b.dataset.view===name));
+  window.scrollTo({top:0, behavior:'auto'});
+  if(name==='viewCalendar') renderCalendar();
+  if(name==='viewStats') renderStatsView();
+}
+document.querySelectorAll('.tabbar button').forEach(btn=>{
+  btn.onclick = ()=> showView(btn.dataset.view);
+});
+document.getElementById('homeViewAll').onclick = ()=> showView('viewCalendar');
+
+/* ---------- calendar ---------- */
+let calView = new Date();      // month currently shown
+calView.setDate(1);
+let selectedDayKey = dayKey(Date.now());
+
+function recordsByDay(){
+  const map = {};
+  records.forEach(r=>{
+    const k = dayKey(r.ts);
+    (map[k] = map[k] || []).push(r);
+  });
+  return map;
+}
+
+function renderCalendar(){
+  const grid = document.getElementById('calGrid');
+  const title = document.getElementById('calTitle');
+  const y = calView.getFullYear(), m = calView.getMonth();
+  title.textContent = `${y} 年 ${String(m+1).padStart(2,'0')} 月`;
+
+  const byDay = recordsByDay();
+  const firstWeekday = new Date(y, m, 1).getDay();
+  const daysInMonth = new Date(y, m+1, 0).getDate();
+  const todayKey = dayKey(Date.now());
+
+  grid.innerHTML = '';
+  for(let i=0;i<firstWeekday;i++){
+    const blank = document.createElement('div');
+    blank.className = 'cal-cell blank';
+    grid.appendChild(blank);
+  }
+  for(let d=1; d<=daysInMonth; d++){
+    const k = `${y}-${m+1}-${d}`;
+    const dayRecs = byDay[k] || [];
+    const cell = document.createElement('div');
+    cell.className = 'cal-cell' + (dayRecs.length?' has':'') +
+      (k===todayKey?' today':'') + (k===selectedDayKey?' sel':'');
+    let marks = '';
+    if(dayRecs.length){
+      const top = [...dayRecs].sort((a,b)=>a.ts-b.ts)[0];
+      const shapeEmoji = top.bristol ? BRISTOL_MAP[top.bristol].emoji : '🟢';
+      const placeEmoji = top.place ? (PLACE_EMOJI[top.place]||'') : '';
+      marks = `<span>${shapeEmoji}</span>${placeEmoji?`<span>${placeEmoji}</span>`:''}`;
+    }
+    cell.innerHTML = `
+      <span class="cal-daynum">${d}</span>
+      <span class="cal-marks">${marks}</span>
+      ${dayRecs.length>1?`<span class="cal-count">${dayRecs.length}</span>`:''}
+    `;
+    if(dayRecs.length || true){
+      cell.onclick = ()=>{ selectedDayKey = k; renderCalendar(); };
+    }
+    grid.appendChild(cell);
+  }
+
+  renderDayDetail(byDay[selectedDayKey] || []);
+  renderTimeline();
+}
+
+function renderDayDetail(dayRecs){
+  const el = document.getElementById('dayDetail');
+  const parts = selectedDayKey.split('-');
+  const label = `${parts[0]} 年 ${String(+parts[1]).padStart(2,'0')} 月 ${String(+parts[2]).padStart(2,'0')} 日`;
+  if(dayRecs.length===0){
+    el.innerHTML = `<div class="day-detail-title">${label}</div><div class="empty">这一天没有记录</div>`;
+    return;
+  }
+  el.innerHTML = `<div class="day-detail-title">${label} · ${dayRecs.length} 次</div>`;
+  [...dayRecs].sort((a,b)=>b.ts-a.ts).forEach(r=>{
+    el.appendChild(buildHistoryItem(r, fmtHM(r.ts)));
+  });
+}
+
+const WEEKDAY_CN = ['周日','周一','周二','周三','周四','周五','周六'];
+function renderTimeline(){
+  const el = document.getElementById('timelineList');
+  document.getElementById('timelineCount').textContent = records.length ? `共 ${records.length} 次` : '';
+  el.innerHTML = '';
+  if(records.length===0){
+    el.innerHTML = '<div class="empty">还没有记录</div>';
+    return;
+  }
+  const sorted = [...records].sort((a,b)=>b.ts-a.ts);
+  let lastKey = null;
+  sorted.forEach(r=>{
+    const k = dayKey(r.ts);
+    if(k!==lastKey){
+      lastKey = k;
+      const d = new Date(r.ts);
+      const head = document.createElement('div');
+      head.className = 'section-title';
+      head.style.marginTop = '14px';
+      head.innerHTML = `${d.getFullYear()} 年 ${d.getMonth()+1} 月 ${d.getDate()} 日 <span class="st-sub">${WEEKDAY_CN[d.getDay()]}</span>`;
+      el.appendChild(head);
+    }
+    el.appendChild(buildHistoryItem(r, fmtHM(r.ts)));
+  });
+}
+
+document.getElementById('calPrev').onclick = ()=>{ calView.setMonth(calView.getMonth()-1); renderCalendar(); };
+document.getElementById('calNext').onclick = ()=>{ calView.setMonth(calView.getMonth()+1); renderCalendar(); };
+document.getElementById('calToday').onclick = ()=>{
+  calView = new Date(); calView.setDate(1);
+  selectedDayKey = dayKey(Date.now());
+  renderCalendar();
+};
+
+/* ---------- statistics view ---------- */
+function pct(n, total){ return total? Math.round(n/total*100) : 0; }
+
+function makeDonut(containerId, data, unit){
+  // data: [{label, value, color}]
+  const el = document.getElementById(containerId);
+  const total = data.reduce((a,b)=>a+b.value,0);
+  if(total===0){ el.innerHTML = '<div class="empty">还没有相关记录</div>'; return; }
+  let acc = 0;
+  const segs = data.filter(d=>d.value>0).map(d=>{
+    const start = acc/total*360;
+    acc += d.value;
+    const end = acc/total*360;
+    return `${d.color} ${start}deg ${end}deg`;
+  }).join(', ');
+  const legend = data.filter(d=>d.value>0).map(d=>`
+    <div class="legend-row">
+      <span class="legend-dot" style="background:${d.color}"></span>
+      <span class="legend-name">${d.label}</span>
+      <span class="legend-val">${d.value}${unit||''} · ${pct(d.value,total)}%</span>
+    </div>`).join('');
+  el.innerHTML = `
+    <div class="donut-wrap">
+      <div class="donut" style="background:conic-gradient(${segs})"></div>
+      <div class="legend">${legend}</div>
+    </div>`;
+}
+
+function makeMeters(containerId, data){
+  // data: [{label, value}]  -> percentage of total
+  const el = document.getElementById(containerId);
+  const total = data.reduce((a,b)=>a+b.value,0);
+  if(total===0){ el.innerHTML = '<div class="empty">还没有相关记录</div>'; return; }
+  el.innerHTML = data.map(d=>{
+    const p = pct(d.value,total);
+    return `
+      <div class="meter-row">
+        <div class="meter-top"><span>${d.label}</span><span class="pct">${d.value} 次 · ${p}%</span></div>
+        <div class="meter-track"><div class="meter-fill" style="width:${p}%"></div></div>
+      </div>`;
+  }).join('');
+}
+
+function makeHistogram(containerId, labelsId, buckets){
+  // buckets: [{label, value}]
+  const el = document.getElementById(containerId);
+  const max = Math.max(1, ...buckets.map(b=>b.value));
+  el.innerHTML = `<div class="histo">${buckets.map(b=>`
+      <div class="hcol">
+        <span class="hval">${b.value||''}</span>
+        <div class="hbar" style="height:${b.value/max*100}%"></div>
+      </div>`).join('')}
+    </div>
+    <div class="histo-labels">${buckets.map(b=>`<span>${b.label}</span>`).join('')}</div>`;
+}
+
+function renderStatsView(){
+  // headline: interval + duration (based on all data)
+  const sorted = [...records].sort((a,b)=>a.ts-b.ts);
+  const intervals = [];
+  for(let i=1;i<sorted.length;i++) intervals.push(sorted[i].ts - sorted[i-1].ts);
+  document.getElementById('sAvgInterval').textContent =
+    intervals.length ? fmtDuration(intervals.reduce((a,b)=>a+b,0)/intervals.length) : '—';
+  const durations = records.filter(r=>r.duration!=null).map(r=>r.duration);
+  document.getElementById('sAvgDuration').textContent =
+    durations.length ? fmtDuration(durations.reduce((a,b)=>a+b,0)/durations.length) : '—';
+
+  // shape distribution
+  const shapeData = BRISTOL.map(b=>({
+    label:`${b.emoji} ${b.title}`,
+    value: records.filter(r=>r.bristol===b.n).length,
+    color: SHAPE_COLORS[b.n]
+  }));
+  makeDonut('shapeStats', shapeData, ' 次');
+
+  // color distribution
+  const colorData = COLOR_OPTS.map(c=>({
+    label:c, value: records.filter(r=>r.color===c).length, color: STOOL_SWATCH[c]
+  }));
+  makeDonut('colorStats', colorData, ' 次');
+
+  // weekly volume (this week Mon..Sun), estimated grams
+  renderVolume();
+
+  // feeling breakdown
+  const feelData = FEEL_OPTS.map(f=>({label:f, value: records.filter(r=>r.feel===f).length}));
+  makeMeters('feelStats', feelData);
+
+  // interval distribution histogram
+  const H = 3600000, D = 86400000;
+  const ibuckets = [
+    {label:'<8h', value:0}, {label:'8-24h', value:0}, {label:'1-2天', value:0},
+    {label:'2-3天', value:0}, {label:'3-7天', value:0}, {label:'>7天', value:0}
+  ];
+  intervals.forEach(iv=>{
+    if(iv < 8*H) ibuckets[0].value++;
+    else if(iv < 24*H) ibuckets[1].value++;
+    else if(iv < 2*D) ibuckets[2].value++;
+    else if(iv < 3*D) ibuckets[3].value++;
+    else if(iv < 7*D) ibuckets[4].value++;
+    else ibuckets[5].value++;
+  });
+  makeHistogram('intervalStats', null, ibuckets);
+
+  // duration min/max + distribution
+  document.getElementById('sMaxDuration').textContent =
+    durations.length ? fmtDuration(Math.max(...durations)) : '—';
+  document.getElementById('sMinDuration').textContent =
+    durations.length ? fmtDuration(Math.min(...durations)) : '—';
+  const M = 60000;
+  const dData = [
+    {label:'< 3 分钟', value: durations.filter(d=>d < 3*M).length},
+    {label:'3 - 10 分钟', value: durations.filter(d=>d >= 3*M && d <= 10*M).length},
+    {label:'> 10 分钟', value: durations.filter(d=>d > 10*M).length}
+  ];
+  makeMeters('durationStats', dData);
+}
+
+function renderVolume(){
+  const el = document.getElementById('volumeStats');
+  // current week Monday 00:00
+  const now = new Date();
+  const monday = new Date(now); monday.setHours(0,0,0,0);
+  const dow = (monday.getDay()+6)%7; // 0=Mon
+  monday.setDate(monday.getDate()-dow);
+  const labels = ['周一','周二','周三','周四','周五','周六','周日'];
+  const totals = new Array(7).fill(0);
+  let any = false;
+  records.forEach(r=>{
+    const diff = Math.floor((r.ts - monday.getTime())/86400000);
+    if(diff>=0 && diff<7){
+      totals[diff] += (AMOUNT_GRAMS[r.amount] || (r.amount==null?150:0));
+      any = true;
+    }
+  });
+  if(!any){ el.innerHTML = '<div class="empty">本周还没有记录</div>'; return; }
+
+  const W = 300, Hh = 110, pad = 6;
+  const maxScale = Math.max(300, ...totals);
+  const pts = totals.map((v,i)=>{
+    const x = pad + i*((W-2*pad)/6);
+    const y = Hh - (v/maxScale)*(Hh-10);
+    return [x,y];
+  });
+  const line = pts.map(p=>`${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ');
+  const area = `${pad},${Hh} ${line} ${(W-pad)},${Hh}`;
+  el.innerHTML = `
+    <svg class="area-chart" viewBox="0 0 ${W} ${Hh}" preserveAspectRatio="none">
+      <polygon points="${area}" fill="rgba(169,116,82,0.16)"></polygon>
+      <polyline points="${line}" fill="none" stroke="var(--accent)" stroke-width="2.5"
+        stroke-linejoin="round" stroke-linecap="round"></polyline>
+      ${pts.map(p=>`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="3.5" fill="var(--accent)"></circle>`).join('')}
+    </svg>
+    <div class="area-x">${labels.map(l=>`<span>${l}</span>`).join('')}</div>
+    <div class="field-hint" style="margin-top:8px;">分量按 少≈100克 / 适中≈200克 / 多≈300克 估算,仅供趋势参考。</div>`;
 }
 
 /* ---------- export / clear ---------- */
