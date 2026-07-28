@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bm-tracker-v3';
+const CACHE_NAME = 'bm-tracker-v4';
 
 const PRECACHE_ASSETS = [
   './',
@@ -40,6 +40,14 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   // Only handle GET requests
   if (event.request.method !== 'GET') return;
+
+  // Cross-origin requests (e.g. the optional cloud-sync calls to a user's own
+  // Supabase project) must always hit the network, never be cache-first —
+  // otherwise sync reads/writes could serve stale cached responses forever.
+  if (new URL(event.request.url).origin !== self.location.origin) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
 
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
