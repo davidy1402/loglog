@@ -162,17 +162,15 @@
   .field-label{font-size:12px;font-weight:600;letter-spacing:0.02em;color:var(--sub);margin-bottom:6px;display:block;margin-top:16px;text-transform:none;}
   .field-label:first-child{margin-top:0;}
 
-  .duration-banner{
-    background:var(--accent-light);
-    border-radius:var(--radius-sm);
-    padding:11px 14px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    font-size:13px;
-    animation:popIn .4s var(--ease-spring) both;
+  .duration-fields{display:flex;gap:10px;}
+  .duration-field{flex:1;display:flex;align-items:center;gap:8px;}
+  .duration-field input{
+    width:100%;border:1.5px solid var(--line);border-radius:12px;padding:10px 11px;
+    font-size:14px;font-family:inherit;background:var(--card);color:var(--ink);
+    font-variant-numeric:tabular-nums;
   }
-  .duration-banner b{font-size:17px;color:var(--ink);font-variant-numeric:tabular-nums;}
+  .duration-field input:focus{outline:none;border-color:var(--accent);}
+  .duration-field span{font-size:12.5px;color:var(--sub);flex-shrink:0;}
 
   .bristol-list{display:flex;flex-direction:column;gap:7px;}
   .bristol-card{
@@ -500,6 +498,23 @@
     background:var(--accent-light);color:var(--accent-strong);font-weight:600;font-size:13px;cursor:pointer;
   }
 
+  /* ---------- cloud sync card ---------- */
+  .cloud-help-link{color:var(--accent);cursor:pointer;text-decoration:underline;text-underline-offset:2px;}
+  .cloud-help-box{
+    margin:10px 0 14px;padding:12px 13px;border-radius:12px;background:var(--accent-light);
+    font-size:11.5px;line-height:1.6;color:var(--ink);
+  }
+  .cloud-help-box ol{margin:6px 0 0;padding-left:18px;}
+  .cloud-help-box pre{
+    margin:8px 0 0;padding:10px;border-radius:8px;background:var(--card);border:1px solid var(--line);
+    font-size:10.5px;line-height:1.5;white-space:pre-wrap;word-break:break-all;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+  .cloud-status-row{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--sub);margin-bottom:10px;}
+  .cloud-status-dot{width:8px;height:8px;border-radius:50%;background:var(--sub);flex-shrink:0;}
+  .cloud-status-dot.ok{background:var(--good);}
+  .cloud-status-dot.err{background:var(--bad);}
+  .cloud-status-dot.syncing{background:var(--accent);animation:pulseDot 1.4s var(--ease-out) infinite;}
+
   /* ---------- reminder settings ---------- */
   .reminder-set{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px;}
   .reminder-set select{
@@ -573,13 +588,22 @@
       <span class="manual-link" id="manualLink">没计时?手动补录一笔</span>
 
       <div class="panel" id="logPanel">
-        <div class="duration-banner" id="durationBanner" style="display:none;">
-          <span>本次用时</span>
-          <b id="durationText">0分钟</b>
-        </div>
-
-        <span class="field-label">时间</span>
+        <span class="field-label">日期和时间</span>
+        <div class="field-hint">可以选任意过去的日期和时间,方便补签之前忘记记的一笔。</div>
         <input type="datetime-local" id="timeInput" class="dt-input">
+
+        <span class="field-label">时长</span>
+        <div class="field-hint">计时结束会自动填入;手动补录/补签也可以自己填一个大概时长。</div>
+        <div class="duration-fields">
+          <div class="duration-field">
+            <input type="number" id="durMinInput" min="0" step="1" inputmode="numeric" placeholder="0">
+            <span>分</span>
+          </div>
+          <div class="duration-field">
+            <input type="number" id="durSecInput" min="0" max="59" step="1" inputmode="numeric" placeholder="0">
+            <span>秒</span>
+          </div>
+        </div>
 
         <span class="field-label">形状</span>
         <div class="bristol-list" id="bristolGrid"></div>
@@ -666,6 +690,71 @@
           <option value="72">超过 3 天</option>
           <option value="96">超过 4 天</option>
         </select>
+      </div>
+    </div>
+
+    <div class="card" id="cloudCard">
+      <div class="section-title">云端同步</div>
+      <div class="data-hint">把记录同步到你自己的免费 Supabase 项目,换手机、丢手机、清空浏览器也不怕数据丢失。数据只发送到你自己配置的地址,不经过任何第三方服务器。<span class="cloud-help-link" id="cloudHelpLink">怎么设置?</span></div>
+      <div class="cloud-help-box" id="cloudHelpBox" style="display:none;">
+        <b>3 步开启云端同步(免费,约2分钟):</b>
+        <ol>
+          <li>打开 supabase.com,免费注册并新建一个项目(New Project)。</li>
+          <li>项目建好后,进入左侧「SQL Editor」,粘贴下面的建表语句并运行一次:</li>
+        </ol>
+        <pre>create table records (
+  id text primary key,
+  user_id uuid not null default auth.uid() references auth.users(id),
+  ts bigint not null,
+  duration bigint,
+  bristol int,
+  amount text, color text, smell text, feel text,
+  symptoms jsonb, mood text, place text, note text,
+  updated_at bigint not null
+);
+alter table records enable row level security;
+create policy "owner access" on records for all
+  using (auth.uid() = user_id) with check (auth.uid() = user_id);</pre>
+        <ol start="3">
+          <li>进入「Project Settings → API」,把 Project URL 和 anon public key 复制粘贴到下面。</li>
+        </ol>
+      </div>
+
+      <div id="cloudSetupStep">
+        <span class="field-label">Supabase 项目 URL</span>
+        <input type="text" id="cloudUrlInput" class="dt-input" placeholder="https://xxxx.supabase.co" autocapitalize="off" autocorrect="off">
+        <span class="field-label">Supabase anon public key</span>
+        <input type="text" id="cloudKeyInput" class="dt-input" placeholder="eyJhbGc..." autocapitalize="off" autocorrect="off">
+        <div class="data-btns" style="margin-top:14px;">
+          <button id="cloudSaveCfgBtn" class="data-primary">保存并继续</button>
+        </div>
+      </div>
+
+      <div id="cloudLoginStep" style="display:none;">
+        <span class="field-label">邮箱</span>
+        <div class="field-hint">用于登录你自己的 Supabase 项目,会收到一封带验证码的邮件。</div>
+        <input type="email" id="cloudEmailInput" class="dt-input" placeholder="you@example.com" autocapitalize="off" autocorrect="off">
+        <div class="data-btns" style="margin-top:14px;">
+          <button id="cloudSendOtpBtn" class="data-primary">发送验证码</button>
+          <button id="cloudChangeCfgBtn">更换项目</button>
+        </div>
+        <div id="cloudOtpStep" style="display:none;">
+          <span class="field-label">邮箱验证码</span>
+          <div class="field-hint">验证码已发送,几分钟内有效;没收到可以检查垃圾邮件或重新发送。</div>
+          <input type="text" id="cloudOtpInput" class="dt-input" placeholder="6位验证码" inputmode="numeric">
+          <div class="data-btns" style="margin-top:14px;">
+            <button id="cloudVerifyOtpBtn" class="data-primary">验证并登录</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="cloudSignedInStep" style="display:none;">
+        <div class="data-hint" id="cloudAccountText"></div>
+        <div class="cloud-status-row"><span class="cloud-status-dot" id="cloudStatusDot"></span><span id="cloudSyncStatus">尚未同步</span></div>
+        <div class="data-btns">
+          <button id="cloudSyncNowBtn" class="data-primary">立即同步</button>
+          <button id="cloudSignOutBtn">退出登录</button>
+        </div>
       </div>
     </div>
 
@@ -869,7 +958,10 @@ function resetForm(){
 }
 resetForm();
 
-function saveRecords(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(records)); }
+function saveRecords(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+  if(typeof CloudSync !== 'undefined') CloudSync.scheduleSync();
+}
 function saveTimer(){ localStorage.setItem(TIMER_KEY, JSON.stringify(activeTimer)); }
 
 function fmtDuration(ms){
@@ -970,12 +1062,12 @@ document.getElementById('manualLink').onclick = ()=>{
 
 /* ---------- log panel ---------- */
 function openLogPanel(){
-  const banner = document.getElementById('durationBanner');
   if(form._duration != null){
-    banner.style.display = 'flex';
-    document.getElementById('durationText').textContent = fmtDuration(form._duration);
+    document.getElementById('durMinInput').value = Math.floor(form._duration/60000);
+    document.getElementById('durSecInput').value = Math.floor((form._duration%60000)/1000);
   } else {
-    banner.style.display = 'none';
+    document.getElementById('durMinInput').value = '';
+    document.getElementById('durSecInput').value = '';
   }
   document.getElementById('noteInput').value = form.note || '';
   document.getElementById('timeInput').value = toLocalInput(form._startTs || Date.now());
@@ -1052,13 +1144,23 @@ function startEdit(r){
   openLogPanel();
 }
 
+function readDurationInput(){
+  const minRaw = document.getElementById('durMinInput').value;
+  const secRaw = document.getElementById('durSecInput').value;
+  if(minRaw === '' && secRaw === '') return null;
+  const min = Math.max(0, parseInt(minRaw, 10) || 0);
+  const sec = Math.max(0, Math.min(59, parseInt(secRaw, 10) || 0));
+  return min*60000 + sec*1000;
+}
+
 document.getElementById('saveBtn').onclick = ()=>{
   const note = document.getElementById('noteInput').value.trim();
   const ts = fromLocalInput(document.getElementById('timeInput').value);
   const fields = {
-    ts, duration: form._duration,
+    ts, duration: readDurationInput(),
     bristol: form.bristol, amount: form.amount, color: form.color, smell: form.smell,
-    feel: form.feel, symptoms: form.symptoms.slice(), mood: form.mood, place: form.place, note
+    feel: form.feel, symptoms: form.symptoms.slice(), mood: form.mood, place: form.place, note,
+    updatedAt: Date.now()
   };
 
   if(form._editId){
@@ -1148,6 +1250,17 @@ function analyzeRecord(rec, priorRecords){
     notes.push('伴随腹胀或打嗝,可能与进食速度、产气食物或消化状态有关。');
   }
 
+  if(rec.duration != null){
+    const durMin = rec.duration / 60000;
+    if(durMin >= 15){
+      notes.push(`本次如厕时间较长(约${fmtDuration(rec.duration)})。Mayo Clinic / Cleveland Clinic 的卫教建议如厕时间尽量控制在10分钟以内,久坐(尤其是滑手机、过度用力)会增加肛门直肠静脉压力,是痔疮的常见诱因之一。如果经常需要这么久,建议关注饮水量和膳食纤维摄入,尽量避免久坐,必要时就医评估。`);
+      escalate('warn');
+    } else if(durMin >= 10){
+      notes.push(`本次用时约${fmtDuration(rec.duration)},略超过建议的10分钟以内。留意是否在滑手机或过度用力,尽量缩短如厕时间有助于降低痔疮风险。`);
+      escalate('warn');
+    }
+  }
+
   const sorted = [...priorRecords].sort((a,b)=>a.ts-b.ts);
   if(sorted.length>0){
     const lastPrior = sorted[sorted.length-1];
@@ -1178,6 +1291,15 @@ function analyzeRecord(rec, priorRecords){
   if(looseCount>=3){
     notes.push(`过去7天有${looseCount}次记录偏稀,如果持续,建议留意饮食和压力状态,必要时就医。`);
     escalate('warn');
+  }
+
+  const recentDurations = recentWindow.filter(r=>r.duration!=null).map(r=>r.duration);
+  if(recentDurations.length>=3){
+    const avgDur = recentDurations.reduce((a,b)=>a+b,0)/recentDurations.length;
+    if(avgDur >= 10*60000){
+      notes.push(`过去7天平均如厕时长约${fmtDuration(avgDur)},持续偏长。建议尽量避免久坐(比如不带手机进厕所),如果同时伴随费力或不尽感,建议关注膳食纤维和饮水量,必要时就医评估痔疮等情况。`);
+      escalate('warn');
+    }
   }
 
   const bloodCountRecent = recentWindow.filter(r=>(r.symptoms||[]).includes('厕纸带血')).length;
@@ -1327,6 +1449,7 @@ function buildHistoryItem(r, timeLabel){
 }
 
 function deleteRecord(id){
+  if(typeof CloudSync !== 'undefined') CloudSync.addTombstones([id]);
   records = records.filter(r=>String(r.id)!==String(id));
   saveRecords();
   renderAll();
@@ -1673,6 +1796,7 @@ document.getElementById('exportBtn').onclick = ()=>{
 
 document.getElementById('clearBtn').onclick = ()=>{
   if(confirm('确定要清空所有记录吗?此操作无法撤销,建议先导出备份。')){
+    if(typeof CloudSync !== 'undefined') CloudSync.addTombstones(records.map(r=>r.id));
     records = [];
     saveRecords();
     renderAll();
@@ -1724,7 +1848,7 @@ document.getElementById('restoreInput').onchange = (e)=>{
       let added = 0;
       valid.forEach(r=>{
         const id = r.id != null ? String(r.id) : (r.ts + '_' + Math.random().toString(36).slice(2,7));
-        if(!byId[id]){ byId[id] = Object.assign({}, r, {id}); added++; }
+        if(!byId[id]){ byId[id] = Object.assign({}, r, {id, updatedAt: r.updatedAt || Date.now()}); added++; }
       });
       records = Object.values(byId);
       saveRecords();
@@ -1754,6 +1878,302 @@ async function requestPersist(){
   }catch(_){
     el.textContent = '无法确认持久化状态,请定期备份。';
   }
+}
+
+/* ---------- cloud sync (optional, backed by your own Supabase project) ---------- */
+const CLOUD_CFG_KEY = 'bm_cloud_cfg';
+const CLOUD_SESSION_KEY = 'bm_cloud_session';
+const CLOUD_LAST_SYNC_KEY = 'bm_cloud_last_sync';
+const CLOUD_TOMBSTONES_KEY = 'bm_cloud_tombstones';
+
+const CloudSync = {
+  cfg: JSON.parse(localStorage.getItem(CLOUD_CFG_KEY) || 'null'),
+  session: JSON.parse(localStorage.getItem(CLOUD_SESSION_KEY) || 'null'),
+  syncing: false,
+  syncTimer: null,
+
+  isConfigured(){ return !!(this.cfg && this.cfg.url && this.cfg.anonKey); },
+  isSignedIn(){ return !!(this.session && this.session.access_token); },
+
+  saveCfg(url, anonKey){
+    this.cfg = { url: url.replace(/\/+$/, ''), anonKey };
+    localStorage.setItem(CLOUD_CFG_KEY, JSON.stringify(this.cfg));
+  },
+  clearCfg(){
+    this.cfg = null; this.session = null;
+    localStorage.removeItem(CLOUD_CFG_KEY);
+    localStorage.removeItem(CLOUD_SESSION_KEY);
+    localStorage.removeItem(CLOUD_LAST_SYNC_KEY);
+  },
+  saveSession(session){
+    this.session = session;
+    localStorage.setItem(CLOUD_SESSION_KEY, JSON.stringify(session));
+  },
+  signOut(){
+    this.session = null;
+    localStorage.removeItem(CLOUD_SESSION_KEY);
+    localStorage.removeItem(CLOUD_LAST_SYNC_KEY);
+  },
+
+  getTombstones(){ return JSON.parse(localStorage.getItem(CLOUD_TOMBSTONES_KEY) || '[]'); },
+  addTombstones(ids){
+    const set = new Set(this.getTombstones());
+    ids.forEach(id=> set.add(String(id)));
+    localStorage.setItem(CLOUD_TOMBSTONES_KEY, JSON.stringify([...set]));
+  },
+  clearTombstones(ids){
+    const remove = new Set(ids.map(String));
+    localStorage.setItem(CLOUD_TOMBSTONES_KEY, JSON.stringify(this.getTombstones().filter(id=>!remove.has(id))));
+  },
+
+  async _errText(res){
+    try{ const j = await res.json(); return j.error_description || j.msg || j.message || res.statusText; }
+    catch(_){ return res.statusText; }
+  },
+
+  async sendOtp(email){
+    const res = await fetch(`${this.cfg.url}/auth/v1/otp`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json', apikey:this.cfg.anonKey},
+      body: JSON.stringify({email, create_user:true})
+    });
+    if(!res.ok) throw new Error(await this._errText(res));
+  },
+
+  async verifyOtp(email, token){
+    const res = await fetch(`${this.cfg.url}/auth/v1/verify`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json', apikey:this.cfg.anonKey},
+      body: JSON.stringify({email, token, type:'email'})
+    });
+    if(!res.ok) throw new Error(await this._errText(res));
+    const data = await res.json();
+    this.saveSession({
+      access_token: data.access_token,
+      refresh_token: data.refresh_token,
+      expires_at: Date.now() + (data.expires_in || 3600)*1000,
+      email: (data.user && data.user.email) || email,
+      user_id: data.user && data.user.id
+    });
+  },
+
+  async ensureFreshToken(){
+    if(!this.isSignedIn()) return;
+    if(this.session.expires_at - Date.now() > 60000) return;
+    const res = await fetch(`${this.cfg.url}/auth/v1/token?grant_type=refresh_token`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json', apikey:this.cfg.anonKey},
+      body: JSON.stringify({refresh_token:this.session.refresh_token})
+    });
+    if(!res.ok){ this.signOut(); throw new Error('登录已过期,请重新登录。'); }
+    const data = await res.json();
+    this.saveSession(Object.assign({}, this.session, {
+      access_token: data.access_token,
+      refresh_token: data.refresh_token,
+      expires_at: Date.now() + (data.expires_in || 3600)*1000
+    }));
+  },
+
+  restHeaders(){
+    return {
+      'Content-Type':'application/json',
+      apikey: this.cfg.anonKey,
+      Authorization: 'Bearer ' + this.session.access_token
+    };
+  },
+
+  toRow(r){
+    return {
+      id: String(r.id), user_id: this.session.user_id, ts: r.ts,
+      duration: r.duration != null ? r.duration : null,
+      bristol: r.bristol != null ? r.bristol : null,
+      amount: r.amount || null, color: r.color || null, smell: r.smell || null,
+      feel: r.feel || null, symptoms: r.symptoms || [], mood: r.mood || null,
+      place: r.place || null, note: r.note || '', updated_at: r.updatedAt || r.ts
+    };
+  },
+  fromRow(row){
+    return {
+      id: row.id, ts: row.ts, duration: row.duration,
+      bristol: row.bristol, amount: row.amount, color: row.color, smell: row.smell,
+      feel: row.feel, symptoms: row.symptoms || [], mood: row.mood, place: row.place,
+      note: row.note || '', updatedAt: row.updated_at
+    };
+  },
+
+  async pushAll(){
+    if(records.length===0) return;
+    const rows = records.map(r=>this.toRow(r));
+    const chunkSize = 200;
+    for(let i=0;i<rows.length;i+=chunkSize){
+      const res = await fetch(`${this.cfg.url}/rest/v1/records?on_conflict=id`, {
+        method:'POST',
+        headers: Object.assign(this.restHeaders(), {Prefer:'resolution=merge-duplicates,return=minimal'}),
+        body: JSON.stringify(rows.slice(i, i+chunkSize))
+      });
+      if(!res.ok) throw new Error(await this._errText(res));
+    }
+  },
+
+  async flushTombstones(){
+    const ids = this.getTombstones();
+    if(ids.length===0) return;
+    for(const id of ids){
+      const res = await fetch(`${this.cfg.url}/rest/v1/records?id=eq.${encodeURIComponent(id)}`, {
+        method:'DELETE',
+        headers: Object.assign(this.restHeaders(), {Prefer:'return=minimal'})
+      });
+      if(!res.ok && res.status !== 404) throw new Error(await this._errText(res));
+    }
+    this.clearTombstones(ids);
+  },
+
+  async pullAll(){
+    const res = await fetch(`${this.cfg.url}/rest/v1/records?select=*`, { headers: this.restHeaders() });
+    if(!res.ok) throw new Error(await this._errText(res));
+    const rows = await res.json();
+    const localById = {};
+    records.forEach(r=> localById[String(r.id)] = r);
+    let changed = false;
+    rows.forEach(row=>{
+      const incoming = this.fromRow(row);
+      const existing = localById[String(incoming.id)];
+      if(!existing || (incoming.updatedAt||0) > (existing.updatedAt||existing.ts||0)){
+        localById[String(incoming.id)] = incoming;
+        changed = true;
+      }
+    });
+    if(changed){
+      records = Object.values(localById);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+    }
+    return changed;
+  },
+
+  async fullSync(){
+    if(!this.isConfigured() || !this.isSignedIn() || this.syncing) return;
+    this.syncing = true;
+    this.updateUI('syncing');
+    try{
+      await this.ensureFreshToken();
+      await this.flushTombstones();
+      await this.pushAll();
+      const changed = await this.pullAll();
+      localStorage.setItem(CLOUD_LAST_SYNC_KEY, String(Date.now()));
+      this.syncing = false;
+      this.updateUI('ok');
+      if(changed) renderAll();
+    }catch(err){
+      this.syncing = false;
+      this.updateUI('err', err && err.message);
+    }
+  },
+
+  scheduleSync(){
+    if(!this.isConfigured() || !this.isSignedIn()) return;
+    if(this.syncTimer) clearTimeout(this.syncTimer);
+    this.syncTimer = setTimeout(()=> this.fullSync(), 1500);
+  },
+
+  updateUI(state, errMsg){
+    const dot = document.getElementById('cloudStatusDot');
+    const text = document.getElementById('cloudSyncStatus');
+    if(!dot || !text) return;
+    dot.className = 'cloud-status-dot';
+    if(state==='syncing'){
+      dot.classList.add('syncing');
+      text.textContent = '同步中…';
+    } else if(state==='err'){
+      dot.classList.add('err');
+      text.textContent = '同步失败:' + (errMsg || '网络错误') + '(会自动重试)';
+    } else {
+      dot.classList.add('ok');
+      const last = parseInt(localStorage.getItem(CLOUD_LAST_SYNC_KEY) || '0', 10);
+      text.textContent = last ? ('已同步 · ' + fmtDate(last)) : '尚未同步';
+    }
+  }
+};
+
+function renderCloudStep(){
+  const setupStep = document.getElementById('cloudSetupStep');
+  const loginStep = document.getElementById('cloudLoginStep');
+  const signedInStep = document.getElementById('cloudSignedInStep');
+  if(!CloudSync.isConfigured()){
+    setupStep.style.display = 'block'; loginStep.style.display = 'none'; signedInStep.style.display = 'none';
+  } else if(!CloudSync.isSignedIn()){
+    setupStep.style.display = 'none'; loginStep.style.display = 'block'; signedInStep.style.display = 'none';
+    document.getElementById('cloudUrlInput').value = CloudSync.cfg.url;
+    document.getElementById('cloudKeyInput').value = CloudSync.cfg.anonKey;
+  } else {
+    setupStep.style.display = 'none'; loginStep.style.display = 'none'; signedInStep.style.display = 'block';
+    document.getElementById('cloudAccountText').textContent = '已登录:' + CloudSync.session.email;
+    CloudSync.updateUI('idle');
+  }
+}
+
+function setupCloudUI(){
+  document.getElementById('cloudHelpLink').onclick = ()=>{
+    const box = document.getElementById('cloudHelpBox');
+    box.style.display = box.style.display==='none' ? 'block' : 'none';
+  };
+
+  document.getElementById('cloudSaveCfgBtn').onclick = ()=>{
+    const url = document.getElementById('cloudUrlInput').value.trim();
+    const key = document.getElementById('cloudKeyInput').value.trim();
+    if(!url || !key){ alert('请填写完整的 URL 和 anon key。'); return; }
+    if(!/^https:\/\/.+/.test(url)){ alert('URL 格式看起来不对,应该类似 https://xxxx.supabase.co'); return; }
+    CloudSync.saveCfg(url, key);
+    renderCloudStep();
+  };
+
+  document.getElementById('cloudChangeCfgBtn').onclick = ()=>{
+    if(confirm('确定要更换 Supabase 项目吗?会退出当前登录(不会影响本机已有的记录)。')){
+      CloudSync.clearCfg();
+      renderCloudStep();
+    }
+  };
+
+  document.getElementById('cloudSendOtpBtn').onclick = async ()=>{
+    const email = document.getElementById('cloudEmailInput').value.trim();
+    if(!email){ alert('请输入邮箱'); return; }
+    const btn = document.getElementById('cloudSendOtpBtn');
+    btn.disabled = true; btn.textContent = '发送中…';
+    try{
+      await CloudSync.sendOtp(email);
+      document.getElementById('cloudOtpStep').style.display = 'block';
+      btn.textContent = '重新发送';
+    }catch(err){
+      alert('发送失败:' + (err.message || '请检查项目 URL / key 是否正确'));
+      btn.textContent = '发送验证码';
+    }
+    btn.disabled = false;
+  };
+
+  document.getElementById('cloudVerifyOtpBtn').onclick = async ()=>{
+    const email = document.getElementById('cloudEmailInput').value.trim();
+    const token = document.getElementById('cloudOtpInput').value.trim();
+    if(!token){ alert('请输入验证码'); return; }
+    const btn = document.getElementById('cloudVerifyOtpBtn');
+    btn.disabled = true; btn.textContent = '验证中…';
+    try{
+      await CloudSync.verifyOtp(email, token);
+      renderCloudStep();
+      CloudSync.fullSync();
+    }catch(err){
+      alert('验证失败:' + (err.message || '验证码不对或已过期'));
+    }
+    btn.disabled = false; btn.textContent = '验证并登录';
+  };
+
+  document.getElementById('cloudSyncNowBtn').onclick = ()=> CloudSync.fullSync();
+
+  document.getElementById('cloudSignOutBtn').onclick = ()=>{
+    CloudSync.signOut();
+    renderCloudStep();
+  };
+
+  renderCloudStep();
+  if(CloudSync.isSignedIn()) CloudSync.fullSync();
 }
 
 /* ---------- reminder ---------- */
@@ -1804,11 +2224,17 @@ function setupReminderUI(){
 }
 
 setInterval(renderSince, 30000);
+setInterval(()=> CloudSync.fullSync(), 5*60000);
+window.addEventListener('online', ()=> CloudSync.fullSync());
+document.addEventListener('visibilitychange', ()=>{
+  if(document.visibilityState === 'visible') CloudSync.fullSync();
+});
 
 renderTimerUI();
 renderAll();
 updateBackupHint();
 setupReminderUI();
+setupCloudUI();
 requestPersist();
 
 /* ---------- PWA: Service Worker & Install Prompt ---------- */
