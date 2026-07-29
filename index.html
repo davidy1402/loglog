@@ -1886,8 +1886,13 @@ const CLOUD_SESSION_KEY = 'bm_cloud_session';
 const CLOUD_LAST_SYNC_KEY = 'bm_cloud_last_sync';
 const CLOUD_TOMBSTONES_KEY = 'bm_cloud_tombstones';
 
+const DEFAULT_CLOUD_CFG = {
+  url: 'https://fdfpyryqncdtkawbcrxw.supabase.co',
+  anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkZnB5cnlxbmNkdGthd2Jjcnh3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzMDk0NTksImV4cCI6MjEwMDg4NTQ1OX0.qIbcBJ0r51jW9A4VmzMx2i6qAdQssf44T1bJsL36yxI'
+};
+
 const CloudSync = {
-  cfg: JSON.parse(localStorage.getItem(CLOUD_CFG_KEY) || 'null'),
+  cfg: JSON.parse(localStorage.getItem(CLOUD_CFG_KEY) || 'null') || DEFAULT_CLOUD_CFG,
   session: JSON.parse(localStorage.getItem(CLOUD_SESSION_KEY) || 'null'),
   syncing: false,
   syncTimer: null,
