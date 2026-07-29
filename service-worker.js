@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bm-tracker-v4';
+const CACHE_NAME = 'bm-tracker-v5';
 
 const PRECACHE_ASSETS = [
   './',
