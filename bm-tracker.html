@@ -731,11 +731,11 @@ create policy "owner access" on records for all
       </div>
 
       <div id="cloudLoginStep" style="display:none;">
-        <span class="field-label">邮箱</span>
-        <div class="field-hint">用于登录你自己的 Supabase 项目,会收到一封带验证码的邮件。</div>
-        <input type="email" id="cloudEmailInput" class="dt-input" placeholder="you@example.com" autocapitalize="off" autocorrect="off">
+        <button id="cloudDirectLoginBtn" class="data-primary" style="margin-bottom:12px;width:100%;">⚡ 免验证码一键直连</button>
+        <span class="field-label">或使用邮箱验证码登录</span>
+        <input type="email" id="cloudEmailInput" class="dt-input" placeholder="you@example.com" value="davidy_1402@loglog.app" autocapitalize="off" autocorrect="off">
         <div class="data-btns" style="margin-top:14px;">
-          <button id="cloudSendOtpBtn" class="data-primary">发送验证码</button>
+          <button id="cloudSendOtpBtn">发送验证码</button>
           <button id="cloudChangeCfgBtn">更换项目</button>
         </div>
         <div id="cloudOtpStep" style="display:none;">
@@ -1936,6 +1936,58 @@ const CloudSync = {
     catch(_){ return res.statusText; }
   },
 
+  async signInDirect(email = 'davidy_1402@loglog.app', password = '123'){
+    const authUrl = `${this.cfg.url}/auth/v1/token?grant_type=password`;
+    let res = await fetch(authUrl, {
+      method:'POST',
+      headers:{'Content-Type':'application/json', apikey:this.cfg.anonKey},
+      body: JSON.stringify({email, password})
+    });
+
+    if(!res.ok){
+      const signUpUrl = `${this.cfg.url}/auth/v1/signup`;
+      const signUpRes = await fetch(signUpUrl, {
+        method:'POST',
+        headers:{'Content-Type':'application/json', apikey:this.cfg.anonKey},
+        body: JSON.stringify({email, password})
+      });
+      if(!signUpRes.ok){
+        throw new Error(await this._errText(signUpRes));
+      }
+      const signUpData = await signUpRes.json();
+      if(signUpData.access_token){
+        res = { ok: true, json: async () => signUpData };
+      } else {
+        res = await fetch(authUrl, {
+          method:'POST',
+          headers:{'Content-Type':'application/json', apikey:this.cfg.anonKey},
+          body: JSON.stringify({email, password})
+        });
+      }
+    }
+
+    if(!res.ok) throw new Error(await this._errText(res));
+    const data = await res.json();
+    this.saveSession({
+      access_token: data.access_token,
+      refresh_token: data.refresh_token,
+      expires_at: Date.now() + (data.expires_in || 3600)*1000,
+      email: (data.user && data.user.email) || email,
+      user_id: data.user && data.user.id
+    });
+  },
+
+  async autoSignInDirect(){
+    if(this.isSignedIn()) return;
+    try {
+      await this.signInDirect('davidy_1402@loglog.app', '123');
+      if(typeof renderCloudStep === 'function') renderCloudStep();
+      this.fullSync();
+    } catch(err) {
+      console.warn('Auto direct sign-in failed:', err);
+    }
+  },
+
   async sendOtp(email){
     const res = await fetch(`${this.cfg.url}/auth/v1/otp`, {
       method:'POST',
@@ -2170,6 +2222,21 @@ function setupCloudUI(){
     btn.disabled = false; btn.textContent = '验证并登录';
   };
 
+  const directBtn = document.getElementById('cloudDirectLoginBtn');
+  if(directBtn){
+    directBtn.onclick = async ()=>{
+      directBtn.disabled = true; directBtn.textContent = '连接中…';
+      try{
+        await CloudSync.signInDirect('davidy_1402@loglog.app', '123');
+        renderCloudStep();
+        CloudSync.fullSync();
+      }catch(err){
+        alert('连接失败:' + (err.message || '网络或密码错误'));
+      }
+      directBtn.disabled = false; directBtn.textContent = '⚡ 免验证码一键直连';
+    };
+  }
+
   document.getElementById('cloudSyncNowBtn').onclick = ()=> CloudSync.fullSync();
 
   document.getElementById('cloudSignOutBtn').onclick = ()=>{
@@ -2178,7 +2245,11 @@ function setupCloudUI(){
   };
 
   renderCloudStep();
-  if(CloudSync.isSignedIn()) CloudSync.fullSync();
+  if(CloudSync.isSignedIn()) {
+    CloudSync.fullSync();
+  } else if(CloudSync.isConfigured()) {
+    CloudSync.autoSignInDirect();
+  }
 }
 
 /* ---------- reminder ---------- */
