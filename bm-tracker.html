@@ -23,87 +23,87 @@
 
 <style>
   :root{
-    --bg-base:#f6f7fb;
-    --card:rgba(255, 255, 255, 0.36);
+    --bg-base:#f2f2f7;
+    --card:rgba(255, 255, 255, 0.76);
     --card-solid:#ffffff;
-    --card-border:rgba(255, 255, 255, 0.92);
-    --glass-blur:blur(48px) saturate(260%) brightness(108%) contrast(104%);
+    --card-border:rgba(255, 255, 255, 0.85);
+    --glass-blur:blur(28px) saturate(190%);
     
     --ink:#1c1c1e;
     --ink-secondary:#3a3a3c;
-    --sub:#606068;
-    --sub-light:#8e8e93;
+    --sub:#8e8e93;
+    --sub-light:#aeaeb2;
     
     --accent:#007aff;
     --accent-strong:#0062cc;
     --accent-light:rgba(0, 122, 255, 0.08);
-    --accent-pill:rgba(0, 122, 255, 0.16);
+    --accent-pill:rgba(0, 122, 255, 0.12);
     
-    --line:rgba(60, 60, 67, 0.08);
-    --cell:rgba(255, 255, 255, 0.38);
+    --line:rgba(60, 60, 67, 0.12);
+    --cell:rgba(120, 120, 128, 0.08);
     --bar:#3a3a3c;
     
     --good:#34c759;
     --warn:#ff9500;
     --bad:#ff3b30;
     
-    --banner-good:rgba(52, 199, 89, 0.18);
-    --banner-warn:rgba(255, 149, 0, 0.18);
-    --banner-bad:rgba(255, 59, 48, 0.18);
-    --tag-warn-bg:rgba(255, 59, 48, 0.18);
+    --banner-good:rgba(52, 199, 89, 0.12);
+    --banner-warn:rgba(255, 149, 0, 0.12);
+    --banner-bad:rgba(255, 59, 48, 0.12);
+    --tag-warn-bg:rgba(255, 59, 48, 0.12);
     
-    --tabbar-bg:rgba(255, 255, 255, 0.46);
-    --tabbar-border:rgba(255, 255, 255, 0.98);
+    --tabbar-bg:rgba(255, 255, 255, 0.82);
+    --tabbar-border:rgba(255, 255, 255, 0.90);
 
-    --radius-xl:28px;
-    --radius-lg:24px;
-    --radius-md:16px;
-    --radius-sm:12px;
+    --radius-xl:24px;
+    --radius-lg:20px;
+    --radius-md:14px;
+    --radius-sm:10px;
     
-    --shadow-card:inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.98), inset 0 -1px 1px 0 rgba(0, 0, 0, 0.03), inset 0 0 28px 0 rgba(255, 255, 255, 0.35), 0 24px 60px 0 rgba(31, 38, 135, 0.09), 0 4px 16px 0 rgba(0, 0, 0, 0.02);
-    --shadow-float:inset 0 2px 2px 0 rgba(255, 255, 255, 1), inset 0 0 28px 0 rgba(255, 255, 255, 0.45), 0 28px 72px rgba(0, 0, 0, 0.14);
-    --shadow-btn:inset 0 1px 1.5px rgba(255, 255, 255, 0.55), 0 8px 26px rgba(0, 122, 255, 0.38);
+    --shadow-card:0 4px 20px 0 rgba(0, 0, 0, 0.04), 0 1px 2px 0 rgba(0, 0, 0, 0.02);
+    --shadow-float:0 12px 36px 0 rgba(0, 0, 0, 0.09), 0 2px 6px 0 rgba(0, 0, 0, 0.03);
+    --shadow-btn:0 4px 14px rgba(0, 122, 255, 0.28);
     --ease-spring:cubic-bezier(0.34, 1.56, 0.64, 1);
-    --ease-out:cubic-bezier(0.22, 1, 0.36, 1);
+    --ease-out:cubic-bezier(0.25, 1, 0.5, 1);
   }
 
   @media (prefers-color-scheme: dark){
     :root{
-      --bg-base:#040407;
-      --card:rgba(20, 20, 28, 0.32);
+      --bg-base:#000000;
+      --card:rgba(28, 28, 30, 0.75);
       --card-solid:#1c1c1e;
-      --card-border:rgba(255, 255, 255, 0.22);
-      --glass-blur:blur(52px) saturate(280%) brightness(112%) contrast(106%);
+      --card-border:rgba(255, 255, 255, 0.12);
+      --glass-blur:blur(30px) saturate(200%);
       
-      --ink:#f8f8fa;
+      --ink:#f2f2f7;
       --ink-secondary:#d1d1d6;
-      --sub:#9a9aa0;
+      --sub:#8e8e93;
       --sub-light:#636366;
       
       --accent:#0a84ff;
       --accent-strong:#409cff;
-      --accent-light:rgba(10, 132, 255, 0.20);
-      --accent-pill:rgba(10, 132, 255, 0.28);
+      --accent-light:rgba(10, 132, 255, 0.16);
+      --accent-pill:rgba(10, 132, 255, 0.22);
       
-      --line:rgba(84, 84, 88, 0.25);
-      --cell:rgba(255, 255, 255, 0.05);
+      --line:rgba(84, 84, 88, 0.35);
+      --cell:rgba(120, 120, 128, 0.2);
       --bar:#8e8e93;
       
       --good:#30d158;
       --warn:#ff9f0a;
       --bad:#ff453a;
       
-      --banner-good:rgba(48, 209, 88, 0.22);
-      --banner-warn:rgba(255, 159, 10, 0.22);
-      --banner-bad:rgba(255, 69, 58, 0.24);
-      --tag-warn-bg:rgba(255, 69, 58, 0.26);
+      --banner-good:rgba(48, 209, 88, 0.16);
+      --banner-warn:rgba(255, 159, 10, 0.16);
+      --banner-bad:rgba(255, 69, 58, 0.18);
+      --tag-warn-bg:rgba(255, 69, 58, 0.20);
       
-      --tabbar-bg:rgba(20, 20, 28, 0.44);
-      --tabbar-border:rgba(255, 255, 255, 0.24);
+      --tabbar-bg:rgba(28, 28, 30, 0.82);
+      --tabbar-border:rgba(255, 255, 255, 0.14);
 
-      --shadow-card:inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.45), inset 0 -1px 1px 0 rgba(0, 0, 0, 0.5), inset 0 0 28px 0 rgba(255, 255, 255, 0.10), 0 24px 64px 0 rgba(0, 0, 0, 0.85);
-      --shadow-float:inset 0 2px 2px 0 rgba(255, 255, 255, 0.45), inset 0 0 32px 0 rgba(255, 255, 255, 0.12), 0 32px 76px 0 rgba(0, 0, 0, 0.90);
-      --shadow-btn:inset 0 1px 1px rgba(255, 255, 255, 0.45), 0 8px 28px rgba(10, 132, 255, 0.55);
+      --shadow-card:0 8px 32px 0 rgba(0, 0, 0, 0.45);
+      --shadow-float:0 16px 40px 0 rgba(0, 0, 0, 0.6);
+      --shadow-btn:0 4px 16px rgba(10, 132, 255, 0.4);
     }
   }
 
@@ -115,55 +115,25 @@
     background-color:var(--bg-base);
     color:var(--ink);
     min-height:100vh;
-    padding:28px 16px calc(108px + env(safe-area-inset-bottom,0px));
+    padding:24px 16px calc(96px + env(safe-area-inset-bottom,0px));
     -webkit-font-smoothing:antialiased;
     text-rendering:optimizeLegibility;
-    position:relative;
-    overflow-x:hidden;
-    transition:color .3s var(--ease-out);
+    transition:background .3s var(--ease-out), color .3s var(--ease-out);
   }
 
-  /* Animated Fluid Light Spheres behind the Glass */
-  body::before, body::after{
-    content:'';
-    position:fixed;
-    border-radius:50%;
-    filter:blur(80px);
-    opacity:0.65;
-    pointer-events:none;
-    z-index:-1;
-    animation:fluidDrift 18s ease-in-out infinite alternate;
-  }
-  body::before{
-    width:320px;height:320px;
-    background:linear-gradient(135deg, rgba(0,122,255,0.45), rgba(88,86,214,0.35));
-    top:-60px;left:-60px;
-  }
-  body::after{
-    width:340px;height:340px;
-    background:linear-gradient(135deg, rgba(255,45,85,0.30), rgba(255,149,0,0.30));
-    bottom:100px;right:-80px;
-    animation-delay:-9s;
-  }
-  @keyframes fluidDrift{
-    0%{transform:translate(0, 0) scale(1);}
-    50%{transform:translate(60px, 80px) scale(1.15) rotate(45deg);}
-    100%{transform:translate(-40px, 120px) scale(0.95) rotate(90deg);}
-  }
+  .wrap{max-width:520px;margin:0 auto;}
+  h1{font-size:24px;font-weight:700;letter-spacing:-0.025em;margin:0 0 4px;}
+  .sub{color:var(--sub);font-size:13px;margin-bottom:20px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
 
-  .wrap{max-width:520px;margin:0 auto;position:relative;z-index:1;}
-  h1{font-size:27px;font-weight:800;letter-spacing:-0.035em;margin:0 0 4px;}
-  .sub{color:var(--sub);font-size:13px;margin-bottom:22px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
-
-  :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:10px;}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:8px;}
 
   .card{
     background:var(--card);
     backdrop-filter:var(--glass-blur);
     -webkit-backdrop-filter:var(--glass-blur);
     border-radius:var(--radius-lg);
-    padding:24px;
-    margin-bottom:18px;
+    padding:22px;
+    margin-bottom:16px;
     box-shadow:var(--shadow-card);
     border:1px solid var(--card-border);
     animation:cardIn .5s var(--ease-out) both;
@@ -2615,74 +2585,6 @@ window.addEventListener('appinstalled', () => {
     installBtn.style.display = 'none';
   }
 });
-
-/* ---------- iOS 27 Radical Dynamic Fluid Ambient Engine ---------- */
-(function initFluidBackground(){
-  const canvas = document.createElement('canvas');
-  canvas.id = 'fluidBgCanvas';
-  canvas.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:-2;pointer-events:none;';
-  document.body.prepend(canvas);
-
-  const ctx = canvas.getContext('2d');
-  let width, height;
-  let mouse = { x: 0.5, y: 0.5, targetX: 0.5, targetY: 0.5 };
-
-  function resize(){
-    width = canvas.width = window.innerWidth;
-    height = canvas.height = window.innerHeight;
-  }
-  window.addEventListener('resize', resize);
-  resize();
-
-  window.addEventListener('pointermove', (e)=>{
-    mouse.targetX = e.clientX / width;
-    mouse.targetY = e.clientY / height;
-  });
-
-  const THEME_PRESETS = {
-    glacier: [
-      { x: 0.20, y: 0.20, vx: 0.0004, vy: 0.0003, r: 0.55, colorLight: 'rgba(0, 122, 255, 0.28)', colorDark: 'rgba(10, 90, 220, 0.45)' },
-      { x: 0.80, y: 0.25, vx: -0.0003, vy: 0.0004, r: 0.50, colorLight: 'rgba(94, 92, 230, 0.22)', colorDark: 'rgba(70, 50, 180, 0.38)' },
-      { x: 0.50, y: 0.85, vx: 0.0003, vy: -0.0003, r: 0.58, colorLight: 'rgba(48, 176, 199, 0.24)', colorDark: 'rgba(20, 130, 140, 0.35)' },
-      { x: 0.85, y: 0.80, vx: -0.0003, vy: -0.0003, r: 0.45, colorLight: 'rgba(255, 180, 80, 0.16)', colorDark: 'rgba(180, 100, 30, 0.25)' }
-    ]
-  };
-
-  const isDark = () => window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-  const blobs = THEME_PRESETS.glacier;
-
-  let time = 0;
-  function animate(){
-    time += 0.008;
-    mouse.x += (mouse.targetX - mouse.x) * 0.03;
-    mouse.y += (mouse.targetY - mouse.y) * 0.03;
-
-    ctx.clearRect(0, 0, width, height);
-    const dark = isDark();
-
-    // Base tranquil luminous background
-    ctx.fillStyle = dark ? '#06070a' : '#f8f9fd';
-    ctx.fillRect(0, 0, width, height);
-
-    blobs.forEach((b, i) => {
-      const curX = (b.x + Math.sin(time * 0.7 + i * 2) * 0.14 + (mouse.x - 0.5) * 0.10) * width;
-      const curY = (b.y + Math.cos(time * 0.6 + i * 1.5) * 0.14 + (mouse.y - 0.5) * 0.10) * height;
-      const radius = b.r * Math.max(width, height) * (0.94 + Math.sin(time * 0.8 + i) * 0.08);
-
-      const grad = ctx.createRadialGradient(curX, curY, 0, curX, curY, radius);
-      grad.addColorStop(0, dark ? b.colorDark : b.colorLight);
-      grad.addColorStop(1, 'transparent');
-
-      ctx.fillStyle = grad;
-      ctx.beginPath();
-      ctx.arc(curX, curY, radius, 0, Math.PI * 2);
-      ctx.fill();
-    });
-
-    requestAnimationFrame(animate);
-  }
-  animate();
-})();
 </script>
 </body>
 </html>
