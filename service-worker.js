@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bm-tracker-v5';
+const CACHE_NAME = 'bm-tracker-v6';
 
 const PRECACHE_ASSETS = [
   './',
@@ -14,14 +14,15 @@ const PRECACHE_ASSETS = [
 
 // Install Event: Precaching static assets
 self.addEventListener('install', (event) => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(PRECACHE_ASSETS);
-    }).then(() => self.skipWaiting())
+    })
   );
 });
 
-// Activate Event: Clean up outdated caches
+// Activate Event: Clean up outdated caches & claim clients immediately
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
@@ -36,19 +37,38 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Fetch Event: Cache First strategy with network fallback & dynamic caching
+// Fetch Event: Network-First for HTML pages, Cache-First for static assets
 self.addEventListener('fetch', (event) => {
   // Only handle GET requests
   if (event.request.method !== 'GET') return;
 
-  // Cross-origin requests (e.g. the optional cloud-sync calls to a user's own
-  // Supabase project) must always hit the network, never be cache-first —
-  // otherwise sync reads/writes could serve stale cached responses forever.
+  // Cross-origin requests (e.g. Supabase, CDNs) always hit network
   if (new URL(event.request.url).origin !== self.location.origin) {
     event.respondWith(fetch(event.request));
     return;
   }
 
+  // Network-First for HTML navigation requests (ensures users always see latest version online)
+  if (event.request.mode === 'navigate' || event.request.destination === 'document') {
+    event.respondWith(
+      fetch(event.request)
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            const responseToCache = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(event.request, responseToCache);
+            });
+          }
+          return networkResponse;
+        })
+        .catch(() => {
+          return caches.match(event.request).then((cached) => cached || caches.match('./index.html'));
+        })
+    );
+    return;
+  }
+
+  // Cache-First with Network fallback for static images and assets
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) {
@@ -63,11 +83,6 @@ self.addEventListener('fetch', (event) => {
           cache.put(event.request, responseToCache);
         });
         return networkResponse;
-      }).catch(() => {
-        // Offline fallback for navigation requests
-        if (event.request.mode === 'navigate') {
-          return caches.match('./bm-tracker.html');
-        }
       });
     })
   );
