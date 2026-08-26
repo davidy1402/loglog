@@ -24,18 +24,14 @@
 <style>
   :root{
     --bg-base:#f6f7fb;
-    --bg-gradient:radial-gradient(at 10% 10%, rgba(140, 205, 255, 0.50) 0px, transparent 50%),
-                  radial-gradient(at 90% 15%, rgba(255, 185, 215, 0.45) 0px, transparent 45%),
-                  radial-gradient(at 50% 90%, rgba(180, 250, 225, 0.40) 0px, transparent 55%),
-                  #f6f7fb;
-    --card:rgba(255, 255, 255, 0.42);
+    --card:rgba(255, 255, 255, 0.36);
     --card-solid:#ffffff;
-    --card-border:rgba(255, 255, 255, 0.90);
-    --glass-blur:blur(40px) saturate(240%) brightness(106%);
+    --card-border:rgba(255, 255, 255, 0.92);
+    --glass-blur:blur(48px) saturate(260%) brightness(108%) contrast(104%);
     
     --ink:#1c1c1e;
     --ink-secondary:#3a3a3c;
-    --sub:#686870;
+    --sub:#606068;
     --sub-light:#8e8e93;
     
     --accent:#007aff;
@@ -44,29 +40,29 @@
     --accent-pill:rgba(0, 122, 255, 0.16);
     
     --line:rgba(60, 60, 67, 0.08);
-    --cell:rgba(255, 255, 255, 0.40);
+    --cell:rgba(255, 255, 255, 0.38);
     --bar:#3a3a3c;
     
     --good:#34c759;
     --warn:#ff9500;
     --bad:#ff3b30;
     
-    --banner-good:rgba(52, 199, 89, 0.16);
-    --banner-warn:rgba(255, 149, 0, 0.16);
-    --banner-bad:rgba(255, 59, 48, 0.16);
-    --tag-warn-bg:rgba(255, 59, 48, 0.16);
+    --banner-good:rgba(52, 199, 89, 0.18);
+    --banner-warn:rgba(255, 149, 0, 0.18);
+    --banner-bad:rgba(255, 59, 48, 0.18);
+    --tag-warn-bg:rgba(255, 59, 48, 0.18);
     
-    --tabbar-bg:rgba(255, 255, 255, 0.50);
+    --tabbar-bg:rgba(255, 255, 255, 0.46);
     --tabbar-border:rgba(255, 255, 255, 0.98);
 
-    --radius-xl:26px;
-    --radius-lg:22px;
+    --radius-xl:28px;
+    --radius-lg:24px;
     --radius-md:16px;
     --radius-sm:12px;
     
-    --shadow-card:inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 0.98), inset 0 -1px 1px 0 rgba(0, 0, 0, 0.03), inset 0 0 20px 0 rgba(255, 255, 255, 0.25), 0 20px 50px 0 rgba(31, 38, 135, 0.08), 0 4px 14px 0 rgba(0, 0, 0, 0.02);
-    --shadow-float:inset 0 2px 2px 0 rgba(255, 255, 255, 1), inset 0 0 24px 0 rgba(255, 255, 255, 0.35), 0 24px 64px rgba(0, 0, 0, 0.12);
-    --shadow-btn:inset 0 1px 1.5px rgba(255, 255, 255, 0.5), 0 8px 24px rgba(0, 122, 255, 0.35);
+    --shadow-card:inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.98), inset 0 -1px 1px 0 rgba(0, 0, 0, 0.03), inset 0 0 28px 0 rgba(255, 255, 255, 0.35), 0 24px 60px 0 rgba(31, 38, 135, 0.09), 0 4px 16px 0 rgba(0, 0, 0, 0.02);
+    --shadow-float:inset 0 2px 2px 0 rgba(255, 255, 255, 1), inset 0 0 28px 0 rgba(255, 255, 255, 0.45), 0 28px 72px rgba(0, 0, 0, 0.14);
+    --shadow-btn:inset 0 1px 1.5px rgba(255, 255, 255, 0.55), 0 8px 26px rgba(0, 122, 255, 0.38);
     --ease-spring:cubic-bezier(0.34, 1.56, 0.64, 1);
     --ease-out:cubic-bezier(0.22, 1, 0.36, 1);
   }
@@ -74,14 +70,10 @@
   @media (prefers-color-scheme: dark){
     :root{
       --bg-base:#040407;
-      --bg-gradient:radial-gradient(at 10% 10%, rgba(25, 80, 180, 0.55) 0px, transparent 50%),
-                    radial-gradient(at 90% 20%, rgba(140, 35, 95, 0.45) 0px, transparent 45%),
-                    radial-gradient(at 50% 90%, rgba(20, 110, 85, 0.40) 0px, transparent 55%),
-                    #040407;
-      --card:rgba(22, 22, 30, 0.38);
+      --card:rgba(20, 20, 28, 0.32);
       --card-solid:#1c1c1e;
-      --card-border:rgba(255, 255, 255, 0.18);
-      --glass-blur:blur(44px) saturate(250%) brightness(110%);
+      --card-border:rgba(255, 255, 255, 0.22);
+      --glass-blur:blur(52px) saturate(280%) brightness(112%) contrast(106%);
       
       --ink:#f8f8fa;
       --ink-secondary:#d1d1d6;
@@ -91,27 +83,27 @@
       --accent:#0a84ff;
       --accent-strong:#409cff;
       --accent-light:rgba(10, 132, 255, 0.20);
-      --accent-pill:rgba(10, 132, 255, 0.26);
+      --accent-pill:rgba(10, 132, 255, 0.28);
       
       --line:rgba(84, 84, 88, 0.25);
-      --cell:rgba(255, 255, 255, 0.06);
+      --cell:rgba(255, 255, 255, 0.05);
       --bar:#8e8e93;
       
       --good:#30d158;
       --warn:#ff9f0a;
       --bad:#ff453a;
       
-      --banner-good:rgba(48, 209, 88, 0.20);
-      --banner-warn:rgba(255, 159, 10, 0.20);
-      --banner-bad:rgba(255, 69, 58, 0.22);
-      --tag-warn-bg:rgba(255, 69, 58, 0.24);
+      --banner-good:rgba(48, 209, 88, 0.22);
+      --banner-warn:rgba(255, 159, 10, 0.22);
+      --banner-bad:rgba(255, 69, 58, 0.24);
+      --tag-warn-bg:rgba(255, 69, 58, 0.26);
       
-      --tabbar-bg:rgba(24, 24, 32, 0.48);
-      --tabbar-border:rgba(255, 255, 255, 0.22);
+      --tabbar-bg:rgba(20, 20, 28, 0.44);
+      --tabbar-border:rgba(255, 255, 255, 0.24);
 
-      --shadow-card:inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 0.35), inset 0 -1px 1px 0 rgba(0, 0, 0, 0.5), inset 0 0 24px 0 rgba(255, 255, 255, 0.05), 0 20px 56px 0 rgba(0, 0, 0, 0.75);
-      --shadow-float:inset 0 2px 2px 0 rgba(255, 255, 255, 0.40), inset 0 0 28px 0 rgba(255, 255, 255, 0.08), 0 28px 68px 0 rgba(0, 0, 0, 0.85);
-      --shadow-btn:inset 0 1px 1px rgba(255, 255, 255, 0.40), 0 8px 26px rgba(10, 132, 255, 0.50);
+      --shadow-card:inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.45), inset 0 -1px 1px 0 rgba(0, 0, 0, 0.5), inset 0 0 28px 0 rgba(255, 255, 255, 0.10), 0 24px 64px 0 rgba(0, 0, 0, 0.85);
+      --shadow-float:inset 0 2px 2px 0 rgba(255, 255, 255, 0.45), inset 0 0 32px 0 rgba(255, 255, 255, 0.12), 0 32px 76px 0 rgba(0, 0, 0, 0.90);
+      --shadow-btn:inset 0 1px 1px rgba(255, 255, 255, 0.45), 0 8px 28px rgba(10, 132, 255, 0.55);
     }
   }
 
@@ -121,17 +113,14 @@
     margin:0;
     font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI",system-ui,sans-serif;
     background-color:var(--bg-base);
-    background-image:var(--bg-gradient);
-    background-attachment:fixed;
-    background-size:cover;
     color:var(--ink);
     min-height:100vh;
-    padding:28px 16px calc(104px + env(safe-area-inset-bottom,0px));
+    padding:28px 16px calc(108px + env(safe-area-inset-bottom,0px));
     -webkit-font-smoothing:antialiased;
     text-rendering:optimizeLegibility;
     position:relative;
     overflow-x:hidden;
-    transition:background .3s var(--ease-out), color .3s var(--ease-out);
+    transition:color .3s var(--ease-out);
   }
 
   /* Animated Fluid Light Spheres behind the Glass */
@@ -2626,6 +2615,71 @@ window.addEventListener('appinstalled', () => {
     installBtn.style.display = 'none';
   }
 });
+
+/* ---------- iOS 27 Radical Dynamic Fluid Ambient Engine ---------- */
+(function initFluidBackground(){
+  const canvas = document.createElement('canvas');
+  canvas.id = 'fluidBgCanvas';
+  canvas.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:-2;pointer-events:none;';
+  document.body.prepend(canvas);
+
+  const ctx = canvas.getContext('2d');
+  let width, height;
+  let mouse = { x: 0.5, y: 0.5, targetX: 0.5, targetY: 0.5 };
+
+  function resize(){
+    width = canvas.width = window.innerWidth;
+    height = canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  window.addEventListener('pointermove', (e)=>{
+    mouse.targetX = e.clientX / width;
+    mouse.targetY = e.clientY / height;
+  });
+
+  const isDark = () => window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+  const blobs = [
+    { x: 0.15, y: 0.20, vx: 0.0005, vy: 0.0004, r: 0.55, colorLight: 'rgba(0, 160, 255, 0.45)', colorDark: 'rgba(0, 100, 255, 0.55)' },
+    { x: 0.85, y: 0.25, vx: -0.0004, vy: 0.0005, r: 0.50, colorLight: 'rgba(255, 65, 140, 0.40)', colorDark: 'rgba(210, 30, 110, 0.48)' },
+    { x: 0.50, y: 0.85, vx: 0.0004, vy: -0.0004, r: 0.55, colorLight: 'rgba(0, 240, 185, 0.40)', colorDark: 'rgba(0, 190, 130, 0.45)' },
+    { x: 0.85, y: 0.80, vx: -0.0003, vy: -0.0003, r: 0.45, colorLight: 'rgba(160, 90, 255, 0.38)', colorDark: 'rgba(130, 45, 230, 0.48)' }
+  ];
+
+  let time = 0;
+  function animate(){
+    time += 0.012;
+    mouse.x += (mouse.targetX - mouse.x) * 0.035;
+    mouse.y += (mouse.targetY - mouse.y) * 0.035;
+
+    ctx.clearRect(0, 0, width, height);
+    const dark = isDark();
+
+    // Base luminous background
+    ctx.fillStyle = dark ? '#040407' : '#f5f6fb';
+    ctx.fillRect(0, 0, width, height);
+
+    blobs.forEach((b, i) => {
+      const curX = (b.x + Math.sin(time * 0.75 + i * 2) * 0.16 + (mouse.x - 0.5) * 0.14) * width;
+      const curY = (b.y + Math.cos(time * 0.65 + i * 1.6) * 0.16 + (mouse.y - 0.5) * 0.14) * height;
+      const radius = b.r * Math.max(width, height) * (0.92 + Math.sin(time * 0.9 + i) * 0.12);
+
+      const grad = ctx.createRadialGradient(curX, curY, 0, curX, curY, radius);
+      grad.addColorStop(0, dark ? b.colorDark : b.colorLight);
+      grad.addColorStop(1, 'transparent');
+
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(curX, curY, radius, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    requestAnimationFrame(animate);
+  }
+  animate();
+})();
 </script>
 </body>
 </html>
