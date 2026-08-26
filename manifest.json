@@ -31,5 +31,21 @@
       "type": "image/png",
       "purpose": "maskable"
     }
+  ],
+  "shortcuts": [
+    {
+      "name": "快速打卡 (Type 4 顺畅)",
+      "short_name": "快速打卡",
+      "description": "一键记录理想顺畅排便",
+      "url": "./index.html?action=quick_ideal",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "开始计时",
+      "short_name": "开始计时",
+      "description": "立即开始排便计时",
+      "url": "./index.html?action=start_timer",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    }
   ]
 }

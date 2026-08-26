@@ -596,16 +596,39 @@
   .area-x{display:flex;margin-top:4px;}
   .area-x span{flex:1;text-align:center;font-size:9.5px;color:var(--sub);}
 
-  /* ---------- reminder banner (home) ---------- */
-  .reminder-banner{
-    display:flex;align-items:center;gap:10px;
-    background:var(--banner-warn);color:var(--warn);
-    border-radius:12px;padding:12px 14px;margin-bottom:14px;
-    font-size:13.5px;font-weight:600;line-height:1.4;
+  /* ---------- health alert & reminder banners (home) ---------- */
+  .health-alert-banner{
+    display:flex;align-items:flex-start;gap:12px;
+    background:var(--banner-bad);color:var(--bad);
+    border:1px solid color-mix(in srgb, var(--bad) 30%, transparent);
+    border-radius:var(--radius-md);padding:14px 16px;margin-bottom:14px;
+    font-size:13px;line-height:1.45;
     animation:popIn .42s var(--ease-spring) both;
   }
-  .reminder-banner span{flex:1;}
-  .reminder-x{background:none;border:none;color:inherit;font-size:19px;cursor:pointer;line-height:1;opacity:.65;padding:0 2px;}
+  .health-alert-banner.warn{
+    background:var(--banner-warn);color:var(--warn);
+    border-color:color-mix(in srgb, var(--warn) 30%, transparent);
+  }
+  .health-alert-banner .alert-ico{flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;}
+  .health-alert-banner .alert-text{flex:1;}
+  .health-alert-banner .alert-title{font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:6px;font-size:13.5px;}
+  .health-alert-banner .alert-desc{font-size:12px;opacity:0.92;line-height:1.42;}
+  .health-alert-banner .alert-x{background:none;border:none;color:inherit;font-size:18px;cursor:pointer;line-height:1;opacity:.65;padding:0 2px;flex-shrink:0;}
+  .health-alert-banner .alert-x:active{opacity:.3;}
+
+  .reminder-banner{
+    display:flex;align-items:flex-start;gap:12px;
+    background:var(--banner-warn);color:var(--warn);
+    border:1px solid color-mix(in srgb, var(--warn) 25%, transparent);
+    border-radius:var(--radius-md);padding:13px 15px;margin-bottom:14px;
+    font-size:13px;font-weight:500;line-height:1.42;
+    animation:popIn .42s var(--ease-spring) both;
+  }
+  .reminder-banner .rem-ico{flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;}
+  .reminder-banner .rem-content{flex:1;}
+  .reminder-banner .rem-title{font-weight:700;font-size:13px;margin-bottom:2px;}
+  .reminder-banner .rem-text{font-size:12px;opacity:0.92;line-height:1.4;}
+  .reminder-x{background:none;border:none;color:inherit;font-size:18px;cursor:pointer;line-height:1;opacity:.65;padding:0 2px;flex-shrink:0;}
   .reminder-x:active{opacity:.3;}
 
   /* ---------- datetime input ---------- */
@@ -794,8 +817,25 @@
       </span>
     </div>
 
+    <div class="health-alert-banner" id="healthAlertBanner" style="display:none;">
+      <div class="alert-ico" id="healthAlertIco">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      </div>
+      <div class="alert-text">
+        <div class="alert-title" id="healthAlertTitle">异常排便预警</div>
+        <div class="alert-desc" id="healthAlertDesc"></div>
+      </div>
+      <button class="alert-x" id="healthAlertDismiss" aria-label="关闭">×</button>
+    </div>
+
     <div class="reminder-banner" id="reminderBanner" style="display:none;">
-      <span id="reminderText"></span>
+      <div class="rem-ico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;color:var(--warn);"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+      </div>
+      <div class="rem-content">
+        <div class="rem-title">规律排便提醒</div>
+        <div class="rem-text" id="reminderText"></div>
+      </div>
       <button class="reminder-x" id="reminderDismiss" aria-label="关闭">×</button>
     </div>
 
@@ -1072,20 +1112,37 @@ create policy "owner access" on bm_records for all
     </div>
 
     <div class="card">
-      <div class="section-title">久未排便提醒</div>
-      <div class="field-hint">当距离上次记录超过所选时长，打开 App 时会自动提醒。</div>
-      <div class="reminder-set">
+      <div class="section-title">规律提醒与异常预警</div>
+      <div class="field-hint">智能监控排便间隔与形状趋势，适时给予温和建议与健康防护。</div>
+      
+      <span class="field-label" style="margin-top:14px;">超期规律提醒</span>
+      <div class="reminder-set" style="margin-top:8px;">
         <label class="switch">
           <input type="checkbox" id="reminderToggle">
           <span class="track"></span>
-          <span>开启提醒</span>
+          <span>开启超期提醒</span>
         </label>
         <select id="reminderThreshold">
-          <option value="24">超过 1 天</option>
-          <option value="48">超过 2 天</option>
-          <option value="72">超过 3 天</option>
-          <option value="96">超过 4 天</option>
+          <option value="24">超过 1 天 (24h)</option>
+          <option value="36">超过 1.5 天 (36h)</option>
+          <option value="48">超过 2 天 (48h)</option>
+          <option value="72">超过 3 天 (72h)</option>
+          <option value="96">超过 4 天 (96h)</option>
         </select>
+      </div>
+
+      <span class="field-label" style="margin-top:16px;">连续异常智能拦截预警</span>
+      <div class="reminder-set" style="margin-top:8px;">
+        <label class="switch">
+          <input type="checkbox" id="healthAlertToggle" checked>
+          <span class="track"></span>
+          <span>连续 3 次异常分析</span>
+        </label>
+        <span class="st-sub" style="font-size:12px;color:var(--sub);">自动识别便秘/腹泻集群</span>
+      </div>
+
+      <div class="data-btns" style="margin-top:16px;">
+        <button id="testNotifBtn" style="width:100%;">测试系统推送通知</button>
       </div>
     </div>
 
@@ -1253,8 +1310,9 @@ let timerInterval = null;
 
 const LAST_BACKUP_KEY = 'bm_last_backup';
 const REMINDER_KEY = 'bm_reminder_cfg';
-let reminderCfg = Object.assign({enabled:false, hours:48}, JSON.parse(localStorage.getItem(REMINDER_KEY) || '{}'));
+let reminderCfg = Object.assign({enabled:false, hours:48, healthAlerts:true}, JSON.parse(localStorage.getItem(REMINDER_KEY) || '{}'));
 let reminderDismissed = false;
+let healthAlertDismissed = false;
 
 // datetime-local <-> timestamp (local time)
 function toLocalInput(ts){
@@ -1761,6 +1819,18 @@ function analyzeRecord(rec, priorRecords){
     else if(lvl==='warn' && status!=='bad') status='warn';
   };
 
+  const allChronological = [...priorRecords, rec].sort((a,b)=>b.ts-a.ts);
+  const top3 = allChronological.slice(0, 3);
+  if(top3.length >= 3){
+    if(top3.every(r => r.bristol && r.bristol <= 2)){
+      notes.push('🚨 连续 3 次记录偏硬/便秘（Type 1–2）。建议每天饮水 2000ml 以上，增加火龙果、燕麦等膳食纤维，晨起喝温水刺激肠道，如厕避免久坐。');
+      escalate('warn');
+    } else if(top3.every(r => r.bristol && r.bristol >= 6)){
+      notes.push('⚠️ 连续 3 次记录偏稀/水样（Type 6–7）。建议少量多次补充温水及电解质防止脱水，避免生冷油腻，如持续超过 2 天建议就医。');
+      escalate('bad');
+    }
+  }
+
   if(rec.bristol){
     const s = SHAPE_INFO[rec.bristol];
     notes.push(`本次形状:${s.label}。${s.tip}`);
@@ -2020,6 +2090,8 @@ function renderAll(){
   renderSince();
   renderStats();
   renderHistory();
+  checkReminder();
+  checkHealthAlerts();
   if(document.getElementById('viewCalendar').classList.contains('active')) renderCalendar();
   if(document.getElementById('viewStats').classList.contains('active')) renderStatsView();
 }
@@ -2836,22 +2908,87 @@ function setupCloudUI(){
   }
 }
 
-/* ---------- reminder ---------- */
+/* ---------- reminder & health alert engine ---------- */
 function saveReminderCfg(){ localStorage.setItem(REMINDER_KEY, JSON.stringify(reminderCfg)); }
+
+const NOTIF_THROTTLE_KEY = 'bm_last_notif_ts';
+function sendWebNotification(title, body){
+  if(!('Notification' in window) || Notification.permission !== 'granted') return;
+  const lastNotif = parseInt(localStorage.getItem(NOTIF_THROTTLE_KEY) || '0', 10);
+  if(Date.now() - lastNotif < 12 * 3600000) return; // throttle: send max once per 12 hours
+  try {
+    new Notification(title, {
+      body,
+      icon: 'icon-192.png',
+      badge: 'icon-192.png',
+      tag: 'bm-reminder'
+    });
+    localStorage.setItem(NOTIF_THROTTLE_KEY, String(Date.now()));
+  } catch(e){}
+}
+
+function checkHealthAlerts(){
+  const banner = document.getElementById('healthAlertBanner');
+  if(!banner) return;
+  if(reminderCfg.healthAlerts === false || healthAlertDismissed || records.length < 3){
+    banner.style.display = 'none';
+    return;
+  }
+
+  const sorted = [...records].sort((a,b)=>b.ts-a.ts);
+  const top3 = sorted.slice(0, 3);
+  
+  // 1. Check for consecutive 3 hard stools (Bristol 1-2)
+  const isAllHard = top3.every(r => r.bristol && r.bristol <= 2);
+  if(isAllHard){
+    banner.className = 'health-alert-banner warn';
+    document.getElementById('healthAlertTitle').textContent = '⚠️ 连续 3 次记录偏硬 / 便秘 (Bristol 1–2)';
+    document.getElementById('healthAlertDesc').textContent = '建议：每天饮水 2000ml 以上，多摄入火龙果、燕麦、奇亚籽等可溶性膳食纤维，晨起喝温水刺激肠道蠕动，如厕尽量控制在 10 分钟内。';
+    banner.style.display = 'flex';
+    return;
+  }
+
+  // 2. Check for consecutive 3 loose/watery stools (Bristol 6-7)
+  const isAllLoose = top3.every(r => r.bristol && r.bristol >= 6);
+  if(isAllLoose){
+    banner.className = 'health-alert-banner';
+    document.getElementById('healthAlertTitle').textContent = '🚨 连续 3 次记录偏稀 / 水样 (Bristol 6–7)';
+    document.getElementById('healthAlertDesc').textContent = '建议：少量多次补充温水及电解质（淡盐水或补液盐），防止脱水；暂停生冷、辛辣及高油腻食物。若持续超过 2 天或伴随腹痛发热，建议就医。';
+    banner.style.display = 'flex';
+    return;
+  }
+
+  // 3. Check for severe symptoms in recent records (repeated blood or high-risk color)
+  const recent7 = records.filter(r => Date.now() - r.ts <= 7 * 86400000);
+  const bloodCount = recent7.filter(r => (r.symptoms||[]).includes('厕纸带血') || r.color === '鲜红/带血').length;
+  if(bloodCount >= 2){
+    banner.className = 'health-alert-banner';
+    document.getElementById('healthAlertTitle').textContent = '🛑 近期多次记录伴随带血';
+    document.getElementById('healthAlertDesc').textContent = `过去 7 天记录了 ${bloodCount} 次厕纸带血或血便。虽然痔疮较为常见，但反复出血建议前往医院消化科或肛肠科做常规排查。`;
+    banner.style.display = 'flex';
+    return;
+  }
+
+  banner.style.display = 'none';
+}
 
 function checkReminder(){
   const banner = document.getElementById('reminderBanner');
   if(!banner) return;
-  if(!reminderCfg.enabled || reminderDismissed || records.length===0){
+  if(!reminderCfg.enabled || reminderDismissed || records.length === 0){
     banner.style.display = 'none';
     return;
   }
   const last = [...records].sort((a,b)=>b.ts-a.ts)[0];
   const diff = Date.now() - last.ts;
-  if(diff >= reminderCfg.hours*3600000){
-    document.getElementById('reminderText').textContent =
-      '距离上次已 ' + fmtDuration(diff) + ',超过你设定的提醒时长,记得留意排便情况。';
+  if(diff >= reminderCfg.hours * 3600000){
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const timeStr = d > 0 ? `${d}天${h > 0 ? h + '小时' : ''}` : `${Math.floor(diff / 3600000)}小时`;
+    const tipText = `距离上次已 ${timeStr}。今天记得多喝水、多吃蔬菜与膳食纤维，适度走动促进肠道蠕动哦 💧🥗`;
+    document.getElementById('reminderText').textContent = tipText;
     banner.style.display = 'flex';
+    sendWebNotification('顺便记 · 规律排便提醒', `已超过 ${timeStr} 未记录排便。今天记得多喝水、多吃蔬果与膳食纤维。`);
   } else {
     banner.style.display = 'none';
   }
@@ -2860,27 +2997,110 @@ function checkReminder(){
 function setupReminderUI(){
   const toggle = document.getElementById('reminderToggle');
   const sel = document.getElementById('reminderThreshold');
-  toggle.checked = !!reminderCfg.enabled;
-  sel.value = String(reminderCfg.hours);
-  toggle.onchange = ()=>{
-    reminderCfg.enabled = toggle.checked;
-    saveReminderCfg();
-    if(toggle.checked && 'Notification' in window && Notification.permission === 'default'){
-      Notification.requestPermission();
-    }
-    reminderDismissed = false;
-    checkReminder();
-  };
-  sel.onchange = ()=>{
-    reminderCfg.hours = parseInt(sel.value, 10) || 48;
-    saveReminderCfg();
-    reminderDismissed = false;
-    checkReminder();
-  };
-  document.getElementById('reminderDismiss').onclick = ()=>{
-    reminderDismissed = true;
-    document.getElementById('reminderBanner').style.display = 'none';
-  };
+  const healthToggle = document.getElementById('healthAlertToggle');
+  const testBtn = document.getElementById('testNotifBtn');
+
+  if(toggle) toggle.checked = !!reminderCfg.enabled;
+  if(sel) sel.value = String(reminderCfg.hours);
+  if(healthToggle) healthToggle.checked = reminderCfg.healthAlerts !== false;
+
+  if(toggle){
+    toggle.onchange = ()=>{
+      reminderCfg.enabled = toggle.checked;
+      saveReminderCfg();
+      if(toggle.checked && 'Notification' in window && Notification.permission === 'default'){
+        Notification.requestPermission();
+      }
+      reminderDismissed = false;
+      checkReminder();
+    };
+  }
+
+  if(sel){
+    sel.onchange = ()=>{
+      reminderCfg.hours = parseInt(sel.value, 10) || 48;
+      saveReminderCfg();
+      reminderDismissed = false;
+      checkReminder();
+    };
+  }
+
+  if(healthToggle){
+    healthToggle.onchange = ()=>{
+      reminderCfg.healthAlerts = healthToggle.checked;
+      saveReminderCfg();
+      healthAlertDismissed = false;
+      checkHealthAlerts();
+    };
+  }
+
+  if(testBtn){
+    testBtn.onclick = async ()=>{
+      if(!('Notification' in window)){
+        alert('当前浏览器不支持 Web Push Notifications API');
+        return;
+      }
+      if(Notification.permission === 'default'){
+        const perm = await Notification.requestPermission();
+        if(perm !== 'granted'){
+          alert('通知权限已被拒绝，请在浏览器或系统设置中允许通知。');
+          return;
+        }
+      } else if(Notification.permission === 'denied'){
+        alert('通知权限已被关闭。请在浏览器设置中开启「顺便记」的通知权限。');
+        return;
+      }
+
+      try {
+        new Notification('顺便记 · 提醒测试', {
+          body: '已超过 2 天未记录，今天记得多喝水与补充膳食纤维 💧🥗',
+          icon: 'icon-192.png',
+          badge: 'icon-192.png'
+        });
+        alert('已成功触发系统测试通知！');
+      } catch(err){
+        alert('发送测试通知失败: ' + err.message);
+      }
+    };
+  }
+
+  const remDismiss = document.getElementById('reminderDismiss');
+  if(remDismiss){
+    remDismiss.onclick = ()=>{
+      reminderDismissed = true;
+      document.getElementById('reminderBanner').style.display = 'none';
+    };
+  }
+
+  const alertDismiss = document.getElementById('healthAlertDismiss');
+  if(alertDismiss){
+    alertDismiss.onclick = ()=>{
+      healthAlertDismissed = true;
+      document.getElementById('healthAlertBanner').style.display = 'none';
+    };
+  }
+}
+
+function handleUrlActions(){
+  const urlParams = new URLSearchParams(window.location.search);
+  const action = urlParams.get('action');
+  if(!action) return;
+
+  if(action === 'quick_ideal'){
+    setTimeout(()=>{
+      const quickBtn = document.getElementById('quickLogIdealBtn');
+      if(quickBtn) quickBtn.click();
+      history.replaceState(null, '', window.location.pathname);
+    }, 200);
+  } else if(action === 'start_timer'){
+    setTimeout(()=>{
+      if(!activeTimer){
+        const startBtn = document.getElementById('startBtn');
+        if(startBtn) startBtn.click();
+      }
+      history.replaceState(null, '', window.location.pathname);
+    }, 200);
+  }
 }
 
 setInterval(renderSince, 30000);
@@ -2896,6 +3116,7 @@ updateBackupHint();
 setupReminderUI();
 setupCloudUI();
 requestPersist();
+handleUrlActions();
 
 /* ---------- PWA: Service Worker & Install Prompt ---------- */
 if ('serviceWorker' in navigator) {
