@@ -2639,32 +2639,35 @@ window.addEventListener('appinstalled', () => {
     mouse.targetY = e.clientY / height;
   });
 
-  const isDark = () => window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const THEME_PRESETS = {
+    glacier: [
+      { x: 0.20, y: 0.20, vx: 0.0004, vy: 0.0003, r: 0.55, colorLight: 'rgba(0, 122, 255, 0.28)', colorDark: 'rgba(10, 90, 220, 0.45)' },
+      { x: 0.80, y: 0.25, vx: -0.0003, vy: 0.0004, r: 0.50, colorLight: 'rgba(94, 92, 230, 0.22)', colorDark: 'rgba(70, 50, 180, 0.38)' },
+      { x: 0.50, y: 0.85, vx: 0.0003, vy: -0.0003, r: 0.58, colorLight: 'rgba(48, 176, 199, 0.24)', colorDark: 'rgba(20, 130, 140, 0.35)' },
+      { x: 0.85, y: 0.80, vx: -0.0003, vy: -0.0003, r: 0.45, colorLight: 'rgba(255, 180, 80, 0.16)', colorDark: 'rgba(180, 100, 30, 0.25)' }
+    ]
+  };
 
-  const blobs = [
-    { x: 0.15, y: 0.20, vx: 0.0005, vy: 0.0004, r: 0.55, colorLight: 'rgba(0, 160, 255, 0.45)', colorDark: 'rgba(0, 100, 255, 0.55)' },
-    { x: 0.85, y: 0.25, vx: -0.0004, vy: 0.0005, r: 0.50, colorLight: 'rgba(255, 65, 140, 0.40)', colorDark: 'rgba(210, 30, 110, 0.48)' },
-    { x: 0.50, y: 0.85, vx: 0.0004, vy: -0.0004, r: 0.55, colorLight: 'rgba(0, 240, 185, 0.40)', colorDark: 'rgba(0, 190, 130, 0.45)' },
-    { x: 0.85, y: 0.80, vx: -0.0003, vy: -0.0003, r: 0.45, colorLight: 'rgba(160, 90, 255, 0.38)', colorDark: 'rgba(130, 45, 230, 0.48)' }
-  ];
+  const isDark = () => window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const blobs = THEME_PRESETS.glacier;
 
   let time = 0;
   function animate(){
-    time += 0.012;
-    mouse.x += (mouse.targetX - mouse.x) * 0.035;
-    mouse.y += (mouse.targetY - mouse.y) * 0.035;
+    time += 0.008;
+    mouse.x += (mouse.targetX - mouse.x) * 0.03;
+    mouse.y += (mouse.targetY - mouse.y) * 0.03;
 
     ctx.clearRect(0, 0, width, height);
     const dark = isDark();
 
-    // Base luminous background
-    ctx.fillStyle = dark ? '#040407' : '#f5f6fb';
+    // Base tranquil luminous background
+    ctx.fillStyle = dark ? '#06070a' : '#f8f9fd';
     ctx.fillRect(0, 0, width, height);
 
     blobs.forEach((b, i) => {
-      const curX = (b.x + Math.sin(time * 0.75 + i * 2) * 0.16 + (mouse.x - 0.5) * 0.14) * width;
-      const curY = (b.y + Math.cos(time * 0.65 + i * 1.6) * 0.16 + (mouse.y - 0.5) * 0.14) * height;
-      const radius = b.r * Math.max(width, height) * (0.92 + Math.sin(time * 0.9 + i) * 0.12);
+      const curX = (b.x + Math.sin(time * 0.7 + i * 2) * 0.14 + (mouse.x - 0.5) * 0.10) * width;
+      const curY = (b.y + Math.cos(time * 0.6 + i * 1.5) * 0.14 + (mouse.y - 0.5) * 0.10) * height;
+      const radius = b.r * Math.max(width, height) * (0.94 + Math.sin(time * 0.8 + i) * 0.08);
 
       const grad = ctx.createRadialGradient(curX, curY, 0, curX, curY, radius);
       grad.addColorStop(0, dark ? b.colorDark : b.colorLight);
