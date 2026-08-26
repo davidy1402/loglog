@@ -2056,7 +2056,7 @@ const CloudSync = {
     catch(_){ return res.statusText; }
   },
 
-  async signInDirect(email = 'davidy_1402@loglog.app', password = 'davidy_1402_loglog'){
+  async signInDirect(email = 'davidy@loglog.app', password = 'davidy_1402_loglog'){
     const authUrl = `${this.cfg.url}/auth/v1/token?grant_type=password`;
     let res = await fetch(authUrl, {
       method:'POST',
@@ -2100,7 +2100,7 @@ const CloudSync = {
   async autoSignInDirect(){
     if(this.isSignedIn()) return;
     try {
-      await this.signInDirect('davidy_1402@loglog.app', 'davidy_1402_loglog');
+      await this.signInDirect('davidy@loglog.app', 'davidy_1402_loglog');
       if(typeof renderCloudStep === 'function') renderCloudStep();
       this.fullSync();
     } catch(err) {
@@ -2161,20 +2161,35 @@ const CloudSync = {
 
   toRow(r){
     return {
-      id: String(r.id), user_id: this.session.user_id, ts: r.ts,
-      duration: r.duration != null ? r.duration : null,
-      bristol: r.bristol != null ? r.bristol : null,
-      amount: r.amount || null, color: r.color || null, smell: r.smell || null,
-      feel: r.feel || null, symptoms: r.symptoms || [], mood: r.mood || null,
-      place: r.place || null, note: r.note || '', updated_at: r.updatedAt || r.ts
+      id: String(r.id),
+      user_id: this.session.user_id,
+      ts: Number(r.ts),
+      duration: r.duration != null ? Number(r.duration) : null,
+      bristol: r.bristol != null ? Number(r.bristol) : null,
+      amount: r.amount || null,
+      color: r.color || null,
+      smell: r.smell || null,
+      feel: r.feel || null,
+      symptoms: r.symptoms || [],
+      mood: r.mood || null,
+      place: r.place || null,
+      note: r.note || ''
     };
   },
   fromRow(row){
     return {
-      id: row.id, ts: row.ts, duration: row.duration,
-      bristol: row.bristol, amount: row.amount, color: row.color, smell: row.smell,
-      feel: row.feel, symptoms: row.symptoms || [], mood: row.mood, place: row.place,
-      note: row.note || '', updatedAt: row.updated_at
+      id: row.id,
+      ts: Number(row.ts),
+      duration: row.duration != null ? Number(row.duration) : null,
+      bristol: row.bristol != null ? Number(row.bristol) : null,
+      amount: row.amount || null,
+      color: row.color || null,
+      smell: row.smell || null,
+      feel: row.feel || null,
+      symptoms: row.symptoms || [],
+      mood: row.mood || null,
+      place: row.place || null,
+      note: row.note || ''
     };
   },
 
@@ -2183,7 +2198,7 @@ const CloudSync = {
     const rows = records.map(r=>this.toRow(r));
     const chunkSize = 200;
     for(let i=0;i<rows.length;i+=chunkSize){
-      const res = await fetch(`${this.cfg.url}/rest/v1/records?on_conflict=id`, {
+      const res = await fetch(`${this.cfg.url}/rest/v1/bm_records?on_conflict=id`, {
         method:'POST',
         headers: Object.assign(this.restHeaders(), {Prefer:'resolution=merge-duplicates,return=minimal'}),
         body: JSON.stringify(rows.slice(i, i+chunkSize))
@@ -2196,7 +2211,7 @@ const CloudSync = {
     const ids = this.getTombstones();
     if(ids.length===0) return;
     for(const id of ids){
-      const res = await fetch(`${this.cfg.url}/rest/v1/records?id=eq.${encodeURIComponent(id)}`, {
+      const res = await fetch(`${this.cfg.url}/rest/v1/bm_records?id=eq.${encodeURIComponent(id)}`, {
         method:'DELETE',
         headers: Object.assign(this.restHeaders(), {Prefer:'return=minimal'})
       });
@@ -2206,7 +2221,7 @@ const CloudSync = {
   },
 
   async pullAll(){
-    const res = await fetch(`${this.cfg.url}/rest/v1/records?select=*`, { headers: this.restHeaders() });
+    const res = await fetch(`${this.cfg.url}/rest/v1/bm_records?select=*`, { headers: this.restHeaders() });
     if(!res.ok) throw new Error(await this._errText(res));
     const rows = await res.json();
     const localById = {};
@@ -2215,13 +2230,13 @@ const CloudSync = {
     rows.forEach(row=>{
       const incoming = this.fromRow(row);
       const existing = localById[String(incoming.id)];
-      if(!existing || (incoming.updatedAt||0) > (existing.updatedAt||existing.ts||0)){
+      if(!existing || (incoming.ts||0) >= (existing.ts||0)){
         localById[String(incoming.id)] = incoming;
         changed = true;
       }
     });
     if(changed){
-      records = Object.values(localById);
+      records = Object.values(localById).sort((a,b)=> b.ts - a.ts);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
     }
     return changed;
@@ -2361,7 +2376,7 @@ function setupCloudUI(){
     directBtn.onclick = async ()=>{
       directBtn.disabled = true; directBtn.textContent = '连接中…';
       try{
-        await CloudSync.signInDirect('davidy_1402@loglog.app', 'davidy_1402_loglog');
+        await CloudSync.signInDirect('davidy@loglog.app', 'davidy_1402_loglog');
         renderCloudStep();
         CloudSync.fullSync();
       }catch(err){
