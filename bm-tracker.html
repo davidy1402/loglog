@@ -2056,7 +2056,7 @@ const CloudSync = {
     catch(_){ return res.statusText; }
   },
 
-  async signInDirect(email = 'davidy_1402@loglog.app', password = '123'){
+  async signInDirect(email = 'davidy_1402@loglog.app', password = 'davidy_1402_loglog'){
     const authUrl = `${this.cfg.url}/auth/v1/token?grant_type=password`;
     let res = await fetch(authUrl, {
       method:'POST',
@@ -2100,7 +2100,7 @@ const CloudSync = {
   async autoSignInDirect(){
     if(this.isSignedIn()) return;
     try {
-      await this.signInDirect('davidy_1402@loglog.app', '123');
+      await this.signInDirect('davidy_1402@loglog.app', 'davidy_1402_loglog');
       if(typeof renderCloudStep === 'function') renderCloudStep();
       this.fullSync();
     } catch(err) {
@@ -2344,8 +2344,14 @@ function setupCloudUI(){
 
   function formatCloudError(err){
     const msg = (err && err.message) || '';
+    if(/over_email_send_rate_limit|rate limit|email not confirmed/i.test(msg)){
+      return 'Supabase 邮件确认功能尚未关闭！\n\n请进入 Supabase 控制台 -> Authentication -> Providers -> Email -> 将「Confirm email」切换为 OFF (关闭) 并保存。\n关闭后即可真正免验证码一秒直连。';
+    }
     if(/load failed|failed to fetch|networkerror/i.test(msg)){
       return '无法连接 Supabase 服务器。可能是你的项目已被 Supabase 自动暂停 (Paused)，请登录 supabase.com 点击 "Restore project" 解冻项目。';
+    }
+    if(/weak_password/i.test(msg)){
+      return 'Supabase 密码长度至少需要 6 位。';
     }
     return msg || '网络或密码错误';
   }
@@ -2355,11 +2361,11 @@ function setupCloudUI(){
     directBtn.onclick = async ()=>{
       directBtn.disabled = true; directBtn.textContent = '连接中…';
       try{
-        await CloudSync.signInDirect('davidy_1402@loglog.app', '123');
+        await CloudSync.signInDirect('davidy_1402@loglog.app', 'davidy_1402_loglog');
         renderCloudStep();
         CloudSync.fullSync();
       }catch(err){
-        alert('连接失败: ' + formatCloudError(err));
+        alert('连接失败:\n' + formatCloudError(err));
       }
       directBtn.disabled = false; directBtn.textContent = '免验证码一键直连';
     };
