@@ -2222,6 +2222,14 @@ function setupCloudUI(){
     btn.disabled = false; btn.textContent = '验证并登录';
   };
 
+  function formatCloudError(err){
+    const msg = (err && err.message) || '';
+    if(/load failed|failed to fetch|networkerror/i.test(msg)){
+      return '无法连接 Supabase 服务器。可能是你的项目已被 Supabase 自动暂停 (Paused)，请登录 supabase.com 点击 "Restore project" 解冻项目。';
+    }
+    return msg || '网络或密码错误';
+  }
+
   const directBtn = document.getElementById('cloudDirectLoginBtn');
   if(directBtn){
     directBtn.onclick = async ()=>{
@@ -2231,7 +2239,7 @@ function setupCloudUI(){
         renderCloudStep();
         CloudSync.fullSync();
       }catch(err){
-        alert('连接失败:' + (err.message || '网络或密码错误'));
+        alert('连接失败: ' + formatCloudError(err));
       }
       directBtn.disabled = false; directBtn.textContent = '⚡ 免验证码一键直连';
     };
