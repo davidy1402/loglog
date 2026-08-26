@@ -372,15 +372,26 @@
   .cancel-btn{background:var(--cell);color:var(--ink);}
   .skip-btn{background:none;color:var(--sub);font-size:12px;text-decoration:underline;padding:6px;}
 
-  .stats-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+  .stats-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
   .stat-box{
     background:var(--cell);
     border-radius:var(--radius-md);
-    padding:14px 8px;
+    padding:12px 4px;
     text-align:center;
+    min-width:0;
+    overflow:hidden;
   }
-  .stat-num{font-size:20px;font-weight:700;letter-spacing:-0.02em;font-variant-numeric:tabular-nums;}
-  .stat-label{font-size:11px;color:var(--sub);margin-top:3px;}
+  .stat-num{
+    font-size:clamp(14px, 3.8vw, 18px);
+    font-weight:700;
+    letter-spacing:-0.02em;
+    font-variant-numeric:tabular-nums;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    line-height:1.25;
+  }
+  .stat-label{font-size:11px;color:var(--sub);margin-top:3px;white-space:nowrap;}
 
   .chart{display:flex;align-items:flex-end;gap:4px;height:70px;margin-top:16px;}
   .chart .bar{
@@ -535,7 +546,7 @@
 
   /* ---------- stats analytics ---------- */
   .duo-stat{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-  .duo-stat .big{font-size:23px;font-weight:700;letter-spacing:-0.02em;color:var(--ink);font-variant-numeric:tabular-nums;}
+  .duo-stat .big{font-size:clamp(17px, 4.5vw, 23px);font-weight:700;letter-spacing:-0.02em;color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .duo-stat .lbl{font-size:12px;color:var(--sub);margin-top:3px;}
   .duo-stat > div{text-align:center;}
   .duo-stat > div + div{border-left:1px solid var(--line);}
@@ -660,6 +671,92 @@
   .edit-btn:hover{background:var(--accent-light);color:var(--accent);}
   .edit-btn:active{transform:scale(0.85);}
   .edit-btn svg{width:15px;height:15px;}
+
+  /* ---------- modal & bottom sheet ---------- */
+  .modal-overlay{
+    position:fixed;
+    inset:0;
+    z-index:999;
+    background:rgba(0, 0, 0, 0.48);
+    backdrop-filter:blur(16px);
+    -webkit-backdrop-filter:blur(16px);
+    display:flex;
+    align-items:flex-end;
+    justify-content:center;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .28s var(--ease-out);
+  }
+  .modal-overlay.open{
+    opacity:1;
+    pointer-events:auto;
+  }
+  .modal-sheet{
+    width:100%;
+    max-width:520px;
+    max-height:88vh;
+    background:var(--card-solid);
+    border:1px solid var(--card-border);
+    border-radius:var(--radius-xl) var(--radius-xl) 0 0;
+    box-shadow:var(--shadow-float);
+    display:flex;
+    flex-direction:column;
+    transform:translateY(100%);
+    transition:transform .34s cubic-bezier(0.16, 1, 0.3, 1);
+    overflow:hidden;
+  }
+  .modal-overlay.open .modal-sheet{
+    transform:translateY(0);
+  }
+  .sheet-header{
+    padding:14px 20px 10px;
+    flex-shrink:0;
+    border-bottom:1px solid var(--line);
+    background:var(--card);
+    backdrop-filter:var(--glass-blur);
+    -webkit-backdrop-filter:var(--glass-blur);
+  }
+  .sheet-handle{
+    width:36px;
+    height:4px;
+    border-radius:2px;
+    background:var(--sub-light);
+    margin:0 auto 10px;
+    opacity:0.5;
+  }
+  .sheet-title-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .sheet-title-row h2{
+    font-size:17px;
+    font-weight:700;
+    margin:0;
+    letter-spacing:-0.015em;
+    color:var(--ink);
+  }
+  .sheet-close-btn{
+    width:32px;
+    height:32px;
+    border-radius:50%;
+    background:var(--cell);
+    border:none;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    color:var(--sub);
+    transition:transform .16s var(--ease-spring), color .2s var(--ease-out), background .2s var(--ease-out);
+  }
+  .sheet-close-btn:active{transform:scale(0.92);}
+  .sheet-close-btn:hover{color:var(--ink);background:var(--line);}
+  .sheet-body{
+    padding:16px 20px calc(24px + env(safe-area-inset-bottom, 0px));
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    flex:1;
+  }
 
   /* ---------- keyframes ---------- */
   @keyframes cardIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
@@ -1011,6 +1108,79 @@ create policy "owner access" on bm_records for all
 
 </div>
 
+<!-- ============ EDIT RECORD MODAL / SHEET ============ -->
+<div class="modal-overlay" id="editModalOverlay" style="display:none;" aria-hidden="true">
+  <div class="modal-sheet" id="editModalSheet" role="dialog" aria-modal="true" aria-labelledby="editModalTitle">
+    <div class="sheet-header">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title-row">
+        <h2 id="editModalTitle">修改记录</h2>
+        <button type="button" class="sheet-close-btn" id="editModalCloseBtn" aria-label="关闭">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="sheet-body">
+      <span class="field-label" style="margin-top:0;">日期和时间</span>
+      <input type="datetime-local" id="editTimeInput" class="dt-input">
+
+      <span class="field-label">时长</span>
+      <div class="duration-fields">
+        <div class="duration-field">
+          <input type="number" id="editDurMinInput" min="0" step="1" inputmode="numeric" placeholder="0">
+          <span>分</span>
+        </div>
+        <div class="duration-field">
+          <input type="number" id="editDurSecInput" min="0" max="59" step="1" inputmode="numeric" placeholder="0">
+          <span>秒</span>
+        </div>
+      </div>
+
+      <span class="field-label">形状 (Bristol 7 型)</span>
+      <div class="bristol-list" id="editBristolGrid"></div>
+
+      <button type="button" class="more-toggle-btn" id="editMoreFieldsToggle">
+        <span class="ico-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><line x1="4" x2="4" y1="21" y2="14"/><line x1="4" x2="4" y1="10" y2="3"/><line x1="12" x2="12" y1="21" y2="12"/><line x1="12" x2="12" y1="8" y2="3"/><line x1="20" x2="20" y1="21" y2="16"/><line x1="20" x2="20" y1="12" y2="3"/><line x1="1" x2="7" y1="14" y2="14"/><line x1="9" x2="15" y1="8" y2="8"/><line x1="17" x2="23" y1="16" y2="16"/></svg>
+          <span class="toggle-text">更多细节 (分量、颜色、感觉等)</span>
+        </span>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+
+      <div class="more-fields-wrap" id="editMoreFieldsWrap">
+        <span class="field-label">分量</span>
+        <div class="chip-row" id="editAmountRow"></div>
+
+        <span class="field-label">颜色</span>
+        <div class="chip-row" id="editColorRow"></div>
+
+        <span class="field-label">气味</span>
+        <div class="chip-row" id="editSmellRow"></div>
+
+        <span class="field-label">排便感觉</span>
+        <div class="chip-row" id="editFeelRow"></div>
+
+        <span class="field-label">伴随情况 (可多选)</span>
+        <div class="chip-row" id="editSymptomRow"></div>
+
+        <span class="field-label">心情</span>
+        <div class="chip-row" id="editMoodRow"></div>
+
+        <span class="field-label">地点</span>
+        <div class="chip-row" id="editPlaceRow"></div>
+
+        <span class="field-label">备注</span>
+        <textarea id="editNoteInput" rows="2" placeholder="输入其他细节…"></textarea>
+      </div>
+
+      <div class="row-btns" style="margin-top:20px;">
+        <button type="button" class="cancel-btn" id="editCancelBtn">取消</button>
+        <button type="button" class="save-btn" id="editSaveBtn">保存修改</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ============ BOTTOM TAB BAR ============ -->
 <nav class="tabbar">
   <button data-view="viewHome" class="active">
@@ -1114,7 +1284,10 @@ function fmtDuration(ms){
   const mins = Math.floor(ms/60000);
   const h = Math.floor(mins/60);
   const d = Math.floor(h/24);
-  if(d > 0) return `${d}天${h%24}小时`;
+  if(d > 0){
+    const remH = h % 24;
+    return remH > 0 ? `${d}天${remH}小时` : `${d}天`;
+  }
   if(h > 0) return `${h}小时${mins%60}分`;
   if(mins > 0) return `${mins}分钟`;
   return `${Math.floor(ms/1000)}秒`;
@@ -1319,15 +1492,201 @@ document.getElementById('cancelBtn').onclick = ()=>{
   document.getElementById('logPanel').classList.remove('open');
 };
 
-function startEdit(r){
-  resetForm();
-  form.bristol = r.bristol; form.amount = r.amount; form.color = r.color; form.smell = r.smell;
-  form.feel = r.feel; form.symptoms = (r.symptoms||[]).slice(); form.mood = r.mood;
-  form.place = r.place; form.note = r.note || '';
-  form._editId = r.id; form._startTs = r.ts; form._duration = r.duration;
-  const hasExtra = !!(r.amount || r.color || r.smell || r.feel || (r.symptoms&&r.symptoms.length) || r.mood || r.place || r.note);
-  openLogPanel(hasExtra);
+/* ---------- edit modal sheet ---------- */
+let editForm = {};
+function resetEditForm(){
+  editForm = {
+    _editId: null, _startTs: null, _duration: null,
+    bristol: null, amount: null, color: null, smell: null,
+    feel: null, symptoms: [], mood: null, place: null, note: ''
+  };
 }
+
+let editMoreFieldsOpen = false;
+function setEditMoreFieldsOpen(open){
+  editMoreFieldsOpen = open;
+  const wrap = document.getElementById('editMoreFieldsWrap');
+  const btn = document.getElementById('editMoreFieldsToggle');
+  if(wrap && btn){
+    wrap.classList.toggle('open', open);
+    wrap.style.display = open ? 'block' : 'none';
+    btn.classList.toggle('open', open);
+    const labelSpan = btn.querySelector('.toggle-text');
+    if(labelSpan) labelSpan.textContent = open ? '收起详细指标' : '更多细节 (分量、颜色、感觉等)';
+    if(window.lucide) lucide.createIcons();
+  }
+}
+document.getElementById('editMoreFieldsToggle').onclick = (e)=>{
+  e.preventDefault();
+  setEditMoreFieldsOpen(!editMoreFieldsOpen);
+};
+
+function renderEditBristolGrid(){
+  const grid = document.getElementById('editBristolGrid');
+  if(!grid) return;
+  grid.innerHTML = '';
+  BRISTOL.forEach(b=>{
+    const el = document.createElement('div');
+    el.className = 'bristol-card' + (editForm.bristol===b.n ? ' selected':'');
+    const levelClass = b.status || 'good';
+    const tagText = b.tag || ('Type ' + b.n);
+    el.innerHTML = `
+      <div class="bristol-num">${b.n}</div>
+      <div class="bristol-text">
+        <div class="bristol-header">
+          <span class="bristol-title">${b.title}</span>
+          <span class="level-tag ${levelClass}">${tagText}</span>
+        </div>
+        <span class="bristol-desc">${b.desc}</span>
+      </div>
+    `;
+    el.onclick = ()=>{
+      editForm.bristol = (editForm.bristol===b.n) ? null : b.n;
+      renderEditBristolGrid();
+    };
+    grid.appendChild(el);
+  });
+}
+
+function makeEditChipRow(containerId, options, field, multi, warnList){
+  warnList = warnList || [];
+  const el = document.getElementById(containerId);
+  if(!el) return;
+  el.innerHTML = '';
+  options.forEach(opt=>{
+    const chip = document.createElement('div');
+    const isSelected = multi ? (editForm[field]||[]).includes(opt) : editForm[field] === opt;
+    const isWarn = warnList.includes(opt);
+    chip.className = 'chip' + (isSelected?' selected':'') + (isWarn?' warn-chip':'');
+    chip.textContent = opt;
+    chip.onclick = ()=>{
+      if(multi){
+        editForm[field] = editForm[field] || [];
+        const idx = editForm[field].indexOf(opt);
+        if(idx>=0) editForm[field].splice(idx,1); else editForm[field].push(opt);
+      } else {
+        editForm[field] = (editForm[field]===opt) ? null : opt;
+      }
+      makeEditChipRow(containerId, options, field, multi, warnList);
+    };
+    el.appendChild(chip);
+  });
+}
+
+function renderEditAllChipGroups(){
+  renderEditBristolGrid();
+  makeEditChipRow('editAmountRow', AMOUNT_OPTS, 'amount', false);
+  makeEditChipRow('editColorRow', COLOR_OPTS, 'color', false, WARN_COLORS);
+  makeEditChipRow('editSmellRow', SMELL_OPTS, 'smell', false);
+  makeEditChipRow('editFeelRow', FEEL_OPTS, 'feel', false);
+  makeEditChipRow('editSymptomRow', SYMPTOM_OPTS, 'symptoms', true, WARN_SYMPTOMS);
+  makeEditChipRow('editMoodRow', MOOD_OPTS, 'mood', false);
+  makeEditChipRow('editPlaceRow', PLACE_OPTS, 'place', false);
+}
+
+function openEditModal(){
+  const overlay = document.getElementById('editModalOverlay');
+  overlay.style.display = 'flex';
+  requestAnimationFrame(()=>{
+    overlay.classList.add('open');
+  });
+  document.body.style.overflow = 'hidden';
+  if(window.lucide) lucide.createIcons();
+}
+
+function closeEditModal(){
+  const overlay = document.getElementById('editModalOverlay');
+  overlay.classList.remove('open');
+  document.body.style.overflow = '';
+  setTimeout(()=>{
+    if(!overlay.classList.contains('open')){
+      overlay.style.display = 'none';
+    }
+  }, 300);
+}
+
+document.getElementById('editModalCloseBtn').onclick = closeEditModal;
+document.getElementById('editCancelBtn').onclick = closeEditModal;
+document.getElementById('editModalOverlay').onclick = (e)=>{
+  if(e.target === document.getElementById('editModalOverlay')){
+    closeEditModal();
+  }
+};
+document.addEventListener('keydown', (e)=>{
+  if(e.key === 'Escape' && document.getElementById('editModalOverlay').classList.contains('open')){
+    closeEditModal();
+  }
+});
+
+function startEdit(r){
+  resetEditForm();
+  editForm._editId = r.id;
+  editForm._startTs = r.ts;
+  editForm._duration = r.duration;
+  editForm.bristol = r.bristol;
+  editForm.amount = r.amount;
+  editForm.color = r.color;
+  editForm.smell = r.smell;
+  editForm.feel = r.feel;
+  editForm.symptoms = (r.symptoms || []).slice();
+  editForm.mood = r.mood;
+  editForm.place = r.place;
+  editForm.note = r.note || '';
+
+  document.getElementById('editTimeInput').value = toLocalInput(r.ts);
+  if(r.duration != null){
+    document.getElementById('editDurMinInput').value = Math.floor(r.duration/60000);
+    document.getElementById('editDurSecInput').value = Math.floor((r.duration%60000)/1000);
+  } else {
+    document.getElementById('editDurMinInput').value = '';
+    document.getElementById('editDurSecInput').value = '';
+  }
+  document.getElementById('editNoteInput').value = r.note || '';
+
+  renderEditAllChipGroups();
+  const hasExtra = !!(r.amount || r.color || r.smell || r.feel || (r.symptoms && r.symptoms.length) || r.mood || r.place || r.note);
+  setEditMoreFieldsOpen(hasExtra);
+
+  openEditModal();
+}
+
+function readEditDurationInput(){
+  const minRaw = document.getElementById('editDurMinInput').value;
+  const secRaw = document.getElementById('editDurSecInput').value;
+  if(minRaw === '' && secRaw === '') return null;
+  const min = Math.max(0, parseInt(minRaw, 10) || 0);
+  const sec = Math.max(0, Math.min(59, parseInt(secRaw, 10) || 0));
+  return min*60000 + sec*1000;
+}
+
+document.getElementById('editSaveBtn').onclick = ()=>{
+  if(!editForm._editId) return;
+  const note = document.getElementById('editNoteInput').value.trim();
+  const ts = fromLocalInput(document.getElementById('editTimeInput').value);
+  const fields = {
+    ts,
+    duration: readEditDurationInput(),
+    bristol: editForm.bristol,
+    amount: editForm.amount,
+    color: editForm.color,
+    smell: editForm.smell,
+    feel: editForm.feel,
+    symptoms: editForm.symptoms.slice(),
+    mood: editForm.mood,
+    place: editForm.place,
+    note,
+    updatedAt: Date.now()
+  };
+
+  const idx = records.findIndex(r => String(r.id) === String(editForm._editId));
+  if(idx >= 0){
+    records[idx] = Object.assign({}, records[idx], fields);
+    selectedDayKey = dayKey(records[idx].ts);
+    saveRecords();
+    renderAll();
+  }
+  closeEditModal();
+};
 
 function readDurationInput(){
   const minRaw = document.getElementById('durMinInput').value;
@@ -1348,20 +1707,12 @@ document.getElementById('saveBtn').onclick = ()=>{
     updatedAt: Date.now()
   };
 
-  if(form._editId){
-    const idx = records.findIndex(r=>String(r.id)===String(form._editId));
-    if(idx>=0) records[idx] = Object.assign({}, records[idx], fields);
-    saveRecords();
-    renderAll();
-    document.getElementById('logPanel').classList.remove('open');
-    return;
-  }
-
   const newRec = Object.assign({ id: Date.now() + '_' + Math.random().toString(36).slice(2,7) }, fields);
   const priorRecords = records.slice();
   records.push(newRec);
   saveRecords();
   renderAll();
+  document.getElementById('logPanel').classList.remove('open');
   const analysis = analyzeRecord(newRec, priorRecords);
   showInsight(analysis);
 };
