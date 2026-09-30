@@ -11,9 +11,6 @@
 <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
 <meta name="color-scheme" content="light dark">
 
-<!-- Lucide Icons & Supabase SDK -->
-<script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <!-- iOS Home Screen Support -->
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -209,6 +206,22 @@
   }
   .manual-link:hover{color:var(--accent);}
   .manual-link:active{opacity:0.6;}
+
+  .cancel-timer-btn{
+    display:block;
+    width:fit-content;
+    margin:10px auto 0;
+    padding:6px 14px;
+    background:none;
+    border:none;
+    color:var(--bad);
+    font-size:12.5px;
+    font-weight:500;
+    cursor:pointer;
+    border-radius:var(--radius-sm);
+    transition:opacity .2s var(--ease-out), transform .18s var(--ease-spring);
+  }
+  .cancel-timer-btn:active{opacity:0.6;transform:scale(0.96);}
 
   .panel{display:none;margin-top:18px;}
   .panel.open{display:block;animation:panelIn .42s var(--ease-out) both;}
@@ -863,6 +876,7 @@
       </div>
 
       <button class="log-btn" id="startBtn">开始</button>
+      <button type="button" class="cancel-timer-btn" id="cancelTimerBtn" style="display:none;">放弃本次计时</button>
       <span class="manual-link" id="manualLink">没计时?手动补录一笔</span>
 
       <div class="panel" id="logPanel">
@@ -1094,17 +1108,16 @@ create policy "owner access" on bm_records for all
       </div>
 
       <div id="cloudLoginStep" style="display:none;">
-        <button id="cloudDirectLoginBtn" class="data-primary" style="margin-bottom:12px;width:100%;display:flex;align-items:center;justify-content:center;gap:6px;">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-          <span>免验证码一键直连</span>
-        </button>
-        <span class="field-label">或使用邮箱验证码登录</span>
-        <input type="email" id="cloudEmailInput" class="dt-input" placeholder="you@example.com" value="davidy@loglog.app" autocapitalize="off" autocorrect="off">
+        <span class="field-label">账号邮箱</span>
+        <input type="email" id="cloudEmailInput" class="dt-input" placeholder="you@example.com" autocapitalize="off" autocorrect="off">
+        <span class="field-label">密码 (直连登录)</span>
+        <input type="password" id="cloudPasswordInput" class="dt-input" placeholder="输入 Supabase 账户密码" autocomplete="current-password">
         <div class="data-btns" style="margin-top:14px;">
-          <button id="cloudSendOtpBtn">发送验证码</button>
+          <button id="cloudDirectLoginBtn" class="data-primary">邮箱密码直连登录</button>
+          <button id="cloudSendOtpBtn">或发送邮箱验证码</button>
           <button id="cloudChangeCfgBtn">更换项目</button>
         </div>
-        <div id="cloudOtpStep" style="display:none;">
+        <div id="cloudOtpStep" style="display:none;margin-top:14px;">
           <span class="field-label">邮箱验证码</span>
           <div class="field-hint">验证码已发送，几分钟内有效。</div>
           <input type="text" id="cloudOtpInput" class="dt-input" placeholder="6位验证码" inputmode="numeric">
@@ -1401,11 +1414,13 @@ function escapeHtml(str){
 function renderTimerUI(){
   const startBtn = document.getElementById('startBtn');
   const timerBox = document.getElementById('timerBox');
+  const cancelTimerBtn = document.getElementById('cancelTimerBtn');
   const manualLink = document.getElementById('manualLink');
   if(activeTimer){
     timerBox.style.display = 'block';
     startBtn.textContent = '结束';
     startBtn.classList.add('stop');
+    if(cancelTimerBtn) cancelTimerBtn.style.display = 'block';
     manualLink.style.display = 'none';
     updateTimerDisplay();
     if(!timerInterval){
@@ -1415,6 +1430,7 @@ function renderTimerUI(){
     timerBox.style.display = 'none';
     startBtn.textContent = '开始';
     startBtn.classList.remove('stop');
+    if(cancelTimerBtn) cancelTimerBtn.style.display = 'none';
     manualLink.style.display = 'block';
     if(timerInterval){ clearInterval(timerInterval); timerInterval = null; }
   }
@@ -1443,6 +1459,18 @@ document.getElementById('startBtn').onclick = ()=>{
   }
 };
 
+const cancelTimerBtn = document.getElementById('cancelTimerBtn');
+if(cancelTimerBtn){
+  cancelTimerBtn.onclick = ()=>{
+    if(!activeTimer) return;
+    if(confirm('确定放弃本次计时吗？时长将不会保存。')){
+      activeTimer = null;
+      saveTimer();
+      renderTimerUI();
+    }
+  };
+}
+
 document.getElementById('manualLink').onclick = ()=>{
   resetForm();
   form._startTs = Date.now();
@@ -1462,7 +1490,6 @@ function setMoreFieldsOpen(open){
     btn.classList.toggle('open', open);
     const labelSpan = btn.querySelector('.toggle-text');
     if(labelSpan) labelSpan.textContent = open ? '收起详细指标' : '记录更多细节 (分量、颜色、感觉等)';
-    if(window.lucide) lucide.createIcons();
   }
 }
 
@@ -1496,7 +1523,6 @@ function openLogPanel(autoOpenDetails = false){
   setMoreFieldsOpen(autoOpenDetails);
   document.getElementById('logPanel').classList.add('open');
   document.getElementById('logPanel').scrollIntoView({behavior:'smooth', block:'nearest'});
-  if(window.lucide) lucide.createIcons();
 }
 
 function makeChipRow(containerId, options, field, multi, warnList){
@@ -1584,7 +1610,6 @@ function setEditMoreFieldsOpen(open){
     btn.classList.toggle('open', open);
     const labelSpan = btn.querySelector('.toggle-text');
     if(labelSpan) labelSpan.textContent = open ? '收起详细指标' : '更多细节 (分量、颜色、感觉等)';
-    if(window.lucide) lucide.createIcons();
   }
 }
 document.getElementById('editMoreFieldsToggle').onclick = (e)=>{
@@ -1662,7 +1687,6 @@ function openEditModal(){
     overlay.classList.add('open');
   });
   document.body.style.overflow = 'hidden';
-  if(window.lucide) lucide.createIcons();
 }
 
 function closeEditModal(){
@@ -1988,7 +2012,8 @@ function renderStats(){
   const sorted = [...records].sort((a,b)=>a.ts-b.ts);
   let intervals = [];
   for(let i=1;i<sorted.length;i++){
-    intervals.push(sorted[i].ts - sorted[i-1].ts);
+    const iv = sorted[i].ts - sorted[i-1].ts;
+    if(iv <= 7 * 86400000) intervals.push(iv);
   }
   const last14 = intervals.slice(-14);
   document.getElementById('statAvgInterval').textContent =
@@ -2075,6 +2100,7 @@ function buildHistoryItem(r, timeLabel){
 }
 
 function deleteRecord(id){
+  if(!confirm('确定要删除这条排便记录吗？删除后无法恢复。')) return;
   if(typeof CloudSync !== 'undefined') CloudSync.addTombstones([id]);
   records = records.filter(r=>String(r.id)!==String(id));
   saveRecords();
@@ -2292,8 +2318,9 @@ function renderStatsView(){
   const sorted = [...records].sort((a,b)=>a.ts-b.ts);
   const intervals = [];
   for(let i=1;i<sorted.length;i++) intervals.push(sorted[i].ts - sorted[i-1].ts);
+  const activeIntervals = intervals.filter(iv => iv <= 7 * 86400000);
   document.getElementById('sAvgInterval').textContent =
-    intervals.length ? fmtDuration(intervals.reduce((a,b)=>a+b,0)/intervals.length) : '—';
+    activeIntervals.length ? fmtDuration(activeIntervals.reduce((a,b)=>a+b,0)/activeIntervals.length) : '—';
   const durations = records.filter(r=>r.duration!=null).map(r=>r.duration);
   document.getElementById('sAvgDuration').textContent =
     durations.length ? fmtDuration(durations.reduce((a,b)=>a+b,0)/durations.length) : '—';
@@ -2413,7 +2440,7 @@ document.getElementById('exportBtn').onclick = ()=>{
     const symptoms = (r.symptoms||[]).join('|');
     csv += `"${t}","${dur}","${r.bristol||''}","${r.amount||''}","${r.color||''}","${r.smell||''}","${r.feel||''}","${symptoms}","${r.mood||''}","${r.place||''}","${note}"\n`;
   });
-  const blob = new Blob([csv], {type:'text/csv'});
+  const blob = new Blob(['\uFEFF' + csv], {type:'text/csv;charset=utf-8;'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
@@ -2514,13 +2541,8 @@ const CLOUD_SESSION_KEY = 'bm_cloud_session';
 const CLOUD_LAST_SYNC_KEY = 'bm_cloud_last_sync';
 const CLOUD_TOMBSTONES_KEY = 'bm_cloud_tombstones';
 
-const DEFAULT_CLOUD_CFG = {
-  url: 'https://fdfpyryqncdtkawbcrxw.supabase.co',
-  anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkZnB5cnlxbmNkdGthd2Jjcnh3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzMDk0NTksImV4cCI6MjEwMDg4NTQ1OX0.qIbcBJ0r51jW9A4VmzMx2i6qAdQssf44T1bJsL36yxI'
-};
-
 const CloudSync = {
-  cfg: JSON.parse(localStorage.getItem(CLOUD_CFG_KEY) || 'null') || DEFAULT_CLOUD_CFG,
+  cfg: JSON.parse(localStorage.getItem(CLOUD_CFG_KEY) || 'null'),
   session: JSON.parse(localStorage.getItem(CLOUD_SESSION_KEY) || 'null'),
   syncing: false,
   syncTimer: null,
@@ -2564,7 +2586,8 @@ const CloudSync = {
     catch(_){ return res.statusText; }
   },
 
-  async signInDirect(email = 'davidy@loglog.app', password = 'davidy_1402_loglog'){
+  async signInDirect(email, password){
+    if(!email || !password) throw new Error('请输入完整的邮箱与密码');
     const authUrl = `${this.cfg.url}/auth/v1/token?grant_type=password`;
     let res = await fetch(authUrl, {
       method:'POST',
@@ -2603,17 +2626,6 @@ const CloudSync = {
       email: (data.user && data.user.email) || email,
       user_id: data.user && data.user.id
     });
-  },
-
-  async autoSignInDirect(){
-    if(this.isSignedIn()) return;
-    try {
-      await this.signInDirect('davidy@loglog.app', 'davidy_1402_loglog');
-      if(typeof renderCloudStep === 'function') renderCloudStep();
-      this.fullSync();
-    } catch(err) {
-      console.warn('Auto direct sign-in failed:', err);
-    }
   },
 
   async sendOtp(email){
@@ -2894,15 +2906,18 @@ function setupCloudUI(){
   const directBtn = document.getElementById('cloudDirectLoginBtn');
   if(directBtn){
     directBtn.onclick = async ()=>{
+      const email = document.getElementById('cloudEmailInput').value.trim();
+      const password = document.getElementById('cloudPasswordInput').value;
+      if(!email || !password){ alert('请填写邮箱和密码。'); return; }
       directBtn.disabled = true; directBtn.textContent = '连接中…';
       try{
-        await CloudSync.signInDirect('davidy@loglog.app', 'davidy_1402_loglog');
+        await CloudSync.signInDirect(email, password);
         renderCloudStep();
         CloudSync.fullSync();
       }catch(err){
         alert('连接失败:\n' + formatCloudError(err));
       }
-      directBtn.disabled = false; directBtn.textContent = '免验证码一键直连';
+      directBtn.disabled = false; directBtn.textContent = '邮箱密码直连登录';
     };
   }
 
@@ -2916,8 +2931,6 @@ function setupCloudUI(){
   renderCloudStep();
   if(CloudSync.isSignedIn()) {
     CloudSync.fullSync();
-  } else if(CloudSync.isConfigured()) {
-    CloudSync.autoSignInDirect();
   }
 }
 

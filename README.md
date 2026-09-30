@@ -46,7 +46,7 @@ cd loglog
 python3 -m http.server 8080 --bind 127.0.0.1
 ```
 
-Open `http://127.0.0.1:8080/bm-tracker.html` in your browser.
+Open `http://127.0.0.1:8080/` (or `index.html`) in your browser.
 
 ---
 
@@ -80,7 +80,7 @@ By default all data stays on-device — great for privacy, but it means a lost/b
 1. Create a free account at [supabase.com](https://supabase.com) and create a new project.
 2. In the project's **SQL Editor**, run:
    ```sql
-   create table records (
+   create table bm_records (
      id text primary key,
      user_id uuid not null default auth.uid() references auth.users(id),
      ts bigint not null,
@@ -88,14 +88,14 @@ By default all data stays on-device — great for privacy, but it means a lost/b
      bristol int,
      amount text, color text, smell text, feel text,
      symptoms jsonb, mood text, place text, note text,
-     updated_at bigint not null
+     updated_at bigint not null default (extract(epoch from now())*1000)::bigint
    );
-   alter table records enable row level security;
-   create policy "owner access" on records for all
+   alter table bm_records enable row level security;
+   create policy "owner access" on bm_records for all
      using (auth.uid() = user_id) with check (auth.uid() = user_id);
    ```
 3. In **Project Settings → API**, copy the **Project URL** and **anon public key**.
-4. In the app, open the **云端同步 (Cloud Sync)** card on the home screen, paste both values, then sign in with your email (a one-time 6-digit code is emailed to you — no password to manage).
+4. In the app, open the **云端同步 (Cloud Sync)** card on the settings screen, paste both values, then sign in with your email & password or email verification code.
 
 Once signed in, every new/edited/deleted record automatically syncs in the background (debounced), and pulls happen on load, on reconnect, and periodically. The same Supabase project + email can be used from another device/browser to pull the same data down.
 
