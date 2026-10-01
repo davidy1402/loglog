@@ -226,8 +226,9 @@
 
   .panel{display:none;margin-top:18px;}
   .panel.open{display:block;animation:panelIn .42s var(--ease-out) both;}
-  .field-label{font-size:12.5px;font-weight:600;letter-spacing:0.02em;color:var(--sub);margin-bottom:10px;display:block;margin-top:24px;text-transform:none;}
+  .field-label{font-size:12.5px;font-weight:600;letter-spacing:0.02em;color:var(--sub);margin-bottom:4px;display:block;margin-top:22px;text-transform:none;}
   .field-label:first-child{margin-top:0;}
+  .field-hint{font-size:11.5px;color:var(--sub);line-height:1.45;margin-bottom:9px;margin-top:0;}
 
   .duration-fields{display:flex;gap:12px;width:100%;}
   .duration-field{flex:1;min-width:0;display:flex;align-items:center;gap:8px;}
@@ -304,28 +305,6 @@
   .level-tag.bad{background:rgba(255,59,48,0.14);color:var(--bad);}
   .bristol-desc{font-size:11.5px;color:var(--sub);}
 
-  .more-toggle-btn{
-    width:100%;
-    padding:13px 18px;
-    border-radius:9999px;
-    border:1px solid var(--card-border);
-    background:var(--cell);
-    color:var(--ink);
-    font-size:13px;
-    font-weight:600;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    cursor:pointer;
-    margin:22px 0 12px;
-    transition:background .18s var(--ease-out), border-color .18s var(--ease-out);
-  }
-  .more-toggle-btn:hover{background:var(--accent-light);}
-  .more-toggle-btn .ico-label{display:flex;align-items:center;gap:8px;}
-  .more-toggle-btn svg.chevron{transition:transform .22s var(--ease-out);}
-  .more-toggle-btn.open svg.chevron{transform:rotate(180deg);}
-  .more-fields-wrap{display:none;animation:fadeIn .25s var(--ease-out);}
-  .more-fields-wrap.open{display:block;}
 
   .chip-row{
     display:flex;
@@ -820,23 +799,21 @@
     letter-spacing:-0.015em;
     color:var(--ink);
   }
-  .sheet-header-btn{
-    background:none;
+  .sheet-close-btn{
+    width:32px;
+    height:32px;
+    border-radius:50%;
     border:none;
-    font-size:15px;
-    font-weight:600;
-    color:var(--accent);
-    cursor:pointer;
-    padding:6px 14px;
-    border-radius:9999px;
-    transition:opacity .15s var(--ease-out), transform .15s var(--ease-spring), background .15s var(--ease-out);
-  }
-  .sheet-header-btn:hover{background:var(--accent-light);}
-  .sheet-header-btn:active{opacity:0.6;transform:scale(0.96);}
-  .sheet-header-btn.cancel{
+    background:var(--cell);
     color:var(--sub);
-    font-weight:400;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    transition:background .2s var(--ease-out), color .2s var(--ease-out), transform .16s var(--ease-spring);
   }
+  .sheet-close-btn:hover{background:var(--accent-light);color:var(--accent);}
+  .sheet-close-btn:active{transform:scale(0.9);}
   .sheet-body{
     padding:20px 22px 28px;
     overflow-y:auto;
@@ -1227,9 +1204,10 @@ create policy "owner access" on bm_records for all
     <div class="sheet-header">
       <div class="sheet-handle" aria-hidden="true"></div>
       <div class="sheet-title-row">
-        <button type="button" class="sheet-header-btn cancel" id="sheetCloseBtn">取消</button>
         <h2 id="modalSheetTitle">记录排便</h2>
-        <button type="button" class="sheet-header-btn" id="sheetSaveTopBtn">保存</button>
+        <button type="button" class="sheet-close-btn" id="sheetCloseBtn" aria-label="关闭">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
       </div>
     </div>
     <div class="sheet-body" id="modalSheetBody">
@@ -1239,9 +1217,11 @@ create policy "owner access" on bm_records for all
       </button>
 
       <span class="field-label" style="margin-top:0;">日期和时间</span>
+      <div class="field-hint">支持补录过去的任意日期与时间</div>
       <input type="datetime-local" id="timeInput" class="dt-input">
 
       <span class="field-label">用时时长</span>
+      <div class="field-hint">计时完成会自动填入，也可手动输入分秒</div>
       <div class="duration-fields">
         <div class="duration-field">
           <input type="number" id="durMinInput" min="0" step="1" inputmode="numeric" placeholder="0">
@@ -1254,41 +1234,40 @@ create policy "owner access" on bm_records for all
       </div>
 
       <span class="field-label">形状 (Bristol)</span>
+      <div class="field-hint">国际标准 Bristol 7 型分类，Type 3 与 4 最为理想健康</div>
       <div class="bristol-list" id="bristolGrid"></div>
 
-      <button type="button" class="more-toggle-btn" id="moreFieldsToggle">
-        <span class="ico-label">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><line x1="4" x2="4" y1="21" y2="14"/><line x1="4" x2="4" y1="10" y2="3"/><line x1="12" x2="12" y1="21" y2="12"/><line x1="12" x2="12" y1="8" y2="3"/><line x1="20" x2="20" y1="21" y2="16"/><line x1="20" x2="20" y1="12" y2="3"/><line x1="1" x2="7" y1="14" y2="14"/><line x1="9" x2="15" y1="8" y2="8"/><line x1="17" x2="23" y1="16" y2="16"/></svg>
-          <span class="toggle-text">更多细节</span>
-        </span>
-        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="m6 9 6 6 6-6"/></svg>
-      </button>
+      <span class="field-label">分量</span>
+      <div class="field-hint">少 (约 100g) / 适中 (约 200g) / 多 (约 300g)</div>
+      <div class="chip-row" id="amountRow"></div>
 
-      <div class="more-fields-wrap" id="moreFieldsWrap">
-        <span class="field-label">分量</span>
-        <div class="chip-row" id="amountRow"></div>
+      <span class="field-label">颜色</span>
+      <div class="field-hint">正常为黄褐色或深褐色；深红、黑便或灰白色建议重点关注</div>
+      <div class="chip-row" id="colorRow"></div>
 
-        <span class="field-label">颜色</span>
-        <div class="chip-row" id="colorRow"></div>
+      <span class="field-label">气味</span>
+      <div class="field-hint">气味变化通常与近期蛋白质摄入或肠道菌群相关</div>
+      <div class="chip-row" id="smellRow"></div>
 
-        <span class="field-label">气味</span>
-        <div class="chip-row" id="smellRow"></div>
+      <span class="field-label">排便感觉</span>
+      <div class="field-hint">顺畅代表肠道蠕动良好；费力或不尽感常见于水分或纤维不足</div>
+      <div class="chip-row" id="feelRow"></div>
 
-        <span class="field-label">排便感觉</span>
-        <div class="chip-row" id="feelRow"></div>
+      <span class="field-label">伴随情况</span>
+      <div class="field-hint">可多选，如发现马桶挂壁、腹痛或带血建议留意</div>
+      <div class="chip-row" id="symptomRow"></div>
 
-        <span class="field-label">伴随情况</span>
-        <div class="chip-row" id="symptomRow"></div>
+      <span class="field-label">心情</span>
+      <div class="field-hint">情绪压力可通过肠脑轴直接影响排便顺畅度</div>
+      <div class="chip-row" id="moodRow"></div>
 
-        <span class="field-label">心情</span>
-        <div class="chip-row" id="moodRow"></div>
+      <span class="field-label">地点</span>
+      <div class="field-hint">观察不同环境或外出对排便规律的影响</div>
+      <div class="chip-row" id="placeRow"></div>
 
-        <span class="field-label">地点</span>
-        <div class="chip-row" id="placeRow"></div>
-
-        <span class="field-label">备注</span>
-        <textarea id="noteInput" rows="2" placeholder="输入其他细节…"></textarea>
-      </div>
+      <span class="field-label">备注</span>
+      <div class="field-hint">可补充当日饮水、饮食或特殊体感细节</div>
+      <textarea id="noteInput" rows="2" placeholder="输入其他细节…"></textarea>
     </div>
     <div class="sheet-footer">
       <button type="button" class="cancel-btn" id="sheetFooterCancelBtn">取消</button>
@@ -1525,24 +1504,10 @@ document.getElementById('manualLink').onclick = ()=>{
 };
 
 /* ---------- log modal bottom sheet ---------- */
-let moreFieldsOpen = false;
-function setMoreFieldsOpen(open){
-  moreFieldsOpen = open;
-  const wrap = document.getElementById('moreFieldsWrap');
-  const btn = document.getElementById('moreFieldsToggle');
-  if(wrap && btn){
-    wrap.classList.toggle('open', open);
-    wrap.style.display = open ? 'block' : 'none';
-    btn.classList.toggle('open', open);
-    const labelSpan = btn.querySelector('.toggle-text');
-    if(labelSpan) labelSpan.textContent = open ? '收起详细指标' : '记录更多细节 (分量、颜色、感觉等)';
-  }
+function setMoreFieldsOpen(){
+  // All fields are always displayed directly in the sheet
 }
 
-document.getElementById('moreFieldsToggle').onclick = (e)=>{
-  e.preventDefault();
-  setMoreFieldsOpen(!moreFieldsOpen);
-};
 
 document.getElementById('quickLogIdealBtn').onclick = (e)=>{
   e.preventDefault();
@@ -1856,8 +1821,7 @@ function handleSaveLog(){
 }
 
 document.getElementById('saveBtn').onclick = handleSaveLog;
-const sheetSaveTopBtn = document.getElementById('sheetSaveTopBtn');
-if(sheetSaveTopBtn) sheetSaveTopBtn.onclick = handleSaveLog;
+
 
 /* ---------- analysis / advice ---------- */
 const SHAPE_INFO = {
