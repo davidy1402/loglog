@@ -229,10 +229,10 @@
   .field-label{font-size:12px;font-weight:600;letter-spacing:0.02em;color:var(--sub);margin-bottom:6px;display:block;margin-top:16px;text-transform:none;}
   .field-label:first-child{margin-top:0;}
 
-  .duration-fields{display:flex;gap:10px;}
-  .duration-field{flex:1;display:flex;align-items:center;gap:8px;}
+  .duration-fields{display:flex;gap:10px;width:100%;}
+  .duration-field{flex:1;min-width:0;display:flex;align-items:center;gap:8px;}
   .duration-field input{
-    width:100%;border:1.5px solid var(--line);border-radius:12px;padding:10px 11px;
+    width:100%;min-width:0;border:1.5px solid var(--line);border-radius:14px;padding:10px 11px;
     font-size:14px;font-family:inherit;background:var(--card);color:var(--ink);
     font-variant-numeric:tabular-nums;
   }
@@ -368,8 +368,9 @@
 
   textarea{
     width:100%;
+    max-width:100%;
     border:1.5px solid var(--line);
-    border-radius:12px;
+    border-radius:14px;
     padding:11px;
     font-size:14px;
     font-family:inherit;
@@ -680,7 +681,7 @@
 
   /* ---------- datetime input ---------- */
   .dt-input{
-    width:100%;border:1.5px solid var(--line);border-radius:12px;padding:10px 11px;
+    width:100%;max-width:100%;border:1.5px solid var(--line);border-radius:14px;padding:10px 11px;
     font-size:14px;font-family:inherit;background:var(--card);color:var(--ink);
   }
   .dt-input:focus{outline:none;border-color:var(--accent);}
@@ -839,12 +840,20 @@
   .sheet-body{
     padding:16px 20px 20px;
     overflow-y:auto;
+    overflow-x:hidden !important;
     overscroll-behavior-y:contain;
     overscroll-behavior-x:none;
     touch-action:pan-y;
     flex:1;
     -webkit-transform:translateZ(0);
     transform:translateZ(0);
+    scrollbar-width:none;
+    -ms-overflow-style:none;
+  }
+  .sheet-body::-webkit-scrollbar{
+    display:none;
+    width:0;
+    height:0;
   }
   .sheet-footer{
     padding:12px 20px calc(14px + env(safe-area-inset-bottom, 0px));
