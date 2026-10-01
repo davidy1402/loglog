@@ -736,6 +736,9 @@
     opacity:0;
     pointer-events:none;
     transition:opacity .28s var(--ease-out);
+    touch-action:none;
+    overscroll-behavior:none;
+    -webkit-overflow-scrolling:auto;
   }
   .modal-overlay.open{
     opacity:1;
@@ -744,36 +747,44 @@
   .modal-sheet{
     width:100%;
     max-width:520px;
-    max-height:88dvh;
-    min-height:55dvh;
+    max-height:86dvh;
     background:var(--card-solid);
     border:1px solid var(--card-border);
+    border-bottom:none;
     border-radius:var(--radius-xl) var(--radius-xl) 0 0;
     box-shadow:var(--shadow-float);
     display:flex;
     flex-direction:column;
-    transform:translateY(100%);
-    transition:transform .34s cubic-bezier(0.16, 1, 0.3, 1);
+    transform:translate3d(0, 100%, 0);
+    -webkit-transform:translate3d(0, 100%, 0);
+    transition:transform .32s cubic-bezier(0.16, 1, 0.3, 1);
     overflow:hidden;
+    contain:paint;
+    touch-action:none;
+    -webkit-backface-visibility:hidden;
+    backface-visibility:hidden;
   }
   .modal-overlay.open .modal-sheet{
-    transform:translateY(0);
+    transform:translate3d(0, 0, 0);
+    -webkit-transform:translate3d(0, 0, 0);
   }
   .sheet-header{
     padding:12px 20px 10px;
     flex-shrink:0;
     border-bottom:1px solid var(--line);
-    background:var(--card);
-    backdrop-filter:var(--glass-blur);
-    -webkit-backdrop-filter:var(--glass-blur);
+    background:var(--card-solid);
+    touch-action:none;
+    user-select:none;
+    -webkit-user-select:none;
   }
   .sheet-handle{
     width:36px;
-    height:4px;
-    border-radius:2px;
+    height:5px;
+    border-radius:2.5px;
     background:var(--sub-light);
     margin:0 auto 10px;
     opacity:0.6;
+    touch-action:none;
   }
   .sheet-title-row{
     display:flex;
@@ -806,19 +817,21 @@
   .sheet-body{
     padding:16px 20px 20px;
     overflow-y:auto;
-    overscroll-behavior:contain;
-    -webkit-overflow-scrolling:touch;
+    overscroll-behavior-y:contain;
+    overscroll-behavior-x:none;
+    touch-action:pan-y;
     flex:1;
+    -webkit-transform:translateZ(0);
+    transform:translateZ(0);
   }
   .sheet-footer{
     padding:12px 20px calc(14px + env(safe-area-inset-bottom, 0px));
     flex-shrink:0;
     border-top:1px solid var(--line);
-    background:var(--card);
-    backdrop-filter:var(--glass-blur);
-    -webkit-backdrop-filter:var(--glass-blur);
+    background:var(--card-solid);
     display:flex;
     gap:10px;
+    touch-action:none;
   }
   .sheet-footer .cancel-btn{
     flex:1;
@@ -1491,6 +1504,30 @@ document.getElementById('quickLogIdealBtn').onclick = (e)=>{
   handleSaveLog();
 };
 
+let bodyScrollTop = 0;
+function lockBodyScroll(){
+  bodyScrollTop = window.pageYOffset || document.documentElement.scrollTop || 0;
+  document.body.style.position = 'fixed';
+  document.body.style.top = `-${bodyScrollTop}px`;
+  document.body.style.left = '0';
+  document.body.style.right = '0';
+  document.body.style.width = '100%';
+  document.body.style.overflow = 'hidden';
+}
+
+function unlockBodyScroll(){
+  const top = document.body.style.top;
+  document.body.style.position = '';
+  document.body.style.top = '';
+  document.body.style.left = '';
+  document.body.style.right = '';
+  document.body.style.width = '';
+  document.body.style.overflow = '';
+  if(top){
+    window.scrollTo(0, -parseInt(top, 10));
+  }
+}
+
 function openLogModal(autoOpenDetails = false){
   const isEdit = form._mode === 'edit';
   const titleEl = document.getElementById('modalSheetTitle');
@@ -1513,23 +1550,38 @@ function openLogModal(autoOpenDetails = false){
   setMoreFieldsOpen(autoOpenDetails);
 
   const overlay = document.getElementById('logModalOverlay');
+  const sheet = document.getElementById('logModalSheet');
+  if(sheet){
+    sheet.style.transform = '';
+    sheet.style.transition = '';
+  }
   if(overlay){
+    overlay.style.opacity = '';
     overlay.style.display = 'flex';
     requestAnimationFrame(()=>{
       overlay.classList.add('open');
     });
   }
-  document.body.style.overflow = 'hidden';
+  lockBodyScroll();
 }
 
 function closeLogModal(){
   const overlay = document.getElementById('logModalOverlay');
+  const sheet = document.getElementById('logModalSheet');
   if(!overlay) return;
   overlay.classList.remove('open');
-  document.body.style.overflow = '';
+  if(sheet){
+    sheet.style.transform = 'translate3d(0, 100%, 0)';
+  }
+  unlockBodyScroll();
   setTimeout(()=>{
     if(!overlay.classList.contains('open')){
       overlay.style.display = 'none';
+      if(sheet){
+        sheet.style.transform = '';
+        sheet.style.transition = '';
+      }
+      overlay.style.opacity = '';
     }
   }, 300);
 }
@@ -1553,6 +1605,72 @@ document.addEventListener('keydown', (e)=>{
     if(overlay && overlay.classList.contains('open')) closeLogModal();
   }
 });
+
+// Native iOS sheet drag-down dismiss gesture
+(function setupSheetDragDismiss(){
+  const sheet = document.getElementById('logModalSheet');
+  const overlay = document.getElementById('logModalOverlay');
+  const header = sheet ? sheet.querySelector('.sheet-header') : null;
+  if(!sheet || !overlay || !header) return;
+
+  let startY = 0;
+  let currentY = 0;
+  let isDragging = false;
+
+  function onTouchStart(e){
+    if(e.touches.length !== 1) return;
+    if(e.target.closest('button')) return;
+    startY = e.touches[0].clientY;
+    currentY = startY;
+    isDragging = false;
+  }
+
+  function onTouchMove(e){
+    if(!startY) return;
+    currentY = e.touches[0].clientY;
+    const deltaY = currentY - startY;
+
+    if(deltaY > 0){
+      isDragging = true;
+      e.cancelable && e.preventDefault();
+      sheet.style.transition = 'none';
+      const dampedY = deltaY < 180 ? deltaY : 180 + (deltaY - 180) * 0.45;
+      sheet.style.transform = `translate3d(0, ${dampedY}px, 0)`;
+      overlay.style.opacity = String(Math.max(0.15, 1 - (dampedY / 420)));
+    }
+  }
+
+  function onTouchEnd(){
+    if(!startY) return;
+    const deltaY = currentY - startY;
+    startY = 0;
+
+    if(!isDragging) return;
+    isDragging = false;
+
+    sheet.style.transition = 'transform .26s cubic-bezier(0.2, 0.9, 0.3, 1)';
+    overlay.style.transition = 'opacity .26s var(--ease-out)';
+
+    if(deltaY > 80){
+      sheet.style.transform = 'translate3d(0, 100%, 0)';
+      overlay.style.opacity = '0';
+      setTimeout(()=>{
+        closeLogModal();
+      }, 240);
+    } else {
+      sheet.style.transform = 'translate3d(0, 0, 0)';
+      overlay.style.opacity = '1';
+      setTimeout(()=>{
+        sheet.style.transition = '';
+        overlay.style.transition = '';
+      }, 260);
+    }
+  }
+
+  header.addEventListener('touchstart', onTouchStart, { passive: true });
+  header.addEventListener('touchmove', onTouchMove, { passive: false });
+  header.addEventListener('touchend', onTouchEnd, { passive: true });
+})();
 
 function makeChipRow(containerId, options, field, multi, warnList){
   warnList = warnList || [];
