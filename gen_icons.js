@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const OUT = __dirname;
 
-// 顺便记 logo — timer-ring + check, monochrome with a single accent.
+// 顺便记 logo: timer-ring + check, monochrome with a single accent.
 // Grey progress ring = the timing; accent check = the logged record.
 const ACCENT = '#0a84ff';
 const RING_ON_DARK = '#a1a1a8';

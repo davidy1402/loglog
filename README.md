@@ -8,18 +8,18 @@ Built with pure Vanilla JavaScript and zero external dependencies.
 
 ## Features
 
-- **Stopwatch & Manual Logging** — One-tap real-time timer with live elapsed display, plus manual/backfill record entry: pick any past date, time, and duration for an entry you forgot to log in the moment.
-- **Bristol Stool Scale Classification** — Visual Type 1–7 stool shape selector with emojis, titles, and clinical descriptions (from hard lumps to liquid).
-- **Multi-Dimensional Context** — Record volume, color (with safety warnings), odor, defecation feeling (strain, incomplete evacuation, urgency), accompanying symptoms (e.g. bleeding), mood, and location.
-- **Automated Health Insights Engine** — Instant post-log evaluation providing evidence-based feedback referencing:
+- **Stopwatch & Manual Logging**: One-tap real-time timer with live elapsed display, plus manual/backfill record entry: pick any past date, time, and duration for an entry you forgot to log in the moment.
+- **Bristol Stool Scale Classification**: Visual Type 1-7 stool shape selector with emojis, titles, and clinical descriptions (from hard lumps to liquid).
+- **Multi-Dimensional Context**: Record volume, color (with safety warnings), odor, defecation feeling (strain, incomplete evacuation, urgency), accompanying symptoms (e.g. bleeding), mood, and location.
+- **Automated Health Insights Engine**: Instant post-log evaluation providing evidence-based feedback referencing:
   - **Bristol Stool Scale** shape guidelines
   - **Rome IV Criteria** for functional constipation pattern detection (evaluating 30-day ratios of hard stools, straining, and incomplete evacuation > 25%)
   - **Mayo Clinic / Cleveland Clinic** stool color clinical reference guides
-  - **Toilet-time guidance** — advice on individual sessions and 7-day average duration when time spent sits above the commonly recommended ~10 minute window (associated with increased hemorrhoid risk)
-- **Weekly Analytics & 14-Day Chart** — Real-time stat cards tracking 7-day frequency, average interval, average duration, and an interactive 14-day bar chart.
-- **Offline PWA Support** — `Cache-First` Service Worker strategy ensuring full functionality in zero-signal environments (e.g. restrooms).
-- **Add to Home Screen (A2HS)** — Web App Manifest with standalone display mode, warm-tone maskable icons, and non-intrusive in-app install prompt.
-- **Local-First, Cloud-Optional** — Data lives in `localStorage` by default (zero server, zero telemetry), with one-click JSON backup/restore, CSV export, and complete data reset. Optionally connect your own free Supabase project for automatic cloud sync across devices — see [Cloud Sync](#cloud-sync-optional) below.
+  - **Toilet-time guidance**: advice on individual sessions and 7-day average duration when time spent sits above the commonly recommended ~10 minute window (associated with increased hemorrhoid risk)
+- **Weekly Analytics & 14-Day Chart**: Real-time stat cards tracking 7-day frequency, average interval, average duration, and an interactive 14-day bar chart.
+- **Offline PWA Support**: `Cache-First` Service Worker strategy ensuring full functionality in zero-signal environments (e.g. restrooms).
+- **Add to Home Screen (A2HS)**: Web App Manifest with standalone display mode, warm-tone maskable icons, and non-intrusive in-app install prompt.
+- **Local-First, Cloud-Optional**: Data lives in `localStorage` by default (zero server, zero telemetry), with one-click JSON backup/restore, CSV export, and complete data reset. Optionally connect your own free Supabase project for automatic cloud sync across devices (see [Cloud Sync](#cloud-sync-optional) below).
 
 ---
 
@@ -34,7 +34,7 @@ Built with pure Vanilla JavaScript and zero external dependencies.
 
 ## Quick Start (Local Mode)
 
-No build tools, Node modules, or compilation required — runs natively in any modern web browser:
+No build tools, Node modules, or compilation required: runs natively in any modern web browser:
 
 ```bash
 # Clone the repository
@@ -73,7 +73,7 @@ Open `http://127.0.0.1:8080/` (or `index.html`) in your browser.
 
 ## Cloud Sync (optional)
 
-By default all data stays on-device — great for privacy, but it means a lost/broken/reset phone loses everything. Cloud Sync is an **opt-in** feature that backs your records up to **your own** free [Supabase](https://supabase.com) project, so nothing is lost even if the device is. It does not use any Loglog-operated server — you own the database.
+By default all data stays on-device: great for privacy, but it means a lost/broken/reset phone loses everything. Cloud Sync is an **opt-in** feature that backs your records up to **your own** free [Supabase](https://supabase.com) project, so nothing is lost even if the device is. It does not use any Loglog-operated server: you own the database.
 
 ### Setup (about 2 minutes)
 
@@ -101,7 +101,7 @@ Once signed in, every new/edited/deleted record automatically syncs in the backg
 
 Notes:
 - The URL and anon key are stored only in this browser's `localStorage`; they are sent only to the Supabase URL you configured.
-- The anon key is meant to be public — access is enforced by the Row Level Security policy above (`auth.uid() = user_id`), not by keeping the key secret.
+- The anon key is meant to be public: access is enforced by the Row Level Security policy above (`auth.uid() = user_id`), not by keeping the key secret.
 - Turning Cloud Sync off (or never configuring it) leaves the app fully offline/local, exactly as before.
 
 ---

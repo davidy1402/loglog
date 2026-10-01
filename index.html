@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>顺便记 · 排便追踪</title>
+<title>顺便记 | 排便追踪</title>
 
 <!-- PWA Manifest & Theme -->
 <link rel="manifest" href="manifest.json">
@@ -122,15 +122,15 @@
     background-color:var(--bg-base);
     color:var(--ink);
     min-height:100vh;
-    padding:24px 16px calc(96px + env(safe-area-inset-bottom,0px));
+    padding:24px 18px calc(96px + env(safe-area-inset-bottom,0px));
     -webkit-font-smoothing:antialiased;
     text-rendering:optimizeLegibility;
     transition:background .3s var(--ease-out), color .3s var(--ease-out);
   }
 
   .wrap{max-width:520px;margin:0 auto;}
-  h1{font-size:24px;font-weight:700;letter-spacing:-0.025em;margin:0 0 4px;}
-  .sub{color:var(--sub);font-size:13px;margin-bottom:20px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  h1{font-size:25px;font-weight:700;letter-spacing:-0.025em;margin:0 0 6px;}
+  .sub{color:var(--sub);font-size:13px;margin-bottom:22px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
 
   button{font-family:inherit;-webkit-tap-highlight-color:transparent;}
   :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:12px;}
@@ -140,8 +140,8 @@
     backdrop-filter:var(--glass-blur);
     -webkit-backdrop-filter:var(--glass-blur);
     border-radius:var(--radius-lg);
-    padding:22px;
-    margin-bottom:16px;
+    padding:24px 22px;
+    margin-bottom:20px;
     box-shadow:var(--shadow-card);
     border:1px solid var(--card-border);
     animation:cardIn .5s var(--ease-out) both;
@@ -226,23 +226,23 @@
 
   .panel{display:none;margin-top:18px;}
   .panel.open{display:block;animation:panelIn .42s var(--ease-out) both;}
-  .field-label{font-size:12px;font-weight:600;letter-spacing:0.02em;color:var(--sub);margin-bottom:6px;display:block;margin-top:16px;text-transform:none;}
+  .field-label{font-size:12.5px;font-weight:600;letter-spacing:0.02em;color:var(--sub);margin-bottom:10px;display:block;margin-top:24px;text-transform:none;}
   .field-label:first-child{margin-top:0;}
 
-  .duration-fields{display:flex;gap:10px;width:100%;}
+  .duration-fields{display:flex;gap:12px;width:100%;}
   .duration-field{flex:1;min-width:0;display:flex;align-items:center;gap:8px;}
   .duration-field input{
-    width:100%;min-width:0;border:1.5px solid var(--line);border-radius:14px;padding:10px 11px;
+    width:100%;min-width:0;border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;
     font-size:14px;font-family:inherit;background:var(--card);color:var(--ink);
     font-variant-numeric:tabular-nums;
   }
   .duration-field input:focus{outline:none;border-color:var(--accent);}
   .duration-field span{font-size:12.5px;color:var(--sub);flex-shrink:0;}
 
-  .bristol-list{display:flex;flex-direction:column;gap:8px;}
+  .bristol-list{display:flex;flex-direction:column;gap:10px;}
   .quick-log-btn{
     width:100%;
-    padding:13px 18px;
+    padding:14px 20px;
     border-radius:9999px;
     border:1px solid var(--card-border);
     background:var(--card);
@@ -256,7 +256,7 @@
     justify-content:center;
     gap:8px;
     cursor:pointer;
-    margin-bottom:16px;
+    margin-bottom:20px;
     box-shadow:var(--shadow-card);
     transition:transform .16s var(--ease-spring), border-color .2s var(--ease-out), background .2s var(--ease-out), box-shadow .2s var(--ease-out);
   }
@@ -267,7 +267,7 @@
     display:flex;
     align-items:center;
     gap:14px;
-    padding:13px 16px;
+    padding:14px 16px;
     border:1px solid var(--card-border);
     border-radius:18px;
     cursor:pointer;
@@ -306,7 +306,7 @@
 
   .more-toggle-btn{
     width:100%;
-    padding:12px 18px;
+    padding:13px 18px;
     border-radius:9999px;
     border:1px solid var(--card-border);
     background:var(--cell);
@@ -317,7 +317,7 @@
     align-items:center;
     justify-content:space-between;
     cursor:pointer;
-    margin:18px 0 8px;
+    margin:22px 0 12px;
     transition:background .18s var(--ease-out), border-color .18s var(--ease-out);
   }
   .more-toggle-btn:hover{background:var(--accent-light);}
@@ -330,8 +330,8 @@
   .chip-row{
     display:flex;
     flex-wrap:wrap;
-    gap:8px;
-    margin-bottom:12px;
+    gap:9px;
+    margin-bottom:14px;
   }
   .chip{
     padding:10px 18px;
@@ -371,7 +371,7 @@
     max-width:100%;
     border:1.5px solid var(--line);
     border-radius:14px;
-    padding:11px;
+    padding:12px 14px;
     font-size:14px;
     font-family:inherit;
     resize:none;
@@ -417,11 +417,11 @@
   .save-btn:active, .cancel-btn:active{transform:scale(0.97);}
   .skip-btn{background:none;color:var(--sub);font-size:12px;text-decoration:underline;padding:6px;}
 
-  .stats-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+  .stats-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
   .stat-box{
     background:var(--cell);
     border-radius:var(--radius-md);
-    padding:12px 4px;
+    padding:14px 6px;
     text-align:center;
     min-width:0;
     overflow:hidden;
@@ -436,7 +436,7 @@
     text-overflow:ellipsis;
     line-height:1.25;
   }
-  .stat-label{font-size:11px;color:var(--sub);margin-top:3px;white-space:nowrap;}
+  .stat-label{font-size:11px;color:var(--sub);margin-top:4px;white-space:nowrap;}
 
   .chart{display:flex;align-items:flex-end;gap:4px;height:70px;margin-top:16px;}
   .chart .bar{
@@ -448,17 +448,17 @@
     transform-origin:bottom;
     animation:growUp .55s var(--ease-out) both;
   }
-  .chart-labels{display:flex;gap:4px;margin-top:5px;}
+  .chart-labels{display:flex;gap:4px;margin-top:6px;}
   .chart-labels span{flex:1;text-align:center;font-size:9px;color:var(--sub);}
 
   .history-item{
-    padding:16px 18px;
+    padding:18px 20px;
     border-radius:var(--radius-md);
     background:var(--card);
     backdrop-filter:var(--glass-blur);
     -webkit-backdrop-filter:var(--glass-blur);
     border:1px solid var(--card-border);
-    margin-bottom:12px;
+    margin-bottom:14px;
     font-size:13px;
     box-shadow:var(--shadow-card);
     animation:fadeIn .4s var(--ease-out) both;
@@ -471,7 +471,7 @@
   .hist-top{display:flex;justify-content:space-between;align-items:center;}
   .hist-time{font-weight:600;}
   .hist-meta{color:var(--sub);font-size:11.5px;margin-top:2px;}
-  .hist-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;}
+  .hist-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
   .hist-tag{
     font-size:11px;
     font-weight:500;
@@ -483,7 +483,7 @@
   }
   .hist-tag.ideal{background:rgba(52,199,89,0.16);color:var(--good);font-weight:600;}
   .hist-tag.warn{background:var(--tag-warn-bg);color:var(--bad);font-weight:600;}
-  .hist-note{color:var(--sub);font-size:12px;margin-top:6px;line-height:1.4;}
+  .hist-note{color:var(--sub);font-size:12px;margin-top:8px;line-height:1.45;}
   .del-btn{
     background:none;border:none;color:var(--sub);font-size:16px;cursor:pointer;margin-left:6px;
     width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;
@@ -492,9 +492,9 @@
   .del-btn:hover{background:var(--tag-warn-bg);color:var(--bad);}
   .del-btn:active{transform:scale(0.85);}
 
-  .section-title{font-size:15px;font-weight:700;letter-spacing:-0.01em;margin-bottom:12px;}
-  .section-title .st-sub{font-weight:400;color:var(--sub);font-size:11px;margin-left:6px;letter-spacing:0;}
-  .empty{color:var(--sub);font-size:13px;text-align:center;padding:24px 0;}
+  .section-title{font-size:15.5px;font-weight:700;letter-spacing:-0.01em;margin-bottom:15px;}
+  .section-title .st-sub{font-weight:400;color:var(--sub);font-size:11.5px;margin-left:6px;letter-spacing:0;}
+  .empty{color:var(--sub);font-size:13px;text-align:center;padding:28px 0;}
 
   .sync-pill{
     display:inline-flex;
@@ -791,7 +791,7 @@
     -webkit-transform:translate3d(0, 0, 0);
   }
   .sheet-header{
-    padding:12px 20px 10px;
+    padding:14px 22px 12px;
     flex-shrink:0;
     border-bottom:1px solid var(--line);
     background:var(--card-solid);
@@ -804,7 +804,7 @@
     height:5px;
     border-radius:2.5px;
     background:var(--sub-light);
-    margin:0 auto 10px;
+    margin:0 auto 12px;
     opacity:0.6;
     touch-action:none;
   }
@@ -838,7 +838,7 @@
     font-weight:400;
   }
   .sheet-body{
-    padding:16px 20px 20px;
+    padding:20px 22px 28px;
     overflow-y:auto;
     overflow-x:hidden !important;
     overscroll-behavior-y:contain;
@@ -856,21 +856,21 @@
     height:0;
   }
   .sheet-footer{
-    padding:12px 20px calc(14px + env(safe-area-inset-bottom, 0px));
+    padding:14px 22px calc(16px + env(safe-area-inset-bottom, 0px));
     flex-shrink:0;
     border-top:1px solid var(--line);
     background:var(--card-solid);
     display:flex;
-    gap:10px;
+    gap:12px;
     touch-action:none;
   }
   .sheet-footer .cancel-btn{
     flex:1;
     margin-top:0;
-    padding:13px 18px;
+    padding:14px 18px;
     border-radius:9999px;
     border:none;
-    font-size:15px;
+    font-size:15.5px;
     font-weight:600;
     cursor:pointer;
     background:var(--cell);
@@ -880,10 +880,10 @@
   .sheet-footer .save-btn{
     flex:2;
     margin-top:0;
-    padding:13px 20px;
+    padding:14px 20px;
     border-radius:9999px;
     border:none;
-    font-size:15px;
+    font-size:15.5px;
     font-weight:600;
     cursor:pointer;
     background:var(--accent);
@@ -956,7 +956,7 @@
 
     <div class="card">
       <div class="since-label">距离上次</div>
-      <div class="since-value" id="sinceValue">—</div>
+      <div class="since-value" id="sinceValue">-</div>
       <div class="since-time" id="sinceTime"></div>
 
       <div class="timer-box" id="timerBox" style="display:none;">
@@ -965,13 +965,13 @@
       </div>
 
       <button class="log-btn" id="startBtn">开始</button>
-      <button type="button" class="cancel-timer-btn" id="cancelTimerBtn" style="display:none;">放弃本次计时</button>
-      <span class="manual-link" id="manualLink">没计时?手动补录一笔</span>
+      <button type="button" class="cancel-timer-btn" id="cancelTimerBtn" style="display:none;">取消计时</button>
+      <span class="manual-link" id="manualLink">手动补录</span>
 
       <div class="panel" id="insightPanel">
         <div class="insight-banner" id="insightBanner"></div>
         <ul class="insight-notes" id="insightNotes"></ul>
-        <div class="insight-disclaimer">提示基于 Bristol Stool Scale 及个人记录趋势生成，仅供参考。</div>
+        <div class="insight-disclaimer">参考 Bristol 分级及个人记录趋势</div>
         <button class="log-btn" id="insightDoneBtn" style="margin-top:16px;">完成</button>
       </div>
     </div>
@@ -984,11 +984,11 @@
           <div class="stat-label">近7天次数</div>
         </div>
         <div class="stat-box">
-          <div class="stat-num" id="statAvgInterval">—</div>
+          <div class="stat-num" id="statAvgInterval">-</div>
           <div class="stat-label">平均间隔</div>
         </div>
         <div class="stat-box">
-          <div class="stat-num" id="statAvgDuration">—</div>
+          <div class="stat-num" id="statAvgDuration">-</div>
           <div class="stat-label">平均用时</div>
         </div>
       </div>
@@ -1006,11 +1006,11 @@
   <!-- ============ CALENDAR VIEW ============ -->
   <div class="view" id="viewCalendar">
     <h1>日历记录</h1>
-    <div class="sub">按天回看每一次记录</div>
+    <div class="sub">按日期查看记录</div>
 
     <div class="card">
       <div class="cal-head">
-        <div class="cal-title" id="calTitle">—</div>
+        <div class="cal-title" id="calTitle">-</div>
         <div class="cal-nav">
           <button id="calPrev" aria-label="上个月">‹</button>
           <button class="cal-today" id="calToday">今天</button>
@@ -1034,17 +1034,17 @@
   <!-- ============ STATS VIEW ============ -->
   <div class="view" id="viewStats">
     <h1>统计分析</h1>
-    <div class="sub">全部基于你自己的真实记录</div>
+    <div class="sub">个人记录趋势</div>
 
     <div class="card">
       <div class="duo-stat">
         <div>
-          <div class="big" id="sAvgInterval">—</div>
+          <div class="big" id="sAvgInterval">-</div>
           <div class="lbl">平均间隔时间</div>
         </div>
         <div>
-          <div class="big" id="sAvgDuration">—</div>
-          <div class="lbl">平均便便时长</div>
+          <div class="big" id="sAvgDuration">-</div>
+          <div class="lbl">平均时长</div>
         </div>
       </div>
     </div>
@@ -1060,7 +1060,7 @@
     </div>
 
     <div class="card">
-      <div class="section-title">本周便便分量 <span class="st-sub">近7天 · 估算</span></div>
+      <div class="section-title">本周分量 <span class="st-sub">近 7 天估算</span></div>
       <div id="volumeStats"></div>
     </div>
 
@@ -1080,14 +1080,14 @@
     </div>
 
     <div class="card">
-      <div class="section-title">便便时长</div>
+      <div class="section-title">用时分析</div>
       <div class="duo-stat" style="margin-bottom:16px;">
         <div>
-          <div class="big" id="sMaxDuration">—</div>
+          <div class="big" id="sMaxDuration">-</div>
           <div class="lbl">最长时长</div>
         </div>
         <div>
-          <div class="big" id="sMinDuration">—</div>
+          <div class="big" id="sMinDuration">-</div>
           <div class="lbl">最短时长</div>
         </div>
       </div>
@@ -1098,14 +1098,14 @@
   <!-- ============ SETTINGS VIEW ============ -->
   <div class="view" id="viewSettings">
     <h1>系统设置</h1>
-    <div class="sub">云端同步、提醒与数据管理</div>
+    <div class="sub">同步、提醒与数据</div>
 
     <div class="card" id="cloudCard">
-      <div class="section-title">云端多端同步 (Supabase)</div>
-      <div class="data-hint">已连接个人专属云端，换设备或在微信/浏览器打开自动保持数据同步。</div>
+      <div class="section-title">云端同步</div>
+      <div class="data-hint">跨设备自动同步记录。</div>
 
       <div id="cloudSignedInStep" style="display:none;margin-top:12px;">
-        <div class="data-hint" id="cloudAccountText" style="font-weight:600;color:var(--text);">已连接个人云端 · davidy@loglog.app</div>
+        <div class="data-hint" id="cloudAccountText" style="font-weight:600;color:var(--text);">已连接个人云端: davidy@loglog.app</div>
         <div class="cloud-status-row"><span class="cloud-status-dot" id="cloudStatusDot"></span><span id="cloudSyncStatus">尚未同步</span></div>
         <div class="data-btns" style="margin-top:12px;">
           <button id="cloudSyncNowBtn" class="data-primary">立即同步</button>
@@ -1114,12 +1114,12 @@
       </div>
 
       <div id="cloudLoginStep" style="display:none;margin-top:12px;">
-        <div class="data-hint" style="color:var(--warn-text);">云端当前未连接，点击下方按钮一键直连：</div>
+        <div class="data-hint" style="color:var(--warn-text);">云端未连接，可重新连接：</div>
         <div class="data-btns" style="margin-top:10px;">
-          <button id="cloudDirectLoginBtn" class="data-primary">一键重连个人云端</button>
+          <button id="cloudDirectLoginBtn" class="data-primary">连接个人云端</button>
         </div>
         <details style="margin-top:12px;font-size:12px;color:var(--sub);">
-          <summary style="cursor:pointer;">自定义邮箱登录或验证码</summary>
+          <summary style="cursor:pointer;">邮箱验证码登录</summary>
           <div style="margin-top:10px;">
             <input type="email" id="cloudEmailInput" class="dt-input" placeholder="you@example.com" value="davidy@loglog.app" autocapitalize="off" autocorrect="off">
             <input type="password" id="cloudPasswordInput" class="dt-input" placeholder="输入 Supabase 账户密码" value="davidy_1402_loglog" autocomplete="current-password" style="margin-top:8px;">
@@ -1137,7 +1137,7 @@
       </div>
 
       <details id="cloudCustomDetails" style="margin-top:14px;font-size:12px;color:var(--sub);">
-        <summary style="cursor:pointer;">高级选项：自定义 Supabase 项目后端</summary>
+        <summary style="cursor:pointer;">自定义 Supabase 后端</summary>
         <div style="margin-top:10px;">
           <span class="field-label">Supabase 项目 URL</span>
           <input type="text" id="cloudUrlInput" class="dt-input" placeholder="https://xxxx.supabase.co" autocapitalize="off" autocorrect="off">
@@ -1168,8 +1168,8 @@ create policy "owner access" on bm_records for all
     </div>
 
     <div class="card">
-      <div class="section-title">规律提醒与异常预警</div>
-      <div class="field-hint">智能监控排便间隔与形状趋势，适时给予温和建议与健康防护。</div>
+      <div class="section-title">提醒与预警</div>
+      <div class="data-hint">排便间隔与健康趋势提示。</div>
       
       <span class="field-label" style="margin-top:14px;">超期规律提醒</span>
       <div class="reminder-set" style="margin-top:8px;">
@@ -1187,18 +1187,18 @@ create policy "owner access" on bm_records for all
         </select>
       </div>
 
-      <span class="field-label" style="margin-top:16px;">连续异常智能拦截预警</span>
+      <span class="field-label" style="margin-top:16px;">连续异常预警</span>
       <div class="reminder-set" style="margin-top:8px;">
         <label class="switch">
           <input type="checkbox" id="healthAlertToggle" checked>
           <span class="track"></span>
-          <span>连续 3 次异常分析</span>
+          <span>连续 3 次异常提醒</span>
         </label>
-        <span class="st-sub" style="font-size:12px;color:var(--sub);">自动识别便秘/腹泻集群</span>
+        <span class="st-sub" style="font-size:12px;color:var(--sub);">便秘与腹泻识别</span>
       </div>
 
       <div class="data-btns" style="margin-top:16px;">
-        <button id="testNotifBtn" style="width:100%;">测试系统推送通知</button>
+        <button id="testNotifBtn" style="width:100%;">测试推送通知</button>
       </div>
     </div>
 
@@ -1235,15 +1235,13 @@ create policy "owner access" on bm_records for all
     <div class="sheet-body" id="modalSheetBody">
       <button type="button" class="quick-log-btn" id="quickLogIdealBtn">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;color:var(--good);"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
-        <span>一键快捷打卡 (理想状态 Type 4 · 顺畅)</span>
+        <span>快捷记录 (Type 4 顺畅)</span>
       </button>
 
       <span class="field-label" style="margin-top:0;">日期和时间</span>
-      <div class="field-hint">可以选任意过去的日期和时间，方便补签。</div>
       <input type="datetime-local" id="timeInput" class="dt-input">
 
       <span class="field-label">用时时长</span>
-      <div class="field-hint">计时结束会自动填入；手动补录也可填大概时长。</div>
       <div class="duration-fields">
         <div class="duration-field">
           <input type="number" id="durMinInput" min="0" step="1" inputmode="numeric" placeholder="0">
@@ -1255,13 +1253,13 @@ create policy "owner access" on bm_records for all
         </div>
       </div>
 
-      <span class="field-label">形状 (Bristol 7 型)</span>
+      <span class="field-label">形状 (Bristol)</span>
       <div class="bristol-list" id="bristolGrid"></div>
 
       <button type="button" class="more-toggle-btn" id="moreFieldsToggle">
         <span class="ico-label">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><line x1="4" x2="4" y1="21" y2="14"/><line x1="4" x2="4" y1="10" y2="3"/><line x1="12" x2="12" y1="21" y2="12"/><line x1="12" x2="12" y1="8" y2="3"/><line x1="20" x2="20" y1="21" y2="16"/><line x1="20" x2="20" y1="12" y2="3"/><line x1="1" x2="7" y1="14" y2="14"/><line x1="9" x2="15" y1="8" y2="8"/><line x1="17" x2="23" y1="16" y2="16"/></svg>
-          <span class="toggle-text">记录更多细节 (分量、颜色、感觉等)</span>
+          <span class="toggle-text">更多细节</span>
         </span>
         <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="m6 9 6 6 6-6"/></svg>
       </button>
@@ -1279,7 +1277,7 @@ create policy "owner access" on bm_records for all
         <span class="field-label">排便感觉</span>
         <div class="chip-row" id="feelRow"></div>
 
-        <span class="field-label">伴随情况 (可多选)</span>
+        <span class="field-label">伴随情况</span>
         <div class="chip-row" id="symptomRow"></div>
 
         <span class="field-label">心情</span>
@@ -1909,10 +1907,10 @@ function analyzeRecord(rec, priorRecords){
   const top3 = allChronological.slice(0, 3);
   if(top3.length >= 3){
     if(top3.every(r => r.bristol && r.bristol <= 2)){
-      notes.push('🚨 连续 3 次记录偏硬/便秘（Type 1–2）。建议每天饮水 2000ml 以上，增加火龙果、燕麦等膳食纤维，晨起喝温水刺激肠道，如厕避免久坐。');
+      notes.push('🚨 连续 3 次记录偏硬/便秘 (Type 1-2)。建议每天饮水 2000ml 以上，增加火龙果、燕麦等膳食纤维，晨起喝温水刺激肠道，如厕避免久坐。');
       escalate('warn');
     } else if(top3.every(r => r.bristol && r.bristol >= 6)){
-      notes.push('⚠️ 连续 3 次记录偏稀/水样（Type 6–7）。建议少量多次补充温水及电解质防止脱水，避免生冷油腻，如持续超过 2 天建议就医。');
+      notes.push('⚠️ 连续 3 次记录偏稀/水样 (Type 6-7)。建议少量多次补充温水及电解质防止脱水，避免生冷油腻，如持续超过 2 天建议就医。');
       escalate('bad');
     }
   }
@@ -2066,11 +2064,11 @@ function renderStats(){
   }
   const last14 = intervals.slice(-14);
   document.getElementById('statAvgInterval').textContent =
-    last14.length>0 ? fmtDuration(last14.reduce((a,b)=>a+b,0)/last14.length) : '—';
+    last14.length>0 ? fmtDuration(last14.reduce((a,b)=>a+b,0)/last14.length) : '-';
 
   const durations = records.filter(r=>r.duration!=null).map(r=>r.duration);
   document.getElementById('statAvgDuration').textContent =
-    durations.length>0 ? fmtDuration(durations.reduce((a,b)=>a+b,0)/durations.length) : '—';
+    durations.length>0 ? fmtDuration(durations.reduce((a,b)=>a+b,0)/durations.length) : '-';
 
   const days = [];
   for(let i=13;i>=0;i--){
@@ -2104,7 +2102,7 @@ function recordTagsHtml(r){
   let tags = '';
   if(r.bristol){
     const bInfo = BRISTOL_MAP[r.bristol];
-    const bTag = bInfo ? `Type ${r.bristol} · ${bInfo.title}` : `Type ${r.bristol}`;
+    const bTag = bInfo ? `Type ${r.bristol} (${bInfo.title})` : `Type ${r.bristol}`;
     const bLevel = (r.bristol === 4) ? ' ideal' : ((r.bristol <= 2 || r.bristol >= 6) ? ' warn' : '');
     tags += `<span class="hist-tag${bLevel}">${bTag}</span>`;
   }
@@ -2129,7 +2127,7 @@ function buildHistoryItem(r, timeLabel){
     <div class="hist-top">
       <div>
         <span class="hist-time">${timeLabel}</span>
-        ${r.duration!=null ? `<span class="hist-meta"> · 用时 ${fmtDuration(r.duration)}</span>` : ''}
+        ${r.duration!=null ? `<span class="hist-meta">，用时 ${fmtDuration(r.duration)}</span>` : ''}
       </div>
       <div class="hist-actions">
         <button class="edit-btn" aria-label="编辑">
@@ -2266,7 +2264,7 @@ function renderDayDetail(dayRecs){
     el.innerHTML = `<div class="day-detail-title">${label}</div><div class="empty">这一天没有记录</div>`;
     return;
   }
-  el.innerHTML = `<div class="day-detail-title">${label} · ${dayRecs.length} 次</div>`;
+  el.innerHTML = `<div class="day-detail-title">${label} (${dayRecs.length} 次)</div>`;
   [...dayRecs].sort((a,b)=>b.ts-a.ts).forEach(r=>{
     el.appendChild(buildHistoryItem(r, fmtHM(r.ts)));
   });
@@ -2325,7 +2323,7 @@ function makeDonut(containerId, data, unit){
     <div class="legend-row" style="animation-delay:${i*45}ms">
       <span class="legend-dot" style="background:${d.color}"></span>
       <span class="legend-name">${d.label}</span>
-      <span class="legend-val">${d.value}${unit||''} · ${pct(d.value,total)}%</span>
+      <span class="legend-val">${d.value}${unit||''} (${pct(d.value,total)}%)</span>
     </div>`).join('');
   el.innerHTML = `
     <div class="donut-wrap">
@@ -2343,7 +2341,7 @@ function makeMeters(containerId, data){
     const p = pct(d.value,total);
     return `
       <div class="meter-row">
-        <div class="meter-top"><span>${d.label}</span><span class="pct">${d.value} 次 · ${p}%</span></div>
+        <div class="meter-top"><span>${d.label}</span><span class="pct">${d.value} 次 (${p}%)</span></div>
         <div class="meter-track"><div class="meter-fill" style="width:${p}%;animation-delay:${i*80}ms"></div></div>
       </div>`;
   }).join('');
@@ -2369,10 +2367,10 @@ function renderStatsView(){
   for(let i=1;i<sorted.length;i++) intervals.push(sorted[i].ts - sorted[i-1].ts);
   const activeIntervals = intervals.filter(iv => iv <= 7 * 86400000);
   document.getElementById('sAvgInterval').textContent =
-    activeIntervals.length ? fmtDuration(activeIntervals.reduce((a,b)=>a+b,0)/activeIntervals.length) : '—';
+    activeIntervals.length ? fmtDuration(activeIntervals.reduce((a,b)=>a+b,0)/activeIntervals.length) : '-';
   const durations = records.filter(r=>r.duration!=null).map(r=>r.duration);
   document.getElementById('sAvgDuration').textContent =
-    durations.length ? fmtDuration(durations.reduce((a,b)=>a+b,0)/durations.length) : '—';
+    durations.length ? fmtDuration(durations.reduce((a,b)=>a+b,0)/durations.length) : '-';
 
   // shape distribution
   const shapeData = BRISTOL.map(b=>({
@@ -2428,9 +2426,9 @@ function renderStatsView(){
 
   // duration min/max + distribution
   document.getElementById('sMaxDuration').textContent =
-    durations.length ? fmtDuration(Math.max(...durations)) : '—';
+    durations.length ? fmtDuration(Math.max(...durations)) : '-';
   document.getElementById('sMinDuration').textContent =
-    durations.length ? fmtDuration(Math.min(...durations)) : '—';
+    durations.length ? fmtDuration(Math.min(...durations)) : '-';
   const M = 60000;
   const dData = [
     {label:'< 3 分钟', value: durations.filter(d=>d < 3*M).length},
@@ -2476,7 +2474,7 @@ function renderVolume(){
       ${pts.map(p=>`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="3.5" fill="var(--ink)"></circle>`).join('')}
     </svg>
     <div class="area-x">${labels.map(l=>`<span>${l}</span>`).join('')}</div>
-    <div class="field-hint" style="margin-top:8px;">分量按 少≈100克 / 适中≈200克 / 多≈300克 估算,仅供趋势参考。</div>`;
+    <div class="data-hint" style="margin-top:10px;">分量参考：少 100g / 适中 200g / 多 300g</div>`;
 }
 
 /* ---------- export / clear ---------- */
@@ -2524,7 +2522,7 @@ function updateBackupHint(){
   } else {
     const days = Math.floor((Date.now()-last)/86400000);
     const ago = days<=0 ? '今天' : days+' 天前';
-    el.textContent = '上次备份:' + ago + (days>=14 ? ' · 距上次备份较久,建议再备份一次。' : '');
+    el.textContent = '上次备份: ' + ago + (days>=14 ? '，建议重新备份' : '');
   }
 }
 
@@ -2875,7 +2873,7 @@ const CloudSync = {
       } else {
         dot.classList.add('ok');
         const last = parseInt(localStorage.getItem(CLOUD_LAST_SYNC_KEY) || '0', 10);
-        text.textContent = last ? ('已同步 · ' + fmtDate(last)) : '尚未同步';
+        text.textContent = last ? ('已同步: ' + fmtDate(last)) : '尚未同步';
       }
     }
     if(hDot && hText){
@@ -2905,7 +2903,7 @@ function renderCloudStep(){
     if(loginStep) loginStep.style.display = 'none';
     if(signedInStep) signedInStep.style.display = 'block';
     const accEl = document.getElementById('cloudAccountText');
-    if(accEl) accEl.textContent = '已连接个人云端 · ' + (CloudSync.session.email || 'davidy@loglog.app');
+    if(accEl) accEl.textContent = '已连接个人云端: ' + (CloudSync.session.email || 'davidy@loglog.app');
     CloudSync.updateUI('idle');
   }
 }
@@ -3052,7 +3050,7 @@ function checkHealthAlerts(){
   const isAllHard = top3.every(r => r.bristol && r.bristol <= 2);
   if(isAllHard){
     banner.className = 'health-alert-banner warn';
-    document.getElementById('healthAlertTitle').textContent = '⚠️ 连续 3 次记录偏硬 / 便秘 (Bristol 1–2)';
+    document.getElementById('healthAlertTitle').textContent = '⚠️ 连续 3 次记录偏硬 / 便秘 (Bristol 1-2)';
     document.getElementById('healthAlertDesc').textContent = '建议：每天饮水 2000ml 以上，多摄入火龙果、燕麦、奇亚籽等可溶性膳食纤维，晨起喝温水刺激肠道蠕动，如厕尽量控制在 10 分钟内。';
     banner.style.display = 'flex';
     return;
@@ -3062,7 +3060,7 @@ function checkHealthAlerts(){
   const isAllLoose = top3.every(r => r.bristol && r.bristol >= 6);
   if(isAllLoose){
     banner.className = 'health-alert-banner';
-    document.getElementById('healthAlertTitle').textContent = '🚨 连续 3 次记录偏稀 / 水样 (Bristol 6–7)';
+    document.getElementById('healthAlertTitle').textContent = '🚨 连续 3 次记录偏稀 / 水样 (Bristol 6-7)';
     document.getElementById('healthAlertDesc').textContent = '建议：少量多次补充温水及电解质（淡盐水或补液盐），防止脱水；暂停生冷、辛辣及高油腻食物。若持续超过 2 天或伴随腹痛发热，建议就医。';
     banner.style.display = 'flex';
     return;
@@ -3098,7 +3096,7 @@ function checkReminder(){
     const tipText = `距离上次已 ${timeStr}。今天记得多喝水、多吃蔬菜与膳食纤维，适度走动促进肠道蠕动哦 💧🥗`;
     document.getElementById('reminderText').textContent = tipText;
     banner.style.display = 'flex';
-    sendWebNotification('顺便记 · 规律排便提醒', `已超过 ${timeStr} 未记录排便。今天记得多喝水、多吃蔬果与膳食纤维。`);
+    sendWebNotification('顺便记: 规律排便提醒', `已超过 ${timeStr} 未记录排便。今天记得多喝水、多吃蔬果与膳食纤维。`);
   } else {
     banner.style.display = 'none';
   }
@@ -3162,7 +3160,7 @@ function setupReminderUI(){
       }
 
       try {
-        new Notification('顺便记 · 提醒测试', {
+        new Notification('顺便记: 提醒测试', {
           body: '已超过 2 天未记录，今天记得多喝水与补充膳食纤维 💧🥗',
           icon: 'icon-192.png',
           badge: 'icon-192.png'
