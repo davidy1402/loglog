@@ -722,6 +722,7 @@
   .edit-btn svg{width:15px;height:15px;}
 
   /* ---------- modal & bottom sheet ---------- */
+  /* ---------- iOS Bottom Sheet ---------- */
   .modal-overlay{
     position:fixed;
     inset:0;
@@ -743,7 +744,8 @@
   .modal-sheet{
     width:100%;
     max-width:520px;
-    max-height:88vh;
+    max-height:88dvh;
+    min-height:55dvh;
     background:var(--card-solid);
     border:1px solid var(--card-border);
     border-radius:var(--radius-xl) var(--radius-xl) 0 0;
@@ -758,7 +760,7 @@
     transform:translateY(0);
   }
   .sheet-header{
-    padding:14px 20px 10px;
+    padding:12px 20px 10px;
     flex-shrink:0;
     border-bottom:1px solid var(--line);
     background:var(--card);
@@ -771,7 +773,7 @@
     border-radius:2px;
     background:var(--sub-light);
     margin:0 auto 10px;
-    opacity:0.5;
+    opacity:0.6;
   }
   .sheet-title-row{
     display:flex;
@@ -785,26 +787,48 @@
     letter-spacing:-0.015em;
     color:var(--ink);
   }
-  .sheet-close-btn{
-    width:32px;
-    height:32px;
-    border-radius:50%;
-    background:var(--cell);
+  .sheet-header-btn{
+    background:none;
     border:none;
-    display:flex;
-    align-items:center;
-    justify-content:center;
+    font-size:15px;
+    font-weight:600;
+    color:var(--accent);
     cursor:pointer;
-    color:var(--sub);
-    transition:transform .16s var(--ease-spring), color .2s var(--ease-out), background .2s var(--ease-out);
+    padding:4px 8px;
+    border-radius:8px;
+    transition:opacity .15s var(--ease-out), transform .15s var(--ease-spring);
   }
-  .sheet-close-btn:active{transform:scale(0.92);}
-  .sheet-close-btn:hover{color:var(--ink);background:var(--line);}
+  .sheet-header-btn:active{opacity:0.6;transform:scale(0.96);}
+  .sheet-header-btn.cancel{
+    color:var(--sub);
+    font-weight:400;
+  }
   .sheet-body{
-    padding:16px 20px calc(24px + env(safe-area-inset-bottom, 0px));
+    padding:16px 20px 20px;
     overflow-y:auto;
+    overscroll-behavior:contain;
     -webkit-overflow-scrolling:touch;
     flex:1;
+  }
+  .sheet-footer{
+    padding:12px 20px calc(14px + env(safe-area-inset-bottom, 0px));
+    flex-shrink:0;
+    border-top:1px solid var(--line);
+    background:var(--card);
+    backdrop-filter:var(--glass-blur);
+    -webkit-backdrop-filter:var(--glass-blur);
+    display:flex;
+    gap:10px;
+  }
+  .sheet-footer .cancel-btn{
+    flex:1;
+    margin-top:0;
+    padding:13px;
+  }
+  .sheet-footer .save-btn{
+    flex:2;
+    margin-top:0;
+    padding:13px;
   }
 
   /* ---------- keyframes ---------- */
@@ -878,72 +902,6 @@
       <button class="log-btn" id="startBtn">开始</button>
       <button type="button" class="cancel-timer-btn" id="cancelTimerBtn" style="display:none;">放弃本次计时</button>
       <span class="manual-link" id="manualLink">没计时?手动补录一笔</span>
-
-      <div class="panel" id="logPanel">
-        <button type="button" class="quick-log-btn" id="quickLogIdealBtn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;color:var(--good);"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
-          <span>一键快捷打卡 (理想状态 Type 4 · 顺畅)</span>
-        </button>
-
-        <span class="field-label">日期和时间</span>
-        <div class="field-hint">可以选任意过去的日期和时间,方便补签之前忘记记的一笔。</div>
-        <input type="datetime-local" id="timeInput" class="dt-input">
-
-        <span class="field-label">时长</span>
-        <div class="field-hint">计时结束会自动填入;手动补录/补签也可以自己填一个大概时长。</div>
-        <div class="duration-fields">
-          <div class="duration-field">
-            <input type="number" id="durMinInput" min="0" step="1" inputmode="numeric" placeholder="0">
-            <span>分</span>
-          </div>
-          <div class="duration-field">
-            <input type="number" id="durSecInput" min="0" max="59" step="1" inputmode="numeric" placeholder="0">
-            <span>秒</span>
-          </div>
-        </div>
-
-        <span class="field-label">形状 (Bristol 7 型)</span>
-        <div class="bristol-list" id="bristolGrid"></div>
-
-        <button type="button" class="more-toggle-btn" id="moreFieldsToggle">
-          <span class="ico-label">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><line x1="4" x2="4" y1="21" y2="14"/><line x1="4" x2="4" y1="10" y2="3"/><line x1="12" x2="12" y1="21" y2="12"/><line x1="12" x2="12" y1="8" y2="3"/><line x1="20" x2="20" y1="21" y2="16"/><line x1="20" x2="20" y1="12" y2="3"/><line x1="1" x2="7" y1="14" y2="14"/><line x1="9" x2="15" y1="8" y2="8"/><line x1="17" x2="23" y1="16" y2="16"/></svg>
-            <span class="toggle-text">记录更多细节 (分量、颜色、感觉等)</span>
-          </span>
-          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="m6 9 6 6 6-6"/></svg>
-        </button>
-
-        <div class="more-fields-wrap" id="moreFieldsWrap">
-          <span class="field-label">分量</span>
-          <div class="chip-row" id="amountRow"></div>
-
-          <span class="field-label">颜色</span>
-          <div class="chip-row" id="colorRow"></div>
-
-          <span class="field-label">气味</span>
-          <div class="chip-row" id="smellRow"></div>
-
-          <span class="field-label">排便感觉</span>
-          <div class="chip-row" id="feelRow"></div>
-
-          <span class="field-label">伴随情况 (可多选)</span>
-          <div class="chip-row" id="symptomRow"></div>
-
-          <span class="field-label">心情</span>
-          <div class="chip-row" id="moodRow"></div>
-
-          <span class="field-label">地点</span>
-          <div class="chip-row" id="placeRow"></div>
-
-          <span class="field-label">备注</span>
-          <textarea id="noteInput" rows="2" placeholder="输入其他细节…"></textarea>
-        </div>
-
-        <div class="row-btns">
-          <button class="cancel-btn" id="cancelBtn">取消</button>
-          <button class="save-btn" id="saveBtn">保存记录</button>
-        </div>
-      </div>
 
       <div class="panel" id="insightPanel">
         <div class="insight-banner" id="insightBanner"></div>
@@ -1078,11 +1036,53 @@
     <div class="sub">云端同步、提醒与数据管理</div>
 
     <div class="card" id="cloudCard">
-      <div class="section-title">云端同步 (Supabase)</div>
-      <div class="data-hint">把记录同步到你自己的免费 Supabase 项目，换设备或清空浏览器也能实时保留数据。<span class="cloud-help-link" id="cloudHelpLink">查看建表 SQL</span></div>
-      <div class="cloud-help-box" id="cloudHelpBox" style="display:none;">
-        <b>Supabase 数据库建表 SQL (在 SQL Editor 运行一次):</b>
-        <pre>create table bm_records (
+      <div class="section-title">云端多端同步 (Supabase)</div>
+      <div class="data-hint">已连接个人专属云端，换设备或在微信/浏览器打开自动保持数据同步。</div>
+
+      <div id="cloudSignedInStep" style="display:none;margin-top:12px;">
+        <div class="data-hint" id="cloudAccountText" style="font-weight:600;color:var(--text);">已连接个人云端 · davidy@loglog.app</div>
+        <div class="cloud-status-row"><span class="cloud-status-dot" id="cloudStatusDot"></span><span id="cloudSyncStatus">尚未同步</span></div>
+        <div class="data-btns" style="margin-top:12px;">
+          <button id="cloudSyncNowBtn" class="data-primary">立即同步</button>
+          <button id="cloudSignOutBtn">断开连接</button>
+        </div>
+      </div>
+
+      <div id="cloudLoginStep" style="display:none;margin-top:12px;">
+        <div class="data-hint" style="color:var(--warn-text);">云端当前未连接，点击下方按钮一键直连：</div>
+        <div class="data-btns" style="margin-top:10px;">
+          <button id="cloudDirectLoginBtn" class="data-primary">一键重连个人云端</button>
+        </div>
+        <details style="margin-top:12px;font-size:12px;color:var(--sub);">
+          <summary style="cursor:pointer;">自定义邮箱登录或验证码</summary>
+          <div style="margin-top:10px;">
+            <input type="email" id="cloudEmailInput" class="dt-input" placeholder="you@example.com" value="davidy@loglog.app" autocapitalize="off" autocorrect="off">
+            <input type="password" id="cloudPasswordInput" class="dt-input" placeholder="输入 Supabase 账户密码" value="davidy_1402_loglog" autocomplete="current-password" style="margin-top:8px;">
+            <div class="data-btns" style="margin-top:8px;">
+              <button id="cloudSendOtpBtn">发送邮箱验证码</button>
+            </div>
+            <div id="cloudOtpStep" style="display:none;margin-top:8px;">
+              <input type="text" id="cloudOtpInput" class="dt-input" placeholder="6位验证码" inputmode="numeric">
+              <button id="cloudVerifyOtpBtn" class="data-primary" style="margin-top:8px;">验证并登录</button>
+            </div>
+          </div>
+        </details>
+      </div>
+
+      <details id="cloudCustomDetails" style="margin-top:14px;font-size:12px;color:var(--sub);">
+        <summary style="cursor:pointer;">高级选项：自定义 Supabase 项目后端</summary>
+        <div style="margin-top:10px;">
+          <span class="field-label">Supabase 项目 URL</span>
+          <input type="text" id="cloudUrlInput" class="dt-input" placeholder="https://xxxx.supabase.co" autocapitalize="off" autocorrect="off">
+          <span class="field-label" style="margin-top:8px;">Supabase anon public key</span>
+          <input type="text" id="cloudKeyInput" class="dt-input" placeholder="eyJhbGc..." autocapitalize="off" autocorrect="off">
+          <div class="data-btns" style="margin-top:10px;">
+            <button id="cloudSaveCfgBtn" class="data-primary">保存配置并继续</button>
+            <button id="cloudRestoreDefaultCfgBtn">恢复默认配置</button>
+          </div>
+          <div class="cloud-help-box" style="margin-top:12px;">
+            <b>Supabase 数据库建表 SQL (在 SQL Editor 运行一次):</b>
+            <pre>create table bm_records (
   id text primary key,
   user_id uuid not null default auth.uid() references auth.users(id),
   ts bigint not null,
@@ -1095,46 +1095,9 @@
 alter table bm_records enable row level security;
 create policy "owner access" on bm_records for all
   using (auth.uid() = user_id) with check (auth.uid() = user_id);</pre>
-      </div>
-
-      <div id="cloudSetupStep">
-        <span class="field-label">Supabase 项目 URL</span>
-        <input type="text" id="cloudUrlInput" class="dt-input" placeholder="https://xxxx.supabase.co" autocapitalize="off" autocorrect="off">
-        <span class="field-label">Supabase anon public key</span>
-        <input type="text" id="cloudKeyInput" class="dt-input" placeholder="eyJhbGc..." autocapitalize="off" autocorrect="off">
-        <div class="data-btns" style="margin-top:14px;">
-          <button id="cloudSaveCfgBtn" class="data-primary">保存配置并继续</button>
-        </div>
-      </div>
-
-      <div id="cloudLoginStep" style="display:none;">
-        <span class="field-label">账号邮箱</span>
-        <input type="email" id="cloudEmailInput" class="dt-input" placeholder="you@example.com" autocapitalize="off" autocorrect="off">
-        <span class="field-label">密码 (直连登录)</span>
-        <input type="password" id="cloudPasswordInput" class="dt-input" placeholder="输入 Supabase 账户密码" autocomplete="current-password">
-        <div class="data-btns" style="margin-top:14px;">
-          <button id="cloudDirectLoginBtn" class="data-primary">邮箱密码直连登录</button>
-          <button id="cloudSendOtpBtn">或发送邮箱验证码</button>
-          <button id="cloudChangeCfgBtn">更换项目</button>
-        </div>
-        <div id="cloudOtpStep" style="display:none;margin-top:14px;">
-          <span class="field-label">邮箱验证码</span>
-          <div class="field-hint">验证码已发送，几分钟内有效。</div>
-          <input type="text" id="cloudOtpInput" class="dt-input" placeholder="6位验证码" inputmode="numeric">
-          <div class="data-btns" style="margin-top:14px;">
-            <button id="cloudVerifyOtpBtn" class="data-primary">验证并登录</button>
           </div>
         </div>
-      </div>
-
-      <div id="cloudSignedInStep" style="display:none;">
-        <div class="data-hint" id="cloudAccountText"></div>
-        <div class="cloud-status-row"><span class="cloud-status-dot" id="cloudStatusDot"></span><span id="cloudSyncStatus">尚未同步</span></div>
-        <div class="data-btns">
-          <button id="cloudSyncNowBtn" class="data-primary">立即同步</button>
-          <button id="cloudSignOutBtn">退出登录</button>
-        </div>
-      </div>
+      </details>
     </div>
 
     <div class="card">
@@ -1191,75 +1154,80 @@ create policy "owner access" on bm_records for all
 
 </div>
 
-<!-- ============ EDIT RECORD MODAL / SHEET ============ -->
-<div class="modal-overlay" id="editModalOverlay" style="display:none;" aria-hidden="true">
-  <div class="modal-sheet" id="editModalSheet" role="dialog" aria-modal="true" aria-labelledby="editModalTitle">
+<!-- ============ BOTTOM SHEET: RECORD & EDIT ============ -->
+<div class="modal-overlay" id="logModalOverlay" style="display:none;" aria-hidden="true">
+  <div class="modal-sheet" id="logModalSheet" role="dialog" aria-modal="true" aria-labelledby="modalSheetTitle">
     <div class="sheet-header">
-      <div class="sheet-handle"></div>
+      <div class="sheet-handle" aria-hidden="true"></div>
       <div class="sheet-title-row">
-        <h2 id="editModalTitle">修改记录</h2>
-        <button type="button" class="sheet-close-btn" id="editModalCloseBtn" aria-label="关闭">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
+        <button type="button" class="sheet-header-btn cancel" id="sheetCloseBtn">取消</button>
+        <h2 id="modalSheetTitle">记录排便</h2>
+        <button type="button" class="sheet-header-btn" id="sheetSaveTopBtn">保存</button>
       </div>
     </div>
-    <div class="sheet-body">
-      <span class="field-label" style="margin-top:0;">日期和时间</span>
-      <input type="datetime-local" id="editTimeInput" class="dt-input">
+    <div class="sheet-body" id="modalSheetBody">
+      <button type="button" class="quick-log-btn" id="quickLogIdealBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;color:var(--good);"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+        <span>一键快捷打卡 (理想状态 Type 4 · 顺畅)</span>
+      </button>
 
-      <span class="field-label">时长</span>
+      <span class="field-label" style="margin-top:0;">日期和时间</span>
+      <div class="field-hint">可以选任意过去的日期和时间，方便补签。</div>
+      <input type="datetime-local" id="timeInput" class="dt-input">
+
+      <span class="field-label">用时时长</span>
+      <div class="field-hint">计时结束会自动填入；手动补录也可填大概时长。</div>
       <div class="duration-fields">
         <div class="duration-field">
-          <input type="number" id="editDurMinInput" min="0" step="1" inputmode="numeric" placeholder="0">
+          <input type="number" id="durMinInput" min="0" step="1" inputmode="numeric" placeholder="0">
           <span>分</span>
         </div>
         <div class="duration-field">
-          <input type="number" id="editDurSecInput" min="0" max="59" step="1" inputmode="numeric" placeholder="0">
+          <input type="number" id="durSecInput" min="0" max="59" step="1" inputmode="numeric" placeholder="0">
           <span>秒</span>
         </div>
       </div>
 
       <span class="field-label">形状 (Bristol 7 型)</span>
-      <div class="bristol-list" id="editBristolGrid"></div>
+      <div class="bristol-list" id="bristolGrid"></div>
 
-      <button type="button" class="more-toggle-btn" id="editMoreFieldsToggle">
+      <button type="button" class="more-toggle-btn" id="moreFieldsToggle">
         <span class="ico-label">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><line x1="4" x2="4" y1="21" y2="14"/><line x1="4" x2="4" y1="10" y2="3"/><line x1="12" x2="12" y1="21" y2="12"/><line x1="12" x2="12" y1="8" y2="3"/><line x1="20" x2="20" y1="21" y2="16"/><line x1="20" x2="20" y1="12" y2="3"/><line x1="1" x2="7" y1="14" y2="14"/><line x1="9" x2="15" y1="8" y2="8"/><line x1="17" x2="23" y1="16" y2="16"/></svg>
-          <span class="toggle-text">更多细节 (分量、颜色、感觉等)</span>
+          <span class="toggle-text">记录更多细节 (分量、颜色、感觉等)</span>
         </span>
         <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="m6 9 6 6 6-6"/></svg>
       </button>
 
-      <div class="more-fields-wrap" id="editMoreFieldsWrap">
+      <div class="more-fields-wrap" id="moreFieldsWrap">
         <span class="field-label">分量</span>
-        <div class="chip-row" id="editAmountRow"></div>
+        <div class="chip-row" id="amountRow"></div>
 
         <span class="field-label">颜色</span>
-        <div class="chip-row" id="editColorRow"></div>
+        <div class="chip-row" id="colorRow"></div>
 
         <span class="field-label">气味</span>
-        <div class="chip-row" id="editSmellRow"></div>
+        <div class="chip-row" id="smellRow"></div>
 
         <span class="field-label">排便感觉</span>
-        <div class="chip-row" id="editFeelRow"></div>
+        <div class="chip-row" id="feelRow"></div>
 
         <span class="field-label">伴随情况 (可多选)</span>
-        <div class="chip-row" id="editSymptomRow"></div>
+        <div class="chip-row" id="symptomRow"></div>
 
         <span class="field-label">心情</span>
-        <div class="chip-row" id="editMoodRow"></div>
+        <div class="chip-row" id="moodRow"></div>
 
         <span class="field-label">地点</span>
-        <div class="chip-row" id="editPlaceRow"></div>
+        <div class="chip-row" id="placeRow"></div>
 
         <span class="field-label">备注</span>
-        <textarea id="editNoteInput" rows="2" placeholder="输入其他细节…"></textarea>
+        <textarea id="noteInput" rows="2" placeholder="输入其他细节…"></textarea>
       </div>
-
-      <div class="row-btns" style="margin-top:20px;">
-        <button type="button" class="cancel-btn" id="editCancelBtn">取消</button>
-        <button type="button" class="save-btn" id="editSaveBtn">保存修改</button>
-      </div>
+    </div>
+    <div class="sheet-footer">
+      <button type="button" class="cancel-btn" id="sheetFooterCancelBtn">取消</button>
+      <button type="button" class="save-btn" id="saveBtn">保存记录</button>
     </div>
   </div>
 </div>
@@ -1352,8 +1320,19 @@ let form = {};
 
 function resetForm(){
   form = {
-    bristol:null, amount:null, color:null, smell:null,
-    feel:null, symptoms:[], mood:null, place:null, note:''
+    _mode: 'create',
+    _editId: null,
+    _startTs: null,
+    _duration: null,
+    bristol: null,
+    amount: null,
+    color: null,
+    smell: null,
+    feel: null,
+    symptoms: [],
+    mood: null,
+    place: null,
+    note: ''
   };
 }
 resetForm();
@@ -1443,15 +1422,16 @@ function updateTimerDisplay(){
 
 document.getElementById('startBtn').onclick = ()=>{
   if(activeTimer){
-    // stop -> open detail panel
+    // stop -> open bottom sheet
     const duration = Date.now() - activeTimer.startTs;
     resetForm();
+    form._mode = 'create';
     form._startTs = activeTimer.startTs;
     form._duration = duration;
     activeTimer = null;
     saveTimer();
     renderTimerUI();
-    openLogPanel();
+    openLogModal();
   } else {
     activeTimer = { startTs: Date.now() };
     saveTimer();
@@ -1473,12 +1453,13 @@ if(cancelTimerBtn){
 
 document.getElementById('manualLink').onclick = ()=>{
   resetForm();
+  form._mode = 'create';
   form._startTs = Date.now();
   form._duration = null;
-  openLogPanel();
+  openLogModal();
 };
 
-/* ---------- log panel ---------- */
+/* ---------- log modal bottom sheet ---------- */
 let moreFieldsOpen = false;
 function setMoreFieldsOpen(open){
   moreFieldsOpen = open;
@@ -1501,15 +1482,23 @@ document.getElementById('moreFieldsToggle').onclick = (e)=>{
 document.getElementById('quickLogIdealBtn').onclick = (e)=>{
   e.preventDefault();
   resetForm();
+  form._mode = 'create';
   form._startTs = Date.now();
   form.bristol = 4;
   form.amount = '适中';
   form.feel = '顺畅';
   form.color = '黄褐色';
-  document.getElementById('saveBtn').click();
+  handleSaveLog();
 };
 
-function openLogPanel(autoOpenDetails = false){
+function openLogModal(autoOpenDetails = false){
+  const isEdit = form._mode === 'edit';
+  const titleEl = document.getElementById('modalSheetTitle');
+  if(titleEl) titleEl.textContent = isEdit ? '编辑排便记录' : '记录排便';
+
+  const quickBtn = document.getElementById('quickLogIdealBtn');
+  if(quickBtn) quickBtn.style.display = isEdit ? 'none' : 'flex';
+
   if(form._duration != null){
     document.getElementById('durMinInput').value = Math.floor(form._duration/60000);
     document.getElementById('durSecInput').value = Math.floor((form._duration%60000)/1000);
@@ -1519,24 +1508,66 @@ function openLogPanel(autoOpenDetails = false){
   }
   document.getElementById('noteInput').value = form.note || '';
   document.getElementById('timeInput').value = toLocalInput(form._startTs || Date.now());
+
   renderAllChipGroups();
   setMoreFieldsOpen(autoOpenDetails);
-  document.getElementById('logPanel').classList.add('open');
-  document.getElementById('logPanel').scrollIntoView({behavior:'smooth', block:'nearest'});
+
+  const overlay = document.getElementById('logModalOverlay');
+  if(overlay){
+    overlay.style.display = 'flex';
+    requestAnimationFrame(()=>{
+      overlay.classList.add('open');
+    });
+  }
+  document.body.style.overflow = 'hidden';
 }
+
+function closeLogModal(){
+  const overlay = document.getElementById('logModalOverlay');
+  if(!overlay) return;
+  overlay.classList.remove('open');
+  document.body.style.overflow = '';
+  setTimeout(()=>{
+    if(!overlay.classList.contains('open')){
+      overlay.style.display = 'none';
+    }
+  }, 300);
+}
+
+const sheetCloseBtn = document.getElementById('sheetCloseBtn');
+if(sheetCloseBtn) sheetCloseBtn.onclick = closeLogModal;
+
+const sheetFooterCancelBtn = document.getElementById('sheetFooterCancelBtn');
+if(sheetFooterCancelBtn) sheetFooterCancelBtn.onclick = closeLogModal;
+
+const logModalOverlay = document.getElementById('logModalOverlay');
+if(logModalOverlay){
+  logModalOverlay.onclick = (e)=>{
+    if(e.target === logModalOverlay) closeLogModal();
+  };
+}
+
+document.addEventListener('keydown', (e)=>{
+  if(e.key === 'Escape'){
+    const overlay = document.getElementById('logModalOverlay');
+    if(overlay && overlay.classList.contains('open')) closeLogModal();
+  }
+});
 
 function makeChipRow(containerId, options, field, multi, warnList){
   warnList = warnList || [];
   const el = document.getElementById(containerId);
+  if(!el) return;
   el.innerHTML = '';
   options.forEach(opt=>{
     const chip = document.createElement('div');
-    const isSelected = multi ? form[field].includes(opt) : form[field] === opt;
+    const isSelected = multi ? (form[field]||[]).includes(opt) : form[field] === opt;
     const isWarn = warnList.includes(opt);
     chip.className = 'chip' + (isSelected?' selected':'') + (isWarn?' warn-chip':'');
     chip.textContent = opt;
     chip.onclick = ()=>{
       if(multi){
+        form[field] = form[field] || [];
         const idx = form[field].indexOf(opt);
         if(idx>=0) form[field].splice(idx,1); else form[field].push(opt);
       } else {
@@ -1550,6 +1581,7 @@ function makeChipRow(containerId, options, field, multi, warnList){
 
 function renderBristolGrid(){
   const grid = document.getElementById('bristolGrid');
+  if(!grid) return;
   grid.innerHTML = '';
   BRISTOL.forEach(b=>{
     const el = document.createElement('div');
@@ -1585,203 +1617,25 @@ function renderAllChipGroups(){
   makeChipRow('placeRow', PLACE_OPTS, 'place', false);
 }
 
-document.getElementById('cancelBtn').onclick = ()=>{
-  document.getElementById('logPanel').classList.remove('open');
-};
-
-/* ---------- edit modal sheet ---------- */
-let editForm = {};
-function resetEditForm(){
-  editForm = {
-    _editId: null, _startTs: null, _duration: null,
-    bristol: null, amount: null, color: null, smell: null,
-    feel: null, symptoms: [], mood: null, place: null, note: ''
-  };
-}
-
-let editMoreFieldsOpen = false;
-function setEditMoreFieldsOpen(open){
-  editMoreFieldsOpen = open;
-  const wrap = document.getElementById('editMoreFieldsWrap');
-  const btn = document.getElementById('editMoreFieldsToggle');
-  if(wrap && btn){
-    wrap.classList.toggle('open', open);
-    wrap.style.display = open ? 'block' : 'none';
-    btn.classList.toggle('open', open);
-    const labelSpan = btn.querySelector('.toggle-text');
-    if(labelSpan) labelSpan.textContent = open ? '收起详细指标' : '更多细节 (分量、颜色、感觉等)';
-  }
-}
-document.getElementById('editMoreFieldsToggle').onclick = (e)=>{
-  e.preventDefault();
-  setEditMoreFieldsOpen(!editMoreFieldsOpen);
-};
-
-function renderEditBristolGrid(){
-  const grid = document.getElementById('editBristolGrid');
-  if(!grid) return;
-  grid.innerHTML = '';
-  BRISTOL.forEach(b=>{
-    const el = document.createElement('div');
-    el.className = 'bristol-card' + (editForm.bristol===b.n ? ' selected':'');
-    const levelClass = b.status || 'good';
-    const tagText = b.tag || ('Type ' + b.n);
-    el.innerHTML = `
-      <div class="bristol-num">${b.n}</div>
-      <div class="bristol-text">
-        <div class="bristol-header">
-          <span class="bristol-title">${b.title}</span>
-          <span class="level-tag ${levelClass}">${tagText}</span>
-        </div>
-        <span class="bristol-desc">${b.desc}</span>
-      </div>
-    `;
-    el.onclick = ()=>{
-      editForm.bristol = (editForm.bristol===b.n) ? null : b.n;
-      renderEditBristolGrid();
-    };
-    grid.appendChild(el);
-  });
-}
-
-function makeEditChipRow(containerId, options, field, multi, warnList){
-  warnList = warnList || [];
-  const el = document.getElementById(containerId);
-  if(!el) return;
-  el.innerHTML = '';
-  options.forEach(opt=>{
-    const chip = document.createElement('div');
-    const isSelected = multi ? (editForm[field]||[]).includes(opt) : editForm[field] === opt;
-    const isWarn = warnList.includes(opt);
-    chip.className = 'chip' + (isSelected?' selected':'') + (isWarn?' warn-chip':'');
-    chip.textContent = opt;
-    chip.onclick = ()=>{
-      if(multi){
-        editForm[field] = editForm[field] || [];
-        const idx = editForm[field].indexOf(opt);
-        if(idx>=0) editForm[field].splice(idx,1); else editForm[field].push(opt);
-      } else {
-        editForm[field] = (editForm[field]===opt) ? null : opt;
-      }
-      makeEditChipRow(containerId, options, field, multi, warnList);
-    };
-    el.appendChild(chip);
-  });
-}
-
-function renderEditAllChipGroups(){
-  renderEditBristolGrid();
-  makeEditChipRow('editAmountRow', AMOUNT_OPTS, 'amount', false);
-  makeEditChipRow('editColorRow', COLOR_OPTS, 'color', false, WARN_COLORS);
-  makeEditChipRow('editSmellRow', SMELL_OPTS, 'smell', false);
-  makeEditChipRow('editFeelRow', FEEL_OPTS, 'feel', false);
-  makeEditChipRow('editSymptomRow', SYMPTOM_OPTS, 'symptoms', true, WARN_SYMPTOMS);
-  makeEditChipRow('editMoodRow', MOOD_OPTS, 'mood', false);
-  makeEditChipRow('editPlaceRow', PLACE_OPTS, 'place', false);
-}
-
-function openEditModal(){
-  const overlay = document.getElementById('editModalOverlay');
-  overlay.style.display = 'flex';
-  requestAnimationFrame(()=>{
-    overlay.classList.add('open');
-  });
-  document.body.style.overflow = 'hidden';
-}
-
-function closeEditModal(){
-  const overlay = document.getElementById('editModalOverlay');
-  overlay.classList.remove('open');
-  document.body.style.overflow = '';
-  setTimeout(()=>{
-    if(!overlay.classList.contains('open')){
-      overlay.style.display = 'none';
-    }
-  }, 300);
-}
-
-document.getElementById('editModalCloseBtn').onclick = closeEditModal;
-document.getElementById('editCancelBtn').onclick = closeEditModal;
-document.getElementById('editModalOverlay').onclick = (e)=>{
-  if(e.target === document.getElementById('editModalOverlay')){
-    closeEditModal();
-  }
-};
-document.addEventListener('keydown', (e)=>{
-  if(e.key === 'Escape' && document.getElementById('editModalOverlay').classList.contains('open')){
-    closeEditModal();
-  }
-});
-
 function startEdit(r){
-  resetEditForm();
-  editForm._editId = r.id;
-  editForm._startTs = r.ts;
-  editForm._duration = r.duration;
-  editForm.bristol = r.bristol;
-  editForm.amount = r.amount;
-  editForm.color = r.color;
-  editForm.smell = r.smell;
-  editForm.feel = r.feel;
-  editForm.symptoms = (r.symptoms || []).slice();
-  editForm.mood = r.mood;
-  editForm.place = r.place;
-  editForm.note = r.note || '';
+  resetForm();
+  form._mode = 'edit';
+  form._editId = r.id;
+  form._startTs = r.ts;
+  form._duration = r.duration;
+  form.bristol = r.bristol;
+  form.amount = r.amount;
+  form.color = r.color;
+  form.smell = r.smell;
+  form.feel = r.feel;
+  form.symptoms = (r.symptoms || []).slice();
+  form.mood = r.mood;
+  form.place = r.place;
+  form.note = r.note || '';
 
-  document.getElementById('editTimeInput').value = toLocalInput(r.ts);
-  if(r.duration != null){
-    document.getElementById('editDurMinInput').value = Math.floor(r.duration/60000);
-    document.getElementById('editDurSecInput').value = Math.floor((r.duration%60000)/1000);
-  } else {
-    document.getElementById('editDurMinInput').value = '';
-    document.getElementById('editDurSecInput').value = '';
-  }
-  document.getElementById('editNoteInput').value = r.note || '';
-
-  renderEditAllChipGroups();
   const hasExtra = !!(r.amount || r.color || r.smell || r.feel || (r.symptoms && r.symptoms.length) || r.mood || r.place || r.note);
-  setEditMoreFieldsOpen(hasExtra);
-
-  openEditModal();
+  openLogModal(hasExtra);
 }
-
-function readEditDurationInput(){
-  const minRaw = document.getElementById('editDurMinInput').value;
-  const secRaw = document.getElementById('editDurSecInput').value;
-  if(minRaw === '' && secRaw === '') return null;
-  const min = Math.max(0, parseInt(minRaw, 10) || 0);
-  const sec = Math.max(0, Math.min(59, parseInt(secRaw, 10) || 0));
-  return min*60000 + sec*1000;
-}
-
-document.getElementById('editSaveBtn').onclick = ()=>{
-  if(!editForm._editId) return;
-  const note = document.getElementById('editNoteInput').value.trim();
-  const ts = fromLocalInput(document.getElementById('editTimeInput').value);
-  const fields = {
-    ts,
-    duration: readEditDurationInput(),
-    bristol: editForm.bristol,
-    amount: editForm.amount,
-    color: editForm.color,
-    smell: editForm.smell,
-    feel: editForm.feel,
-    symptoms: editForm.symptoms.slice(),
-    mood: editForm.mood,
-    place: editForm.place,
-    note,
-    updatedAt: Date.now()
-  };
-
-  const idx = records.findIndex(r => String(r.id) === String(editForm._editId));
-  if(idx >= 0){
-    records[idx] = Object.assign({}, records[idx], fields);
-    selectedDayKey = dayKey(records[idx].ts);
-    saveRecords();
-    renderAll();
-  }
-  closeEditModal();
-};
 
 function readDurationInput(){
   const minRaw = document.getElementById('durMinInput').value;
@@ -1792,25 +1646,48 @@ function readDurationInput(){
   return min*60000 + sec*1000;
 }
 
-document.getElementById('saveBtn').onclick = ()=>{
+function handleSaveLog(){
   const note = document.getElementById('noteInput').value.trim();
   const ts = fromLocalInput(document.getElementById('timeInput').value);
   const fields = {
-    ts, duration: readDurationInput(),
-    bristol: form.bristol, amount: form.amount, color: form.color, smell: form.smell,
-    feel: form.feel, symptoms: form.symptoms.slice(), mood: form.mood, place: form.place, note,
+    ts,
+    duration: readDurationInput(),
+    bristol: form.bristol,
+    amount: form.amount,
+    color: form.color,
+    smell: form.smell,
+    feel: form.feel,
+    symptoms: (form.symptoms || []).slice(),
+    mood: form.mood,
+    place: form.place,
+    note,
     updatedAt: Date.now()
   };
 
-  const newRec = Object.assign({ id: Date.now() + '_' + Math.random().toString(36).slice(2,7) }, fields);
-  const priorRecords = records.slice();
-  records.push(newRec);
-  saveRecords();
-  renderAll();
-  document.getElementById('logPanel').classList.remove('open');
-  const analysis = analyzeRecord(newRec, priorRecords);
-  showInsight(analysis);
-};
+  if(form._mode === 'edit' && form._editId){
+    const idx = records.findIndex(r => String(r.id) === String(form._editId));
+    if(idx >= 0){
+      records[idx] = Object.assign({}, records[idx], fields);
+      selectedDayKey = dayKey(records[idx].ts);
+      saveRecords();
+      renderAll();
+    }
+  } else {
+    const newRec = Object.assign({ id: Date.now() + '_' + Math.random().toString(36).slice(2,7) }, fields);
+    const priorRecords = records.slice();
+    records.push(newRec);
+    saveRecords();
+    renderAll();
+    const analysis = analyzeRecord(newRec, priorRecords);
+    showInsight(analysis);
+  }
+
+  closeLogModal();
+}
+
+document.getElementById('saveBtn').onclick = handleSaveLog;
+const sheetSaveTopBtn = document.getElementById('sheetSaveTopBtn');
+if(sheetSaveTopBtn) sheetSaveTopBtn.onclick = handleSaveLog;
 
 /* ---------- analysis / advice ---------- */
 const SHAPE_INFO = {
@@ -1965,7 +1842,7 @@ function analyzeRecord(rec, priorRecords){
 }
 
 function showInsight(analysis){
-  document.getElementById('logPanel').classList.remove('open');
+  closeLogModal();
   const banner = document.getElementById('insightBanner');
   banner.className = 'insight-banner ' + analysis.status;
   const statusText = {good:'状态良好', warn:'建议留意', bad:'需要关注'}[analysis.status];
@@ -2541,8 +2418,13 @@ const CLOUD_SESSION_KEY = 'bm_cloud_session';
 const CLOUD_LAST_SYNC_KEY = 'bm_cloud_last_sync';
 const CLOUD_TOMBSTONES_KEY = 'bm_cloud_tombstones';
 
+const DEFAULT_CLOUD_CFG = {
+  url: 'https://fdfpyryqncdtkawbcrxw.supabase.co',
+  anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkZnB5cnlxbmNkdGthd2Jjcnh3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzMDk0NTksImV4cCI6MjEwMDg4NTQ1OX0.qIbcBJ0r51jW9A4VmzMx2i6qAdQssf44T1bJsL36yxI'
+};
+
 const CloudSync = {
-  cfg: JSON.parse(localStorage.getItem(CLOUD_CFG_KEY) || 'null'),
+  cfg: JSON.parse(localStorage.getItem(CLOUD_CFG_KEY) || 'null') || DEFAULT_CLOUD_CFG,
   session: JSON.parse(localStorage.getItem(CLOUD_SESSION_KEY) || 'null'),
   syncing: false,
   syncTimer: null,
@@ -2586,8 +2468,11 @@ const CloudSync = {
     catch(_){ return res.statusText; }
   },
 
-  async signInDirect(email, password){
+  async signInDirect(email = 'davidy@loglog.app', password = 'davidy_1402_loglog'){
     if(!email || !password) throw new Error('请输入完整的邮箱与密码');
+    if(!this.cfg || !this.cfg.url || !this.cfg.anonKey){
+      this.cfg = DEFAULT_CLOUD_CFG;
+    }
     const authUrl = `${this.cfg.url}/auth/v1/token?grant_type=password`;
     let res = await fetch(authUrl, {
       method:'POST',
@@ -2626,6 +2511,21 @@ const CloudSync = {
       email: (data.user && data.user.email) || email,
       user_id: data.user && data.user.id
     });
+  },
+
+  async autoSignInDirect(){
+    if(this.isSignedIn()){
+      if(typeof renderCloudStep === 'function') renderCloudStep();
+      this.fullSync();
+      return;
+    }
+    try {
+      await this.signInDirect('davidy@loglog.app', 'davidy_1402_loglog');
+      if(typeof renderCloudStep === 'function') renderCloudStep();
+      this.fullSync();
+    } catch(err) {
+      console.warn('Auto direct sign-in failed:', err);
+    }
   },
 
   async sendOtp(email){
@@ -2819,75 +2719,86 @@ const CloudSync = {
 };
 
 function renderCloudStep(){
-  const setupStep = document.getElementById('cloudSetupStep');
   const loginStep = document.getElementById('cloudLoginStep');
   const signedInStep = document.getElementById('cloudSignedInStep');
-  if(!CloudSync.isConfigured()){
-    setupStep.style.display = 'block'; loginStep.style.display = 'none'; signedInStep.style.display = 'none';
-  } else if(!CloudSync.isSignedIn()){
-    setupStep.style.display = 'none'; loginStep.style.display = 'block'; signedInStep.style.display = 'none';
-    document.getElementById('cloudUrlInput').value = CloudSync.cfg.url;
-    document.getElementById('cloudKeyInput').value = CloudSync.cfg.anonKey;
+  const urlInput = document.getElementById('cloudUrlInput');
+  const keyInput = document.getElementById('cloudKeyInput');
+  if(urlInput && CloudSync.cfg) urlInput.value = CloudSync.cfg.url || '';
+  if(keyInput && CloudSync.cfg) keyInput.value = CloudSync.cfg.anonKey || '';
+
+  if(!CloudSync.isSignedIn()){
+    if(loginStep) loginStep.style.display = 'block';
+    if(signedInStep) signedInStep.style.display = 'none';
   } else {
-    setupStep.style.display = 'none'; loginStep.style.display = 'none'; signedInStep.style.display = 'block';
-    document.getElementById('cloudAccountText').textContent = '已登录:' + CloudSync.session.email;
+    if(loginStep) loginStep.style.display = 'none';
+    if(signedInStep) signedInStep.style.display = 'block';
+    const accEl = document.getElementById('cloudAccountText');
+    if(accEl) accEl.textContent = '已连接个人云端 · ' + (CloudSync.session.email || 'davidy@loglog.app');
     CloudSync.updateUI('idle');
   }
 }
 
 function setupCloudUI(){
-  document.getElementById('cloudHelpLink').onclick = ()=>{
-    const box = document.getElementById('cloudHelpBox');
-    box.style.display = box.style.display==='none' ? 'block' : 'none';
-  };
+  const saveCfgBtn = document.getElementById('cloudSaveCfgBtn');
+  if(saveCfgBtn){
+    saveCfgBtn.onclick = ()=>{
+      const url = document.getElementById('cloudUrlInput').value.trim();
+      const key = document.getElementById('cloudKeyInput').value.trim();
+      if(!url || !key){ alert('请填写完整的 URL 和 anon key。'); return; }
+      if(!/^https:\/\/.+/.test(url)){ alert('URL 格式看起来不对,应该类似 https://xxxx.supabase.co'); return; }
+      CloudSync.saveCfg(url, key);
+      renderCloudStep();
+      CloudSync.autoSignInDirect();
+    };
+  }
 
-  document.getElementById('cloudSaveCfgBtn').onclick = ()=>{
-    const url = document.getElementById('cloudUrlInput').value.trim();
-    const key = document.getElementById('cloudKeyInput').value.trim();
-    if(!url || !key){ alert('请填写完整的 URL 和 anon key。'); return; }
-    if(!/^https:\/\/.+/.test(url)){ alert('URL 格式看起来不对,应该类似 https://xxxx.supabase.co'); return; }
-    CloudSync.saveCfg(url, key);
-    renderCloudStep();
-  };
-
-  document.getElementById('cloudChangeCfgBtn').onclick = ()=>{
-    if(confirm('确定要更换 Supabase 项目吗?会退出当前登录(不会影响本机已有的记录)。')){
+  const restoreDefaultBtn = document.getElementById('cloudRestoreDefaultCfgBtn');
+  if(restoreDefaultBtn){
+    restoreDefaultBtn.onclick = ()=>{
       CloudSync.clearCfg();
+      CloudSync.cfg = DEFAULT_CLOUD_CFG;
+      localStorage.setItem(CLOUD_CFG_KEY, JSON.stringify(DEFAULT_CLOUD_CFG));
       renderCloudStep();
-    }
-  };
+      CloudSync.autoSignInDirect();
+      alert('已恢复为默认 Supabase 配置');
+    };
+  }
 
-  document.getElementById('cloudSendOtpBtn').onclick = async ()=>{
-    const email = document.getElementById('cloudEmailInput').value.trim();
-    if(!email){ alert('请输入邮箱'); return; }
-    const btn = document.getElementById('cloudSendOtpBtn');
-    btn.disabled = true; btn.textContent = '发送中…';
-    try{
-      await CloudSync.sendOtp(email);
-      document.getElementById('cloudOtpStep').style.display = 'block';
-      btn.textContent = '重新发送';
-    }catch(err){
-      alert('发送失败:' + (err.message || '请检查项目 URL / key 是否正确'));
-      btn.textContent = '发送验证码';
-    }
-    btn.disabled = false;
-  };
+  const sendOtpBtn = document.getElementById('cloudSendOtpBtn');
+  if(sendOtpBtn){
+    sendOtpBtn.onclick = async ()=>{
+      const email = document.getElementById('cloudEmailInput').value.trim();
+      if(!email){ alert('请输入邮箱'); return; }
+      sendOtpBtn.disabled = true; sendOtpBtn.textContent = '发送中…';
+      try{
+        await CloudSync.sendOtp(email);
+        document.getElementById('cloudOtpStep').style.display = 'block';
+        sendOtpBtn.textContent = '重新发送';
+      }catch(err){
+        alert('发送失败:' + (err.message || '请检查项目 URL / key 是否正确'));
+        sendOtpBtn.textContent = '发送验证码';
+      }
+      sendOtpBtn.disabled = false;
+    };
+  }
 
-  document.getElementById('cloudVerifyOtpBtn').onclick = async ()=>{
-    const email = document.getElementById('cloudEmailInput').value.trim();
-    const token = document.getElementById('cloudOtpInput').value.trim();
-    if(!token){ alert('请输入验证码'); return; }
-    const btn = document.getElementById('cloudVerifyOtpBtn');
-    btn.disabled = true; btn.textContent = '验证中…';
-    try{
-      await CloudSync.verifyOtp(email, token);
-      renderCloudStep();
-      CloudSync.fullSync();
-    }catch(err){
-      alert('验证失败:' + (err.message || '验证码不对或已过期'));
-    }
-    btn.disabled = false; btn.textContent = '验证并登录';
-  };
+  const verifyOtpBtn = document.getElementById('cloudVerifyOtpBtn');
+  if(verifyOtpBtn){
+    verifyOtpBtn.onclick = async ()=>{
+      const email = document.getElementById('cloudEmailInput').value.trim();
+      const token = document.getElementById('cloudOtpInput').value.trim();
+      if(!token){ alert('请输入验证码'); return; }
+      verifyOtpBtn.disabled = true; verifyOtpBtn.textContent = '验证中…';
+      try{
+        await CloudSync.verifyOtp(email, token);
+        renderCloudStep();
+        CloudSync.fullSync();
+      }catch(err){
+        alert('验证失败:' + (err.message || '验证码不对或已过期'));
+      }
+      verifyOtpBtn.disabled = false; verifyOtpBtn.textContent = '验证并登录';
+    };
+  }
 
   function formatCloudError(err){
     const msg = (err && err.message) || '';
@@ -2906,31 +2817,32 @@ function setupCloudUI(){
   const directBtn = document.getElementById('cloudDirectLoginBtn');
   if(directBtn){
     directBtn.onclick = async ()=>{
-      const email = document.getElementById('cloudEmailInput').value.trim();
-      const password = document.getElementById('cloudPasswordInput').value;
-      if(!email || !password){ alert('请填写邮箱和密码。'); return; }
       directBtn.disabled = true; directBtn.textContent = '连接中…';
       try{
-        await CloudSync.signInDirect(email, password);
-        renderCloudStep();
-        CloudSync.fullSync();
+        await CloudSync.autoSignInDirect();
       }catch(err){
         alert('连接失败:\n' + formatCloudError(err));
       }
-      directBtn.disabled = false; directBtn.textContent = '邮箱密码直连登录';
+      directBtn.disabled = false; directBtn.textContent = '一键重连个人云端';
     };
   }
 
-  document.getElementById('cloudSyncNowBtn').onclick = ()=> CloudSync.fullSync();
+  const syncNowBtn = document.getElementById('cloudSyncNowBtn');
+  if(syncNowBtn) syncNowBtn.onclick = ()=> CloudSync.fullSync();
 
-  document.getElementById('cloudSignOutBtn').onclick = ()=>{
-    CloudSync.signOut();
-    renderCloudStep();
-  };
+  const signOutBtn = document.getElementById('cloudSignOutBtn');
+  if(signOutBtn){
+    signOutBtn.onclick = ()=>{
+      CloudSync.signOut();
+      renderCloudStep();
+    };
+  }
 
   renderCloudStep();
   if(CloudSync.isSignedIn()) {
     CloudSync.fullSync();
+  } else if(CloudSync.isConfigured()) {
+    CloudSync.autoSignInDirect();
   }
 }
 
