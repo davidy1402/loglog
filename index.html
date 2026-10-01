@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>顺便记 | 排便追踪</title>
+<title>PutPut 顺便记 | 排便计时与健康追踪</title>
 
 <!-- PWA Manifest & Theme -->
 <link rel="manifest" href="manifest.json">
@@ -15,7 +15,7 @@
 <!-- iOS Home Screen Support -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="顺便记">
+<meta name="apple-mobile-web-app-title" content="PutPut">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 
 <style>
@@ -900,9 +900,9 @@
 
   <!-- ============ HOME VIEW ============ -->
   <div class="view active" id="viewHome">
-    <h1>顺便记</h1>
+    <h1>PutPut</h1>
     <div class="sub">
-      <span>排便计时 + 追踪</span>
+      <span>顺便记: 排便计时与健康追踪</span>
       <span class="sync-pill" id="cloudSyncStatusPill">
         <span class="cloud-status-dot" id="cloudHeaderDot"></span>
         <span id="cloudHeaderStatus">云同步就绪</span>
@@ -3060,7 +3060,7 @@ function checkReminder(){
     const tipText = `距离上次已 ${timeStr}。今天记得多喝水、多吃蔬菜与膳食纤维，适度走动促进肠道蠕动哦 💧🥗`;
     document.getElementById('reminderText').textContent = tipText;
     banner.style.display = 'flex';
-    sendWebNotification('顺便记: 规律排便提醒', `已超过 ${timeStr} 未记录排便。今天记得多喝水、多吃蔬果与膳食纤维。`);
+    sendWebNotification('PutPut: 规律排便提醒', `已超过 ${timeStr} 未记录排便。今天记得多喝水、多吃蔬果与膳食纤维。`);
   } else {
     banner.style.display = 'none';
   }
@@ -3119,12 +3119,12 @@ function setupReminderUI(){
           return;
         }
       } else if(Notification.permission === 'denied'){
-        alert('通知权限已被关闭。请在浏览器设置中开启「顺便记」的通知权限。');
+        alert('通知权限已被关闭。请在浏览器设置中开启「PutPut」的通知权限。');
         return;
       }
 
       try {
-        new Notification('顺便记: 提醒测试', {
+        new Notification('PutPut: 提醒测试', {
           body: '已超过 2 天未记录，今天记得多喝水与补充膳食纤维 💧🥗',
           icon: 'icon-192.png',
           badge: 'icon-192.png'
