@@ -1077,29 +1077,71 @@
     <h1>系统设置</h1>
     <div class="sub">同步、提醒与数据</div>
 
+    <!-- 1. 提醒设置 -->
+    <div class="card">
+      <div class="section-title">排便规律提醒</div>
+      <div class="data-hint">超期健康提醒与连续异常预警，支持系统锁屏唤醒。</div>
+
+      <div class="reminder-set" style="margin-top:14px;">
+        <label class="switch">
+          <input type="checkbox" id="reminderToggle">
+          <span class="track"></span>
+          <span>超期规律提醒</span>
+        </label>
+        <select id="reminderThreshold">
+          <option value="24">超过 1 天 (24h)</option>
+          <option value="36">超过 1.5 天 (36h)</option>
+          <option value="48">超过 2 天 (48h)</option>
+          <option value="72">超过 3 天 (72h)</option>
+          <option value="96">超过 4 天 (96h)</option>
+        </select>
+      </div>
+
+      <div class="reminder-set" style="margin-top:14px;">
+        <label class="switch">
+          <input type="checkbox" id="healthAlertToggle" checked>
+          <span class="track"></span>
+          <span>连续异常预警</span>
+        </label>
+        <span class="st-sub" style="font-size:12px;color:var(--sub);">便秘与腹泻识别</span>
+      </div>
+
+      <div id="pushStatusRow" style="margin-top:14px;padding:9px 12px;border-radius:10px;background:var(--cell);display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--sub);">
+        <span id="pushStatusDot" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#9ca3af;flex-shrink:0;"></span>
+        <span id="pushStatusText" style="flex:1;">正在检查系统推送能力...</span>
+      </div>
+
+      <div id="iosPushBanner" style="display:none;margin-top:10px;padding:9px 12px;border-radius:8px;background:var(--accent-light);border:1px solid var(--line);color:var(--ink-secondary);font-size:12px;line-height:1.45;">
+        📱 <b>锁屏通知提示</b>：若需锁屏亮屏提醒，请通过 Safari「添加到主屏幕」并在桌面打开。
+      </div>
+    </div>
+
+    <!-- 2. 云端同步 -->
     <div class="card" id="cloudCard">
       <div class="section-title">云端同步</div>
       <div class="data-hint">跨设备自动同步记录。</div>
 
       <div id="cloudSignedInStep" style="display:none;margin-top:12px;">
-        <div class="data-hint" id="cloudAccountText" style="font-weight:600;color:var(--text);">已连接个人云端: davidy@loglog.app</div>
-        <div class="cloud-status-row"><span class="cloud-status-dot" id="cloudStatusDot"></span><span id="cloudSyncStatus">尚未同步</span></div>
-        <div class="data-btns" style="margin-top:12px;">
+        <div class="cloud-status-row" style="margin-bottom:12px;">
+          <span class="cloud-status-dot" id="cloudStatusDot"></span>
+          <span id="cloudAccountText" style="font-weight:500;color:var(--ink);">已连接个人云端: davidy@loglog.app</span>
+        </div>
+        <div class="data-btns">
           <button id="cloudSyncNowBtn" class="data-primary">立即同步</button>
           <button id="cloudSignOutBtn">断开连接</button>
         </div>
       </div>
 
       <div id="cloudLoginStep" style="display:none;margin-top:12px;">
-        <div class="data-hint" style="color:var(--warn-text);">云端未连接，可重新连接：</div>
-        <div class="data-btns" style="margin-top:10px;">
+        <div class="data-hint" style="color:var(--warn);margin-bottom:8px;">云端未连接，可重新连接：</div>
+        <div class="data-btns">
           <button id="cloudDirectLoginBtn" class="data-primary">连接个人云端</button>
         </div>
         <details style="margin-top:12px;font-size:12px;color:var(--sub);">
           <summary style="cursor:pointer;">邮箱验证码登录</summary>
           <div style="margin-top:10px;">
             <input type="email" id="cloudEmailInput" class="dt-input" placeholder="you@example.com" value="davidy@loglog.app" autocapitalize="off" autocorrect="off">
-            <input type="password" id="cloudPasswordInput" class="dt-input" placeholder="输入 Supabase 账户密码" value="davidy_1402_loglog" autocomplete="current-password" style="margin-top:8px;">
+            <input type="password" id="cloudPasswordInput" class="dt-input" placeholder="输入密码" value="davidy_1402_loglog" autocomplete="current-password" style="margin-top:8px;">
             <div class="data-btns" style="margin-top:8px;">
               <button id="cloudSendOtpBtn">发送邮箱验证码</button>
             </div>
@@ -1112,111 +1154,66 @@
           </div>
         </details>
       </div>
-
-      <details id="cloudCustomDetails" style="margin-top:14px;font-size:12px;color:var(--sub);">
-        <summary style="cursor:pointer;">自定义 Supabase 后端</summary>
-        <div style="margin-top:10px;">
-          <span class="field-label">Supabase 项目 URL</span>
-          <input type="text" id="cloudUrlInput" class="dt-input" placeholder="https://xxxx.supabase.co" autocapitalize="off" autocorrect="off">
-          <span class="field-label" style="margin-top:8px;">Supabase anon public key</span>
-          <input type="text" id="cloudKeyInput" class="dt-input" placeholder="eyJhbGc..." autocapitalize="off" autocorrect="off">
-          <div class="data-btns" style="margin-top:10px;">
-            <button id="cloudSaveCfgBtn" class="data-primary">保存配置并继续</button>
-            <button id="cloudRestoreDefaultCfgBtn">恢复默认配置</button>
-          </div>
-          <div class="cloud-help-box" style="margin-top:12px;">
-            <b>Supabase 数据库建表 SQL (在 SQL Editor 运行一次):</b>
-            <pre>create table bm_records (
-  id text primary key,
-  user_id uuid not null default auth.uid() references auth.users(id),
-  ts bigint not null,
-  duration bigint,
-  bristol int,
-  amount text, color text, smell text, feel text,
-  symptoms jsonb, mood text, place text, note text,
-  updated_at bigint not null default (extract(epoch from now())*1000)::bigint
-);
-alter table bm_records enable row level security;
-create policy "owner access" on bm_records for all
-  using (auth.uid() = user_id) with check (auth.uid() = user_id);</pre>
-          </div>
-        </div>
-      </details>
     </div>
 
-    <div class="card">
-      <div class="section-title">提醒与系统级推送</div>
-      <div class="data-hint">排便超期规律提醒，支持 iOS 16.4+ 及 Android 锁屏后台推送。</div>
-      
-      <span class="field-label" style="margin-top:14px;">超期规律提醒</span>
-      <div class="reminder-set" style="margin-top:8px;">
-        <label class="switch">
-          <input type="checkbox" id="reminderToggle">
-          <span class="track"></span>
-          <span>开启超期提醒</span>
-        </label>
-        <select id="reminderThreshold">
-          <option value="24">超过 1 天 (24h)</option>
-          <option value="36">超过 1.5 天 (36h)</option>
-          <option value="48">超过 2 天 (48h)</option>
-          <option value="72">超过 3 天 (72h)</option>
-          <option value="96">超过 4 天 (96h)</option>
-        </select>
-      </div>
-
-      <div id="pushStatusRow" style="margin-top:8px;font-size:12px;color:var(--sub);display:flex;align-items:center;gap:6px;">
-        <span id="pushStatusDot" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#9ca3af;"></span>
-        <span id="pushStatusText">正在检查系统推送能力...</span>
-      </div>
-
-      <div id="iosPushBanner" style="display:none;margin-top:10px;padding:9px 12px;border-radius:8px;background:#fef3c7;border:1px solid #fde68a;color:#92400e;font-size:12px;line-height:1.45;">
-        📱 <b>iOS 锁屏通知提示</b>：苹果系统要求必须先在 Safari 浏览器点击底部分享按钮选择「添加到主屏幕」，从桌面图标打开 App 后方可接收系统级锁屏通知。
-      </div>
-
-      <span class="field-label" style="margin-top:16px;">连续异常预警</span>
-      <div class="reminder-set" style="margin-top:8px;">
-        <label class="switch">
-          <input type="checkbox" id="healthAlertToggle" checked>
-          <span class="track"></span>
-          <span>连续 3 次异常提醒</span>
-        </label>
-        <span class="st-sub" style="font-size:12px;color:var(--sub);">便秘与腹泻识别</span>
-      </div>
-
-      <div class="data-btns" style="margin-top:16px;display:flex;gap:8px;">
-        <button id="testImmediatePushBtn" class="data-primary" style="flex:1;">立即发送 APNs 推送</button>
-        <button id="testLockscreenPushBtn" style="flex:1;">锁屏测试 (5s后)</button>
-      </div>
-
-      <div style="margin-top:8px;display:flex;gap:8px;">
-        <button id="copyPushSubBtn" style="flex:1;font-size:12px;background:none;border:1px dashed var(--border);color:var(--sub);padding:6px 10px;border-radius:8px;cursor:pointer;">复制本设备推送凭证 (PushSubscription)</button>
-        <button id="configRelayBtn" style="font-size:12px;background:none;border:1px dashed var(--border);color:var(--sub);padding:6px 10px;border-radius:8px;cursor:pointer;">中继配置</button>
-      </div>
-
-      <div id="relayConfigPanel" style="display:none;margin-top:10px;padding:10px;border-radius:8px;background:var(--bg);border:1px solid var(--border);">
-        <label class="field-label" style="font-size:12px;">Web Push 中继服务器 URL (Cloudflare Worker):</label>
-        <input type="url" id="relayUrlInput" placeholder="https://putput-push-relay.yourname.workers.dev" style="width:100%;margin-top:6px;padding:7px 10px;font-size:12px;border:1px solid var(--border);border-radius:6px;background:var(--card-bg);color:var(--text);box-sizing:border-box;">
-        <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:8px;">
-          <button id="saveRelayBtn" class="data-primary" style="font-size:12px;padding:5px 12px;">保存中继</button>
-        </div>
-      </div>
-    </div>
-
+    <!-- 3. 本地数据管理 -->
     <div class="card">
       <div class="section-title">本地数据管理</div>
       <div class="data-hint" id="backupHint"></div>
       <div class="data-hint" id="persistHint"></div>
       <div class="data-btns">
-        <button id="backupBtn" class="data-primary">导出备份 (JSON)</button>
-        <button id="restoreBtn">恢复备份 (JSON)</button>
+        <button id="exportBtn" class="data-primary">导出表格 (CSV)</button>
+        <button id="backupBtn">备份 (JSON)</button>
+        <button id="restoreBtn">恢复 (JSON)</button>
       </div>
-      <div class="data-btns">
-        <button id="exportBtn">导出表格 (CSV)</button>
-        <button id="clearBtn" class="data-danger">清空所有数据</button>
+      <div style="margin-top:12px;text-align:right;">
+        <button id="clearBtn" class="data-danger" style="background:none;border:none;color:var(--bad);font-size:12px;cursor:pointer;padding:4px 8px;">清空所有本地数据</button>
       </div>
       <button id="installBtn" class="install-btn" style="display:none;margin-top:8px;">安装到主屏幕</button>
       <input type="file" id="restoreInput" accept="application/json,.json" style="display:none;">
     </div>
+
+    <!-- 4. 高级与调试工具 (默认折叠收纳在最底部) -->
+    <details id="advancedDevDetails" style="margin:24px auto 16px;text-align:center;font-size:12px;color:var(--sub);max-width:400px;">
+      <summary style="cursor:pointer;padding:6px;user-select:none;opacity:0.6;">高级与调试工具</summary>
+      
+      <div class="card" style="margin-top:12px;text-align:left;border-style:dashed;">
+        <div class="section-title" style="font-size:13px;">推送调试工具</div>
+        <div class="data-hint" style="font-size:11.5px;">用于测试苹果 APNs 链路与设备凭证排查。</div>
+
+        <div class="data-btns" style="margin-top:10px;">
+          <button id="testImmediatePushBtn" class="data-primary" style="font-size:12px;padding:7px 10px;">立即发送 APNs 测试</button>
+          <button id="testLockscreenPushBtn" style="font-size:12px;padding:7px 10px;">锁屏测试 (5s后)</button>
+        </div>
+
+        <div style="margin-top:8px;display:flex;gap:8px;">
+          <button id="copyPushSubBtn" style="flex:1;font-size:11px;background:none;border:1px dashed var(--line);color:var(--sub);padding:5px 8px;border-radius:8px;cursor:pointer;">复制推送凭证</button>
+          <button id="configRelayBtn" style="font-size:11px;background:none;border:1px dashed var(--line);color:var(--sub);padding:5px 8px;border-radius:8px;cursor:pointer;">配置中继</button>
+        </div>
+
+        <div id="relayConfigPanel" style="display:none;margin-top:10px;padding:8px;border-radius:8px;background:var(--cell);">
+          <label class="field-label" style="font-size:11px;margin-top:0;">中继服务器 URL (Cloudflare Worker):</label>
+          <input type="url" id="relayUrlInput" placeholder="https://putput-push-relay.davidyongjiawei.workers.dev" style="width:100%;margin-top:4px;padding:6px 8px;font-size:11.5px;border:1px solid var(--line);border-radius:6px;background:var(--card);color:var(--ink);box-sizing:border-box;">
+          <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px;">
+            <button id="saveRelayBtn" class="data-primary" style="font-size:11px;padding:4px 8px;">保存</button>
+          </div>
+        </div>
+
+        <details id="cloudCustomDetails" style="margin-top:12px;font-size:11px;color:var(--sub);">
+          <summary style="cursor:pointer;">自定义 Supabase 后端</summary>
+          <div style="margin-top:8px;">
+            <span class="field-label" style="font-size:11px;margin-top:4px;">Supabase URL</span>
+            <input type="text" id="cloudUrlInput" class="dt-input" style="font-size:11.5px;padding:6px 8px;" placeholder="https://xxxx.supabase.co" autocapitalize="off" autocorrect="off">
+            <span class="field-label" style="font-size:11px;margin-top:6px;">anon key</span>
+            <input type="text" id="cloudKeyInput" class="dt-input" style="font-size:11.5px;padding:6px 8px;" placeholder="eyJhbGc..." autocapitalize="off" autocorrect="off">
+            <div class="data-btns" style="margin-top:8px;">
+              <button id="cloudSaveCfgBtn" class="data-primary" style="font-size:11px;padding:4px 8px;">保存配置</button>
+              <button id="cloudRestoreDefaultCfgBtn" style="font-size:11px;padding:4px 8px;">恢复默认</button>
+            </div>
+          </div>
+        </details>
+      </div>
+    </details>
   </div>
 
 </div>
@@ -3013,6 +3010,7 @@ const NOTIF_THROTTLE_KEY = 'bm_last_notif_ts';
 const VAPID_PUBLIC_KEY = 'BESInMhTogu5qLjgz9f8jyMhG2pQRBGYU12USMTFJXrel-L1Ubm-8IQF_MO3lLmREp1_anGdOf1K7Msc-wq4g-g';
 const PUSH_SUB_KEY = 'putput_push_subscription';
 const PUSH_RELAY_KEY = 'putput_push_relay_url';
+const DEFAULT_PUSH_RELAY_URL = 'https://putput-push-relay.davidyongjiawei.workers.dev';
 
 function urlBase64ToUint8Array(base64String) {
   const padding = '='.repeat((4 - base64String.length % 4) % 4);
@@ -3076,7 +3074,7 @@ const WebPushManager = {
     return sub;
   },
   async syncSchedule(hours) {
-    const relayUrl = localStorage.getItem(PUSH_RELAY_KEY);
+    const relayUrl = (localStorage.getItem(PUSH_RELAY_KEY) || DEFAULT_PUSH_RELAY_URL).trim();
     if (!relayUrl) return;
     const sub = await this.getSubscription();
     if (!sub) return;
@@ -3226,35 +3224,35 @@ async function updatePushStatusUI(){
   if(!dot || !text) return;
 
   if(!WebPushManager.isSupported()){
-    dot.style.background = '#ef4444';
-    text.textContent = '当前环境不支持系统级 Web Push (iOS需16.4+并添加到主屏幕)';
+    dot.style.background = '#9ca3af';
+    text.textContent = '添加到主屏幕可解锁系统级锁屏提醒';
     return;
   }
 
   if(!('Notification' in window) || Notification.permission === 'default'){
     dot.style.background = '#f59e0b';
-    text.textContent = '通知未授权：勾选超期提醒以开启系统级后台推送';
+    text.textContent = '开启上方开关即可允许系统提醒';
     return;
   }
 
   if(Notification.permission === 'denied'){
     dot.style.background = '#ef4444';
-    text.textContent = '系统通知权限已被拒绝，请在系统设置中允许通知';
+    text.textContent = '通知已被系统禁用，可在手机设置中开启';
     return;
   }
 
   try {
     const sub = await WebPushManager.getSubscription();
     if(sub){
-      dot.style.background = '#10b981';
-      text.textContent = '● 系统级后台推送 (Web Push) 已就绪，支持锁屏唤醒';
+      dot.style.background = 'var(--good)';
+      text.textContent = '系统锁屏后台提醒已就绪';
     } else {
-      dot.style.background = '#3b82f6';
-      text.textContent = '已授权通知，未激活推送凭证 (点击测试即可生成)';
+      dot.style.background = 'var(--good)';
+      text.textContent = '已开启提醒';
     }
   } catch(e){
-    dot.style.background = '#f59e0b';
-    text.textContent = '无法获取推送状态';
+    dot.style.background = '#9ca3af';
+    text.textContent = '系统提醒已就绪';
   }
 }
 
@@ -3273,7 +3271,7 @@ function setupReminderUI(){
   if(toggle) toggle.checked = !!reminderCfg.enabled;
   if(sel) sel.value = String(reminderCfg.hours);
   if(healthToggle) healthToggle.checked = reminderCfg.healthAlerts !== false;
-  if(relayUrlInput) relayUrlInput.value = localStorage.getItem(PUSH_RELAY_KEY) || '';
+  if(relayUrlInput) relayUrlInput.value = localStorage.getItem(PUSH_RELAY_KEY) || DEFAULT_PUSH_RELAY_URL;
 
   updatePushStatusUI();
 
@@ -3319,7 +3317,7 @@ function setupReminderUI(){
       const sub = await WebPushManager.subscribe();
       updatePushStatusUI();
 
-      const relayUrl = (localStorage.getItem(PUSH_RELAY_KEY) || '').trim();
+      const relayUrl = (localStorage.getItem(PUSH_RELAY_KEY) || DEFAULT_PUSH_RELAY_URL).trim();
       if(relayUrl){
         const originalText = btnElement.textContent;
         btnElement.disabled = true;
