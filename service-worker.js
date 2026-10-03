@@ -1,4 +1,4 @@
-const CACHE_NAME = 'putput-v19';
+const CACHE_NAME = 'putput-v20';
 
 const PRECACHE_ASSETS = [
   './',
@@ -95,11 +95,11 @@ self.addEventListener('push', (event) => {
     try {
       data = event.data.json();
     } catch (e) {
-      data = { title: 'PutPut: 规律排便提醒', body: event.data.text() };
+      data = { title: '规律排便提醒', body: event.data.text() };
     }
   }
 
-  const title = data.title || 'PutPut: 规律排便提醒';
+  const title = data.title || '规律排便提醒';
   const options = {
     body: data.body || '已超过 48 小时未记录排便。今天记得多喝水、多吃蔬果与膳食纤维 💧🥗',
     icon: new URL('icon-192.png', self.registration.scope).href,

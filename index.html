@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PutPut 顺便记 | 排便计时与健康追踪</title>
+<title>PutPut | 排便计时与健康追踪</title>
 
 <!-- PWA Manifest & Theme -->
 <link rel="manifest" href="manifest.json">
@@ -3204,7 +3204,7 @@ function checkReminder(){
     const tipText = `距离上次已 ${timeStr}。今天记得多喝水、多吃蔬菜与膳食纤维，适度走动促进肠道蠕动哦 💧🥗`;
     document.getElementById('reminderText').textContent = tipText;
     banner.style.display = 'flex';
-    sendWebNotification('PutPut: 规律排便提醒', `已超过 ${timeStr} 未记录排便。今天记得多喝水、多吃蔬果与膳食纤维。`);
+    sendWebNotification('规律排便提醒', `已超过 ${timeStr} 未记录排便。今天记得多喝水、多吃蔬果与膳食纤维。`);
   } else {
     banner.style.display = 'none';
   }

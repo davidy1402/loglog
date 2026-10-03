@@ -183,17 +183,17 @@ function generateReminderMessage(data, now) {
     timeStr = `${Math.max(1, Math.floor(elapsedMs / 3600000))}小时`;
   }
 
-  let title = 'PutPut: 规律排便提醒';
+  let title = '规律排便提醒';
   let body = `距离上次排便已 ${timeStr}。今天记得适度走动、多喝温水，促进肠道蠕动哦 💧🥗`;
 
   if (data.healthCondition === 'blood') {
-    title = 'PutPut: 肠道健康关注提醒';
+    title = '肠道健康关注提醒';
     body = `距离上次排便已 ${timeStr}。近期排便记录伴随带血，如厕请勿久坐，若反复出现建议就医排查 🛑`;
   } else if (data.healthCondition === 'hard' || (data.lastBristol && data.lastBristol <= 2)) {
-    title = 'PutPut: 肠道补水与膳食纤维提醒';
+    title = '肠道补水与膳食纤维提醒';
     body = `距离上次排便已 ${timeStr}。近几次便便偏硬 (Bristol 1-2)，今天记得多饮温水与补充膳食纤维 💧🥗`;
   } else if (data.healthCondition === 'loose' || (data.lastBristol && data.lastBristol >= 6)) {
-    title = 'PutPut: 消化道调理提醒';
+    title = '消化道调理提醒';
     body = `距离上次排便已 ${timeStr}。近期便型偏稀，注意清淡饮食并少量多次补充水分与电解质 💧`;
   }
 

@@ -32,7 +32,7 @@ webpush.setVapidDetails(
 const args = process.argv.slice(2);
 let subJson = null;
 let delay = 0;
-let title = 'PutPut: 锁屏系统级提醒测试';
+let title = '锁屏系统级提醒测试';
 let body = '锁屏推送成功！这是由苹果 APNs 唤醒的系统级通知 💧🥗';
 
 for (let i = 0; i < args.length; i++) {
