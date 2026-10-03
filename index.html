@@ -1145,8 +1145,8 @@ create policy "owner access" on bm_records for all
     </div>
 
     <div class="card">
-      <div class="section-title">提醒与预警</div>
-      <div class="data-hint">排便间隔与健康趋势提示。</div>
+      <div class="section-title">提醒与系统级推送</div>
+      <div class="data-hint">排便超期规律提醒，支持 iOS 16.4+ 及 Android 锁屏后台推送。</div>
       
       <span class="field-label" style="margin-top:14px;">超期规律提醒</span>
       <div class="reminder-set" style="margin-top:8px;">
@@ -1164,6 +1164,15 @@ create policy "owner access" on bm_records for all
         </select>
       </div>
 
+      <div id="pushStatusRow" style="margin-top:8px;font-size:12px;color:var(--sub);display:flex;align-items:center;gap:6px;">
+        <span id="pushStatusDot" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#9ca3af;"></span>
+        <span id="pushStatusText">正在检查系统推送能力...</span>
+      </div>
+
+      <div id="iosPushBanner" style="display:none;margin-top:10px;padding:9px 12px;border-radius:8px;background:#fef3c7;border:1px solid #fde68a;color:#92400e;font-size:12px;line-height:1.45;">
+        📱 <b>iOS 锁屏通知提示</b>：苹果系统要求必须先在 Safari 浏览器点击底部分享按钮选择「添加到主屏幕」，从桌面图标打开 App 后方可接收系统级锁屏通知。
+      </div>
+
       <span class="field-label" style="margin-top:16px;">连续异常预警</span>
       <div class="reminder-set" style="margin-top:8px;">
         <label class="switch">
@@ -1174,8 +1183,22 @@ create policy "owner access" on bm_records for all
         <span class="st-sub" style="font-size:12px;color:var(--sub);">便秘与腹泻识别</span>
       </div>
 
-      <div class="data-btns" style="margin-top:16px;">
-        <button id="testNotifBtn" style="width:100%;">测试推送通知</button>
+      <div class="data-btns" style="margin-top:16px;display:flex;gap:8px;">
+        <button id="testLockscreenPushBtn" class="data-primary" style="flex:1;">系统锁屏推送测试 (5s后)</button>
+        <button id="testLocalNotifBtn" style="flex:1;">前台即时测试</button>
+      </div>
+
+      <div style="margin-top:8px;display:flex;gap:8px;">
+        <button id="copyPushSubBtn" style="flex:1;font-size:12px;background:none;border:1px dashed var(--border);color:var(--sub);padding:6px 10px;border-radius:8px;cursor:pointer;">复制本设备推送凭证 (PushSubscription)</button>
+        <button id="configRelayBtn" style="font-size:12px;background:none;border:1px dashed var(--border);color:var(--sub);padding:6px 10px;border-radius:8px;cursor:pointer;">中继配置</button>
+      </div>
+
+      <div id="relayConfigPanel" style="display:none;margin-top:10px;padding:10px;border-radius:8px;background:var(--bg);border:1px solid var(--border);">
+        <label class="field-label" style="font-size:12px;">Web Push 中继服务器 URL (Cloudflare Worker):</label>
+        <input type="url" id="relayUrlInput" placeholder="https://putput-push-relay.yourname.workers.dev" style="width:100%;margin-top:6px;padding:7px 10px;font-size:12px;border:1px solid var(--border);border-radius:6px;background:var(--card-bg);color:var(--text);box-sizing:border-box;">
+        <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:8px;">
+          <button id="saveRelayBtn" class="data-primary" style="font-size:12px;padding:5px 12px;">保存中继</button>
+        </div>
       </div>
     </div>
 
@@ -1384,6 +1407,9 @@ resetForm();
 function saveRecords(){
   localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
   if(typeof CloudSync !== 'undefined') CloudSync.scheduleSync();
+  if(typeof WebPushManager !== 'undefined' && reminderCfg && reminderCfg.enabled) {
+    WebPushManager.syncSchedule(reminderCfg.hours);
+  }
 }
 function saveTimer(){ localStorage.setItem(TIMER_KEY, JSON.stringify(activeTimer)); }
 
@@ -2984,17 +3010,119 @@ function setupCloudUI(){
 function saveReminderCfg(){ localStorage.setItem(REMINDER_KEY, JSON.stringify(reminderCfg)); }
 
 const NOTIF_THROTTLE_KEY = 'bm_last_notif_ts';
-function sendWebNotification(title, body){
+const VAPID_PUBLIC_KEY = 'BESInMhTogu5qLjgz9f8jyMhG2pQRBGYU12USMTFJXrel-L1Ubm-8IQF_MO3lLmREp1_anGdOf1K7Msc-wq4g-g';
+const PUSH_SUB_KEY = 'putput_push_subscription';
+const PUSH_RELAY_KEY = 'putput_push_relay_url';
+
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const rawData = window.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i);
+  }
+  return outputArray;
+}
+
+const WebPushManager = {
+  isSupported() {
+    return 'serviceWorker' in navigator && 'PushManager' in window;
+  },
+  isIos() {
+    return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  },
+  isStandalone() {
+    return window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+  },
+  async getRegistration() {
+    if (!('serviceWorker' in navigator)) return null;
+    try {
+      return await navigator.serviceWorker.ready;
+    } catch(e) {
+      return null;
+    }
+  },
+  async getSubscription() {
+    const reg = await this.getRegistration();
+    if (!reg || !('pushManager' in reg)) return null;
+    try {
+      return await reg.pushManager.getSubscription();
+    } catch(e) {
+      return null;
+    }
+  },
+  async subscribe() {
+    if (!this.isSupported()) {
+      throw new Error('当前环境不支持 Web Push API');
+    }
+    const reg = await this.getRegistration();
+    if (!reg) throw new Error('Service Worker 尚未就绪，请刷新重试');
+
+    if (Notification.permission !== 'granted') {
+      const perm = await Notification.requestPermission();
+      if (perm !== 'granted') throw new Error('通知权限已被拒绝');
+    }
+
+    let sub = await reg.pushManager.getSubscription();
+    if (!sub) {
+      const convertedKey = urlBase64ToUint8Array(VAPID_PUBLIC_KEY);
+      sub = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: convertedKey
+      });
+    }
+    localStorage.setItem(PUSH_SUB_KEY, JSON.stringify(sub));
+    return sub;
+  },
+  async syncSchedule(hours) {
+    const relayUrl = localStorage.getItem(PUSH_RELAY_KEY);
+    if (!relayUrl) return;
+    const sub = await this.getSubscription();
+    if (!sub) return;
+
+    const last = [...records].sort((a,b)=>b.ts-a.ts)[0];
+    const nextRemindAt = (last ? last.ts : Date.now()) + (hours || 48) * 3600000;
+
+    try {
+      await fetch(`${relayUrl.replace(/\/+$/, '')}/api/schedule`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          subscription: sub,
+          nextRemindAt,
+          hours: hours || 48
+        })
+      });
+    } catch(e) {
+      console.warn('Sync push schedule to relay failed:', e);
+    }
+  }
+};
+
+async function sendWebNotification(title, body){
   if(!('Notification' in window) || Notification.permission !== 'granted') return;
   const lastNotif = parseInt(localStorage.getItem(NOTIF_THROTTLE_KEY) || '0', 10);
   if(Date.now() - lastNotif < 12 * 3600000) return; // throttle: send max once per 12 hours
+
   try {
-    new Notification(title, {
-      body,
-      icon: 'icon-192.png',
-      badge: 'icon-192.png',
-      tag: 'bm-reminder'
-    });
+    const reg = await WebPushManager.getRegistration();
+    if(reg && 'showNotification' in reg){
+      await reg.showNotification(title, {
+        body,
+        icon: 'icon-192.png',
+        badge: 'icon-192.png',
+        tag: 'putput-reminder',
+        renotify: true
+      });
+    } else {
+      new Notification(title, {
+        body,
+        icon: 'icon-192.png',
+        badge: 'icon-192.png',
+        tag: 'putput-reminder'
+      });
+    }
     localStorage.setItem(NOTIF_THROTTLE_KEY, String(Date.now()));
   } catch(e){}
 }
@@ -3066,24 +3194,87 @@ function checkReminder(){
   }
 }
 
+async function updatePushStatusUI(){
+  const dot = document.getElementById('pushStatusDot');
+  const text = document.getElementById('pushStatusText');
+  const iosBanner = document.getElementById('iosPushBanner');
+
+  if(iosBanner){
+    if(WebPushManager.isIos() && !WebPushManager.isStandalone()){
+      iosBanner.style.display = 'block';
+    } else {
+      iosBanner.style.display = 'none';
+    }
+  }
+
+  if(!dot || !text) return;
+
+  if(!WebPushManager.isSupported()){
+    dot.style.background = '#ef4444';
+    text.textContent = '当前环境不支持系统级 Web Push (iOS需16.4+并添加到主屏幕)';
+    return;
+  }
+
+  if(!('Notification' in window) || Notification.permission === 'default'){
+    dot.style.background = '#f59e0b';
+    text.textContent = '通知未授权：勾选超期提醒以开启系统级后台推送';
+    return;
+  }
+
+  if(Notification.permission === 'denied'){
+    dot.style.background = '#ef4444';
+    text.textContent = '系统通知权限已被拒绝，请在系统设置中允许通知';
+    return;
+  }
+
+  try {
+    const sub = await WebPushManager.getSubscription();
+    if(sub){
+      dot.style.background = '#10b981';
+      text.textContent = '● 系统级后台推送 (Web Push) 已就绪，支持锁屏唤醒';
+    } else {
+      dot.style.background = '#3b82f6';
+      text.textContent = '已授权通知，未激活推送凭证 (点击测试即可生成)';
+    }
+  } catch(e){
+    dot.style.background = '#f59e0b';
+    text.textContent = '无法获取推送状态';
+  }
+}
+
 function setupReminderUI(){
   const toggle = document.getElementById('reminderToggle');
   const sel = document.getElementById('reminderThreshold');
   const healthToggle = document.getElementById('healthAlertToggle');
-  const testBtn = document.getElementById('testNotifBtn');
+  const testLockBtn = document.getElementById('testLockscreenPushBtn');
+  const testLocalBtn = document.getElementById('testLocalNotifBtn');
+  const copySubBtn = document.getElementById('copyPushSubBtn');
+  const configRelayBtn = document.getElementById('configRelayBtn');
+  const relayPanel = document.getElementById('relayConfigPanel');
+  const relayUrlInput = document.getElementById('relayUrlInput');
+  const saveRelayBtn = document.getElementById('saveRelayBtn');
 
   if(toggle) toggle.checked = !!reminderCfg.enabled;
   if(sel) sel.value = String(reminderCfg.hours);
   if(healthToggle) healthToggle.checked = reminderCfg.healthAlerts !== false;
+  if(relayUrlInput) relayUrlInput.value = localStorage.getItem(PUSH_RELAY_KEY) || '';
+
+  updatePushStatusUI();
 
   if(toggle){
-    toggle.onchange = ()=>{
+    toggle.onchange = async ()=>{
       reminderCfg.enabled = toggle.checked;
       saveReminderCfg();
-      if(toggle.checked && 'Notification' in window && Notification.permission === 'default'){
-        Notification.requestPermission();
+      if(toggle.checked){
+        try {
+          await WebPushManager.subscribe();
+          await WebPushManager.syncSchedule(reminderCfg.hours);
+        } catch(err){
+          console.warn('Subscribe push on toggle failed:', err);
+        }
       }
       reminderDismissed = false;
+      updatePushStatusUI();
       checkReminder();
     };
   }
@@ -3092,6 +3283,7 @@ function setupReminderUI(){
     sel.onchange = ()=>{
       reminderCfg.hours = parseInt(sel.value, 10) || 48;
       saveReminderCfg();
+      WebPushManager.syncSchedule(reminderCfg.hours);
       reminderDismissed = false;
       checkReminder();
     };
@@ -3106,32 +3298,98 @@ function setupReminderUI(){
     };
   }
 
-  if(testBtn){
-    testBtn.onclick = async ()=>{
+  if(testLockBtn){
+    testLockBtn.onclick = async ()=>{
+      try {
+        const sub = await WebPushManager.subscribe();
+        updatePushStatusUI();
+
+        const relayUrl = (localStorage.getItem(PUSH_RELAY_KEY) || '').trim();
+        if(relayUrl){
+          testLockBtn.disabled = true;
+          testLockBtn.textContent = '请求中...';
+          const res = await fetch(`${relayUrl.replace(/\/+$/, '')}/api/test-push`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              subscription: sub,
+              delaySeconds: 5,
+              title: 'PutPut: 锁屏系统级提醒',
+              text: '锁屏推送成功！这是由苹果 APNs 唤醒的系统级通知 💧🥗'
+            })
+          });
+          const data = await res.json();
+          testLockBtn.disabled = false;
+          testLockBtn.textContent = '系统锁屏推送测试 (5s后)';
+          if(data.success){
+            alert('已向中继发出延迟 5 秒推送请求！\n\n请现在按下电源键锁屏，观察苹果 APNs 是否成功唤醒手机屏幕。');
+          } else {
+            alert('推送中继返回错误: ' + (data.error || JSON.stringify(data)));
+          }
+        } else {
+          // No relay URL configured: copy subscription to clipboard & prompt
+          const subText = JSON.stringify(sub);
+          if(navigator.clipboard && navigator.clipboard.writeText){
+            await navigator.clipboard.writeText(subText);
+          }
+          alert('已成功生成并复制本设备推送凭证 (PushSubscription)！\n\n【测试方法】\n1. 在电脑 Mac 终端直接运行:\n   node scripts/send_push.js --delay 5\n2. 5 秒内按手机电源键锁屏，即可亲眼见证 APNs 唤醒亮屏！\n\n【云端自动化】\n你也可以在下方「中继配置」填入部署好的 Cloudflare Worker 地址，实现随时随地一键锁屏推送。');
+        }
+      } catch(err){
+        alert('启用推送失败: ' + err.message);
+        updatePushStatusUI();
+      }
+    };
+  }
+
+  if(testLocalBtn){
+    testLocalBtn.onclick = async ()=>{
       if(!('Notification' in window)){
-        alert('当前浏览器不支持 Web Push Notifications API');
+        alert('当前浏览器不支持 Notification API');
         return;
       }
-      if(Notification.permission === 'default'){
+      if(Notification.permission !== 'granted'){
         const perm = await Notification.requestPermission();
         if(perm !== 'granted'){
-          alert('通知权限已被拒绝，请在浏览器或系统设置中允许通知。');
+          alert('通知权限已被拒绝');
           return;
         }
-      } else if(Notification.permission === 'denied'){
-        alert('通知权限已被关闭。请在浏览器设置中开启「PutPut」的通知权限。');
-        return;
       }
+      sendWebNotification('PutPut: 前台即时测试', '前台通知测试成功！正常使用时请多喝温水与膳食纤维 💧🥗');
+      alert('已触发前台即时通知测试');
+    };
+  }
 
+  if(copySubBtn){
+    copySubBtn.onclick = async ()=>{
       try {
-        new Notification('PutPut: 提醒测试', {
-          body: '已超过 2 天未记录，今天记得多喝水与补充膳食纤维 💧🥗',
-          icon: 'icon-192.png',
-          badge: 'icon-192.png'
-        });
-        alert('已成功触发系统测试通知！');
-      } catch(err){
-        alert('发送测试通知失败: ' + err.message);
+        const sub = await WebPushManager.subscribe();
+        const json = JSON.stringify(sub, null, 2);
+        if(navigator.clipboard && navigator.clipboard.writeText){
+          await navigator.clipboard.writeText(json);
+          alert('✅ 已将本设备 PushSubscription JSON 复制到剪贴板！');
+        } else {
+          prompt('请手动复制下方 PushSubscription JSON:', json);
+        }
+      } catch(e){
+        alert('获取推送凭证失败: ' + e.message);
+      }
+    };
+  }
+
+  if(configRelayBtn && relayPanel){
+    configRelayBtn.onclick = ()=>{
+      relayPanel.style.display = relayPanel.style.display === 'none' ? 'block' : 'none';
+    };
+  }
+
+  if(saveRelayBtn && relayUrlInput){
+    saveRelayBtn.onclick = ()=>{
+      const val = relayUrlInput.value.trim();
+      localStorage.setItem(PUSH_RELAY_KEY, val);
+      alert(val ? '✅ 中继服务器 URL 已保存！' : 'ℹ️ 已清除中继配置，将使用本地/复制凭证模式。');
+      if(relayPanel) relayPanel.style.display = 'none';
+      if(val && reminderCfg.enabled){
+        WebPushManager.syncSchedule(reminderCfg.hours);
       }
     };
   }

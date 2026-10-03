@@ -1,4 +1,4 @@
-const CACHE_NAME = 'putput-v17';
+const CACHE_NAME = 'putput-v18';
 
 const PRECACHE_ASSETS = [
   './',
@@ -84,6 +84,51 @@ self.addEventListener('fetch', (event) => {
         });
         return networkResponse;
       });
+    })
+  );
+});
+
+// Push Event: Handle incoming background Web Push from APNs (iOS) & FCM (Android)
+self.addEventListener('push', (event) => {
+  let data = {};
+  if (event.data) {
+    try {
+      data = event.data.json();
+    } catch (e) {
+      data = { title: 'PutPut: 规律排便提醒', body: event.data.text() };
+    }
+  }
+
+  const title = data.title || 'PutPut: 规律排便提醒';
+  const options = {
+    body: data.body || '已超过 48 小时未记录排便。今天记得多喝水、多吃蔬果与膳食纤维 💧🥗',
+    icon: 'icon-192.png',
+    badge: 'icon-192.png',
+    tag: 'putput-reminder',
+    renotify: true,
+    data: {
+      url: data.url || './'
+    }
+  };
+
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+// Notification Click Event: Focus or open the app when tapping the notification
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const targetUrl = (event.notification.data && event.notification.data.url) || './';
+  
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
+      for (const client of windowClients) {
+        if ('focus' in client) {
+          return client.focus();
+        }
+      }
+      if (clients.openWindow) {
+        return clients.openWindow(targetUrl);
+      }
     })
   );
 });

@@ -1,0 +1,13 @@
+name = "putput-push-relay"
+main = "worker.js"
+compatibility_date = "2026-10-01"
+
+[triggers]
+crons = ["*/30 * * * *"]
+
+# To persist subscriptions across cron jobs, create a KV namespace:
+# wrangler kv:namespace create PUTPUT_KV
+# and uncomment below:
+# [[kv_namespaces]]
+# binding = "PUTPUT_KV"
+# id = "<YOUR_KV_NAMESPACE_ID>"
