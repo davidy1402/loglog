@@ -3081,8 +3081,21 @@ const WebPushManager = {
     const sub = await this.getSubscription();
     if (!sub) return;
 
-    const last = [...records].sort((a,b)=>b.ts-a.ts)[0];
-    const nextRemindAt = (last ? last.ts : Date.now()) + (hours || 48) * 3600000;
+    const sorted = [...records].sort((a,b)=>b.ts-a.ts);
+    const last = sorted[0];
+    const top3 = sorted.slice(0, 3);
+    const isAllHard = top3.length >= 3 && top3.every(r => r.bristol && r.bristol <= 2);
+    const isAllLoose = top3.length >= 3 && top3.every(r => r.bristol && r.bristol >= 6);
+    const recent7 = records.filter(r => Date.now() - r.ts <= 7 * 86400000);
+    const bloodCount = recent7.filter(r => (r.symptoms||[]).includes('厕纸带血') || r.color === '鲜红/带血').length;
+
+    let healthCondition = 'normal';
+    if(bloodCount >= 2) healthCondition = 'blood';
+    else if(isAllHard || (last && last.bristol <= 2)) healthCondition = 'hard';
+    else if(isAllLoose || (last && last.bristol >= 6)) healthCondition = 'loose';
+
+    const lastRecordTs = last ? last.ts : Date.now();
+    const nextRemindAt = lastRecordTs + (hours || 48) * 3600000;
 
     try {
       await fetch(`${relayUrl.replace(/\/+$/, '')}/api/schedule`, {
@@ -3091,7 +3104,10 @@ const WebPushManager = {
         body: JSON.stringify({
           subscription: sub,
           nextRemindAt,
-          hours: hours || 48
+          lastRecordTs,
+          hours: hours || 48,
+          healthCondition,
+          lastBristol: last ? last.bristol : null
         })
       });
     } catch(e) {
@@ -3308,14 +3324,30 @@ function setupReminderUI(){
         if(relayUrl){
           testLockBtn.disabled = true;
           testLockBtn.textContent = '请求中...';
+
+          const sorted = [...records].sort((a,b)=>b.ts-a.ts);
+          const last = sorted[0];
+          const top3 = sorted.slice(0, 3);
+          const isAllHard = top3.length >= 3 && top3.every(r => r.bristol && r.bristol <= 2);
+          const isAllLoose = top3.length >= 3 && top3.every(r => r.bristol && r.bristol >= 6);
+          const recent7 = records.filter(r => Date.now() - r.ts <= 7 * 86400000);
+          const bloodCount = recent7.filter(r => (r.symptoms||[]).includes('厕纸带血') || r.color === '鲜红/带血').length;
+
+          let healthCondition = 'normal';
+          if(bloodCount >= 2) healthCondition = 'blood';
+          else if(isAllHard || (last && last.bristol <= 2)) healthCondition = 'hard';
+          else if(isAllLoose || (last && last.bristol >= 6)) healthCondition = 'loose';
+
           const res = await fetch(`${relayUrl.replace(/\/+$/, '')}/api/test-push`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               subscription: sub,
               delaySeconds: 5,
-              title: 'PutPut: 锁屏系统级提醒',
-              text: '锁屏推送成功！这是由苹果 APNs 唤醒的系统级通知 💧🥗'
+              lastRecordTs: last ? last.ts : null,
+              healthCondition,
+              lastBristol: last ? last.bristol : null,
+              hours: reminderCfg.hours || 48
             })
           });
           const data = await res.json();

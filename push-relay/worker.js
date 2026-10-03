@@ -170,6 +170,36 @@ async function sendWebPush(subscription, payloadObj) {
   };
 }
 
+function generateReminderMessage(data, now) {
+  const lastRecordTs = data.lastRecordTs || (data.nextRemindAt ? data.nextRemindAt - (data.hours || 48) * 3600000 : now - 48 * 3600000);
+  const elapsedMs = Math.max(0, now - lastRecordTs);
+  const days = Math.floor(elapsedMs / 86400000);
+  const hours = Math.floor((elapsedMs % 86400000) / 3600000);
+
+  let timeStr = '';
+  if (days > 0) {
+    timeStr = hours > 0 ? `${days}天${hours}小时` : `${days}天`;
+  } else {
+    timeStr = `${Math.max(1, Math.floor(elapsedMs / 3600000))}小时`;
+  }
+
+  let title = 'PutPut: 规律排便提醒';
+  let body = `距离上次排便已 ${timeStr}。今天记得适度走动、多喝温水，促进肠道蠕动哦 💧🥗`;
+
+  if (data.healthCondition === 'blood') {
+    title = 'PutPut: 肠道健康关注提醒';
+    body = `距离上次排便已 ${timeStr}。近期排便记录伴随带血，如厕请勿久坐，若反复出现建议就医排查 🛑`;
+  } else if (data.healthCondition === 'hard' || (data.lastBristol && data.lastBristol <= 2)) {
+    title = 'PutPut: 肠道补水与膳食纤维提醒';
+    body = `距离上次排便已 ${timeStr}。近几次便便偏硬 (Bristol 1-2)，今天记得多饮温水与补充膳食纤维 💧🥗`;
+  } else if (data.healthCondition === 'loose' || (data.lastBristol && data.lastBristol >= 6)) {
+    title = 'PutPut: 消化道调理提醒';
+    body = `距离上次排便已 ${timeStr}。近期便型偏稀，注意清淡饮食并少量多次补充水分与电解质 💧`;
+  }
+
+  return { title, body, url: './' };
+}
+
 export default {
   async fetch(request, env, ctx) {
     if (request.method === 'OPTIONS') {
@@ -200,11 +230,12 @@ export default {
           });
         }
 
-        const pushPayload = {
-          title: title || 'PutPut: 锁屏系统级提醒',
-          body: text || '锁屏推送成功！这是由苹果 APNs 唤醒的系统级通知 💧🥗',
-          url: './'
-        };
+        let pushPayload;
+        if (title && text) {
+          pushPayload = { title, body: text, url: './' };
+        } else {
+          pushPayload = generateReminderMessage(body, Date.now());
+        }
 
         if (delaySeconds > 0) {
           // Asynchronously wait and push in background
@@ -222,14 +253,15 @@ export default {
             success: true,
             delayed: true,
             delaySeconds,
-            message: `将在 ${delaySeconds} 秒后触发 APNs 推送，请立刻锁屏！`
+            message: `将在 ${delaySeconds} 秒后触发 APNs 推送，请立刻锁屏！`,
+            preview: pushPayload
           }), {
             headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
           });
         }
 
         const result = await sendWebPush(subscription, pushPayload);
-        return new Response(JSON.stringify({ success: result.ok, apnsStatus: result.status }), {
+        return new Response(JSON.stringify({ success: result.ok, apnsStatus: result.status, preview: pushPayload }), {
           headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
         });
       } catch (err) {
@@ -242,7 +274,7 @@ export default {
 
     if (url.pathname === '/api/schedule' && request.method === 'POST') {
       try {
-        const { subscription, nextRemindAt, hours = 48 } = await request.json();
+        const { subscription, nextRemindAt, lastRecordTs, hours = 48, healthCondition, lastBristol } = await request.json();
         if (!subscription || !subscription.endpoint) {
           return new Response(JSON.stringify({ error: 'Missing subscription' }), {
             status: 400,
@@ -255,7 +287,10 @@ export default {
           await env.PUTPUT_KV.put(key, JSON.stringify({
             subscription,
             nextRemindAt: nextRemindAt || (Date.now() + hours * 3600000),
+            lastRecordTs: lastRecordTs || (Date.now() - hours * 3600000),
             hours,
+            healthCondition,
+            lastBristol,
             updatedAt: Date.now()
           }), {
             expirationTtl: 30 * 86400 // Keep for 30 days
@@ -288,12 +323,8 @@ export default {
       try {
         const data = JSON.parse(dataStr);
         if (data.nextRemindAt && data.nextRemindAt <= now) {
-          const diffHours = Math.floor((now - (data.nextRemindAt - data.hours * 3600000)) / 3600000);
-          await sendWebPush(data.subscription, {
-            title: 'PutPut: 规律排便提醒',
-            body: `已超过 ${diffHours} 小时未记录排便。今天记得多喝水、多吃蔬果与膳食纤维 💧🥗`,
-            url: './'
-          });
+          const pushPayload = generateReminderMessage(data, now);
+          await sendWebPush(data.subscription, pushPayload);
 
           // Throttle: Next reminder in 24 hours if still unlogged
           data.nextRemindAt = now + 24 * 3600000;
