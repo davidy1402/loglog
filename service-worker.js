@@ -1,4 +1,4 @@
-const CACHE_NAME = 'putput-v18';
+const CACHE_NAME = 'putput-v19';
 
 const PRECACHE_ASSETS = [
   './',
@@ -102,8 +102,8 @@ self.addEventListener('push', (event) => {
   const title = data.title || 'PutPut: 规律排便提醒';
   const options = {
     body: data.body || '已超过 48 小时未记录排便。今天记得多喝水、多吃蔬果与膳食纤维 💧🥗',
-    icon: 'icon-192.png',
-    badge: 'icon-192.png',
+    icon: new URL('icon-192.png', self.registration.scope).href,
+    badge: new URL('icon-192.png', self.registration.scope).href,
     tag: 'putput-reminder',
     renotify: true,
     data: {

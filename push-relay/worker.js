@@ -238,30 +238,16 @@ export default {
         }
 
         if (delaySeconds > 0) {
-          // Asynchronously wait and push in background
-          ctx.waitUntil(new Promise(async (resolve) => {
-            await new Promise((r) => setTimeout(r, delaySeconds * 1000));
-            try {
-              await sendWebPush(subscription, pushPayload);
-            } catch (e) {
-              console.error('Delayed push error:', e);
-            }
-            resolve();
-          }));
-
-          return new Response(JSON.stringify({
-            success: true,
-            delayed: true,
-            delaySeconds,
-            message: `将在 ${delaySeconds} 秒后触发 APNs 推送，请立刻锁屏！`,
-            preview: pushPayload
-          }), {
-            headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
-          });
+          // Synchronously hold request open so Cloudflare Free Tier doesn't kill isolate
+          await new Promise((r) => setTimeout(r, delaySeconds * 1000));
         }
 
         const result = await sendWebPush(subscription, pushPayload);
-        return new Response(JSON.stringify({ success: result.ok, apnsStatus: result.status, preview: pushPayload }), {
+        return new Response(JSON.stringify({
+          success: result.ok,
+          apnsStatus: result.status,
+          preview: pushPayload
+        }), {
           headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
         });
       } catch (err) {

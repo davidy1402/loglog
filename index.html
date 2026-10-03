@@ -1184,8 +1184,8 @@ create policy "owner access" on bm_records for all
       </div>
 
       <div class="data-btns" style="margin-top:16px;display:flex;gap:8px;">
-        <button id="testLockscreenPushBtn" class="data-primary" style="flex:1;">系统锁屏推送测试 (5s后)</button>
-        <button id="testLocalNotifBtn" style="flex:1;">前台即时测试</button>
+        <button id="testImmediatePushBtn" class="data-primary" style="flex:1;">立即发送 APNs 推送</button>
+        <button id="testLockscreenPushBtn" style="flex:1;">锁屏测试 (5s后)</button>
       </div>
 
       <div style="margin-top:8px;display:flex;gap:8px;">
@@ -3262,8 +3262,8 @@ function setupReminderUI(){
   const toggle = document.getElementById('reminderToggle');
   const sel = document.getElementById('reminderThreshold');
   const healthToggle = document.getElementById('healthAlertToggle');
+  const testImmediateBtn = document.getElementById('testImmediatePushBtn');
   const testLockBtn = document.getElementById('testLockscreenPushBtn');
-  const testLocalBtn = document.getElementById('testLocalNotifBtn');
   const copySubBtn = document.getElementById('copyPushSubBtn');
   const configRelayBtn = document.getElementById('configRelayBtn');
   const relayPanel = document.getElementById('relayConfigPanel');
@@ -3314,80 +3314,71 @@ function setupReminderUI(){
     };
   }
 
-  if(testLockBtn){
-    testLockBtn.onclick = async ()=>{
-      try {
-        const sub = await WebPushManager.subscribe();
-        updatePushStatusUI();
+  const triggerTestPush = async (delaySeconds, btnElement) => {
+    try {
+      const sub = await WebPushManager.subscribe();
+      updatePushStatusUI();
 
-        const relayUrl = (localStorage.getItem(PUSH_RELAY_KEY) || '').trim();
-        if(relayUrl){
-          testLockBtn.disabled = true;
-          testLockBtn.textContent = '请求中...';
+      const relayUrl = (localStorage.getItem(PUSH_RELAY_KEY) || '').trim();
+      if(relayUrl){
+        const originalText = btnElement.textContent;
+        btnElement.disabled = true;
+        btnElement.textContent = delaySeconds > 0 ? '5秒倒计时...' : '发送中...';
 
-          const sorted = [...records].sort((a,b)=>b.ts-a.ts);
-          const last = sorted[0];
-          const top3 = sorted.slice(0, 3);
-          const isAllHard = top3.length >= 3 && top3.every(r => r.bristol && r.bristol <= 2);
-          const isAllLoose = top3.length >= 3 && top3.every(r => r.bristol && r.bristol >= 6);
-          const recent7 = records.filter(r => Date.now() - r.ts <= 7 * 86400000);
-          const bloodCount = recent7.filter(r => (r.symptoms||[]).includes('厕纸带血') || r.color === '鲜红/带血').length;
+        const sorted = [...records].sort((a,b)=>b.ts-a.ts);
+        const last = sorted[0];
+        const top3 = sorted.slice(0, 3);
+        const isAllHard = top3.length >= 3 && top3.every(r => r.bristol && r.bristol <= 2);
+        const isAllLoose = top3.length >= 3 && top3.every(r => r.bristol && r.bristol >= 6);
+        const recent7 = records.filter(r => Date.now() - r.ts <= 7 * 86400000);
+        const bloodCount = recent7.filter(r => (r.symptoms||[]).includes('厕纸带血') || r.color === '鲜红/带血').length;
 
-          let healthCondition = 'normal';
-          if(bloodCount >= 2) healthCondition = 'blood';
-          else if(isAllHard || (last && last.bristol <= 2)) healthCondition = 'hard';
-          else if(isAllLoose || (last && last.bristol >= 6)) healthCondition = 'loose';
+        let healthCondition = 'normal';
+        if(bloodCount >= 2) healthCondition = 'blood';
+        else if(isAllHard || (last && last.bristol <= 2)) healthCondition = 'hard';
+        else if(isAllLoose || (last && last.bristol >= 6)) healthCondition = 'loose';
 
-          const res = await fetch(`${relayUrl.replace(/\/+$/, '')}/api/test-push`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              subscription: sub,
-              delaySeconds: 5,
-              lastRecordTs: last ? last.ts : null,
-              healthCondition,
-              lastBristol: last ? last.bristol : null,
-              hours: reminderCfg.hours || 48
-            })
-          });
-          const data = await res.json();
-          testLockBtn.disabled = false;
-          testLockBtn.textContent = '系统锁屏推送测试 (5s后)';
-          if(data.success){
-            alert('已向中继发出延迟 5 秒推送请求！\n\n请现在按下电源键锁屏，观察苹果 APNs 是否成功唤醒手机屏幕。');
-          } else {
-            alert('推送中继返回错误: ' + (data.error || JSON.stringify(data)));
-          }
+        const res = await fetch(`${relayUrl.replace(/\/+$/, '')}/api/test-push`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            subscription: sub,
+            delaySeconds,
+            lastRecordTs: last ? last.ts : null,
+            healthCondition,
+            lastBristol: last ? last.bristol : null,
+            hours: reminderCfg.hours || 48
+          })
+        });
+        const data = await res.json();
+        btnElement.disabled = false;
+        btnElement.textContent = originalText;
+        if(data.success && data.apnsStatus === 201){
+          alert('🎉 苹果 APNs 推送成功 (状态码 201)！\n\n已成功向你的 iPhone 投递系统级通知。');
         } else {
-          // No relay URL configured: copy subscription to clipboard & prompt
-          const subText = JSON.stringify(sub);
-          if(navigator.clipboard && navigator.clipboard.writeText){
-            await navigator.clipboard.writeText(subText);
-          }
-          alert('已成功生成并复制本设备推送凭证 (PushSubscription)！\n\n【测试方法】\n1. 在电脑 Mac 终端直接运行:\n   node scripts/send_push.js --delay 5\n2. 5 秒内按手机电源键锁屏，即可亲眼见证 APNs 唤醒亮屏！\n\n【云端自动化】\n你也可以在下方「中继配置」填入部署好的 Cloudflare Worker 地址，实现随时随地一键锁屏推送。');
+          alert('推送中继返回: ' + (data.apnsStatus ? `APNs状态 ${data.apnsStatus}` : (data.error || JSON.stringify(data))));
         }
-      } catch(err){
-        alert('启用推送失败: ' + err.message);
-        updatePushStatusUI();
+      } else {
+        const subText = JSON.stringify(sub);
+        if(navigator.clipboard && navigator.clipboard.writeText){
+          await navigator.clipboard.writeText(subText);
+        }
+        alert('已成功生成并复制本设备推送凭证 (PushSubscription)！\n\n【测试方法】\n1. 在电脑 Mac 终端直接运行:\n   node scripts/send_push.js --delay 5\n2. 5 秒内按手机电源键锁屏，即可亲眼见证 APNs 唤醒亮屏！\n\n【云端自动化】\n你也可以在下方「中继配置」填入部署好的 Cloudflare Worker 地址，实现随时随地一键锁屏推送。');
       }
-    };
+    } catch(err){
+      alert('启用推送失败: ' + err.message);
+      updatePushStatusUI();
+    }
+  };
+
+  if(testImmediateBtn){
+    testImmediateBtn.onclick = () => triggerTestPush(0, testImmediateBtn);
   }
 
-  if(testLocalBtn){
-    testLocalBtn.onclick = async ()=>{
-      if(!('Notification' in window)){
-        alert('当前浏览器不支持 Notification API');
-        return;
-      }
-      if(Notification.permission !== 'granted'){
-        const perm = await Notification.requestPermission();
-        if(perm !== 'granted'){
-          alert('通知权限已被拒绝');
-          return;
-        }
-      }
-      sendWebNotification('PutPut: 前台即时测试', '前台通知测试成功！正常使用时请多喝温水与膳食纤维 💧🥗');
-      alert('已触发前台即时通知测试');
+  if(testLockBtn){
+    testLockBtn.onclick = () => {
+      alert('5 秒倒计时即将开始！点击确定后，请立刻按电源键锁屏。');
+      triggerTestPush(5, testLockBtn);
     };
   }
 
