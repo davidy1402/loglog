@@ -1,4 +1,4 @@
-const CACHE_NAME = 'putput-v25';
+const CACHE_NAME = 'putput-v26';
 
 const PRECACHE_ASSETS = [
   './',
