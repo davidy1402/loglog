@@ -1,4 +1,4 @@
-const CACHE_NAME = 'putput-v22';
+const CACHE_NAME = 'putput-v23';
 
 const PRECACHE_ASSETS = [
   './',
@@ -9,7 +9,8 @@ const PRECACHE_ASSETS = [
   './icon-v2-512.png',
   './icon-v2-maskable-192.png',
   './icon-v2-maskable-512.png',
-  './apple-touch-icon-v2.png'
+  './apple-touch-icon-v2.png',
+  './putput-expressions.png'
 ];
 
 // Install Event: Precaching static assets

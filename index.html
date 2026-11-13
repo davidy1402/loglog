@@ -894,6 +894,37 @@
       transition-duration:0.001ms !important;
     }
   }
+
+  /* PutPut: warm surfaces and a calm, task-first home screen. */
+  :root{
+    --bg-base:#faf5ed;--card:#fffcf8;--card-solid:#fffcf8;--card-border:#ebded2;--glass-blur:none;
+    --ink:#38291f;--ink-secondary:#574236;--sub:#766052;--sub-light:#a99587;
+    --accent:#96512e;--accent-strong:#75402a;--accent-light:#f4e6d8;--accent-pill:#f2dfcc;
+    --line:#e7dace;--cell:#f7eee5;--bar:#ad704d;
+    --tabbar-bg:rgba(255,252,248,.96);--tabbar-border:#e9dbce;--tabbar-blur:blur(16px);
+    --tabbar-shadow:0 12px 32px rgba(96,65,44,.14);--tabbar-active-bg:#f4e6d8;
+    --tabbar-active-border:transparent;--tabbar-active-shadow:none;
+    --shadow-card:none;--shadow-btn:0 5px 12px rgba(140,77,48,.17);--shadow-float:0 14px 35px rgba(65,43,30,.18);
+  }
+  body{padding:calc(28px + env(safe-area-inset-top,0px)) 24px calc(125px + env(safe-area-inset-bottom,0px));}
+  .wrap{max-width:480px}.card{border-radius:20px;padding:22px;margin-bottom:18px;animation:none}
+  .brand-header{display:flex;align-items:center;gap:11px;margin-bottom:28px}.brand-header img{width:49px;height:49px;border-radius:16px}.brand-header h1{font-size:25px;margin:0;letter-spacing:-.035em}.brand-tagline{font-size:12px;color:var(--sub);margin-top:2px}
+  .home-welcome h2{font-size:30px;line-height:1.22;letter-spacing:-.035em;margin:0 0 8px}.home-welcome p{font-size:14px;color:var(--sub);line-height:1.6;margin:0 0 15px}.home-sync{margin-bottom:18px}
+  .hero-card{background:#f2e5d5;border-color:#f2e5d5;border-radius:28px;padding:24px}.hero-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}.hero-copy{min-width:0}.since-label{color:#765b49}.since-value{font-size:clamp(25px,8vw,33px);font-weight:700;line-height:1.2;margin:7px 0}.since-time{font-size:13px;color:#765f50;line-height:1.5}
+  .hero-mascot{flex:none;width:100px;height:100px;margin:-6px -7px 0 0;border-radius:50%;background-image:url('putput-expressions.png');background-size:200% 200%;background-position:0 0;mix-blend-mode:multiply}.hero-mascot[data-face="focus"]{background-position:100% 0}.hero-mascot[data-face="happy"]{background-position:0 100%}
+  .log-btn{background:#96512e;border-radius:16px;margin-top:23px;min-height:54px}.log-btn.stop{background:#75402a;box-shadow:var(--shadow-btn)}.manual-link{width:100%;border:0;background:transparent;color:#80543b;padding:0;font-size:14px;font-weight:600;margin-top:15px}
+  .stat-box{background:#f9f2eb}.section-title{font-size:18px}.stats-grid{gap:1px;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--line)}.stat-box{border-radius:0;padding:18px 8px}.stat-num{font-size:clamp(16px,4.5vw,22px)}
+  .tabbar{width:min(calc(100% - 36px),444px);bottom:calc(14px + env(safe-area-inset-bottom,0px));border-radius:25px;padding:6px 10px;gap:0}.tabbar button{border-radius:16px}.tabbar button.active .tab-ico{transform:none}
+  .modal-sheet{border-radius:24px 24px 0 0}.sheet-header,.sheet-footer{background:var(--card-solid)}
+  input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),select,textarea{font-size:16px !important}
+  :focus-visible{outline:3px solid #a95f38;outline-offset:3px}::selection{background:#e9c9ad;color:#38291f}
+  @media (prefers-color-scheme:dark){
+    :root{--bg-base:#211b18;--card:#302722;--card-solid:#302722;--card-border:#4e4038;--ink:#f8efe6;--ink-secondary:#e8d8ca;--sub:#d0bcad;--sub-light:#a48f80;--accent:#eca979;--accent-strong:#f3c09a;--accent-light:#49352b;--accent-pill:#5c4030;--line:#58483d;--cell:#3b302a;--bar:#daa37c;--tabbar-bg:rgba(48,39,34,.96);--tabbar-border:#5d4b3f;--tabbar-active-bg:#5c4030;--tabbar-active-border:transparent;--tabbar-active-shadow:none}
+    :root{--bad:#ff9a8b;--warn:#ffc383;--good:#98d9a8} .save-btn,.sheet-footer .save-btn,.data-btns button.data-primary,.bristol-card.selected .bristol-num{color:#2d1c14}
+    .hero-card{background:#47352a;border-color:#47352a}.since-label,.since-time{color:#e3cabb}.hero-mascot{mix-blend-mode:normal}.log-btn{color:#fff9f4}.manual-link{color:#f3c09a}.stat-box{background:#382d27}
+  }
+  @media(max-width:350px){body{padding-left:16px;padding-right:16px}.hero-mascot{width:76px;height:76px}.hero-card{padding:20px}}
+
 </style>
 </head>
 <body>
@@ -901,9 +932,10 @@
 
   <!-- ============ HOME VIEW ============ -->
   <div class="view active" id="viewHome">
-    <h1>PutPut</h1>
-    <div class="sub">
-      <span>顺便记: 排便计时与健康追踪</span>
+    <div class="brand-header"><img src="icon-v2-192.png" alt=""><div><h1>PutPut</h1><div class="brand-tagline">给日常一点关心</div></div></div>
+    <div class="home-welcome"><h2>今天也慢慢来。</h2><p>记录一下，了解自己的日常节奏。</p></div>
+    <div class="sub home-sync">
+      <span>排便计时与健康追踪</span>
       <span class="sync-pill" id="cloudSyncStatusPill">
         <span class="cloud-status-dot" id="cloudHeaderDot"></span>
         <span id="cloudHeaderStatus">云同步就绪</span>
@@ -932,10 +964,10 @@
       <button class="reminder-x" id="reminderDismiss" aria-label="关闭">×</button>
     </div>
 
-    <div class="card">
-      <div class="since-label">距离上次</div>
+    <div class="card hero-card">
+      <div class="hero-top"><div class="hero-copy"><div class="since-label">距离上次记录</div>
       <div class="since-value" id="sinceValue">-</div>
-      <div class="since-time" id="sinceTime"></div>
+      <div class="since-time" id="sinceTime"></div></div><div id="heroMascot" class="hero-mascot" data-face="calm" role="img" aria-label="PutPut 角色，平静微笑"></div></div>
 
       <div class="timer-box" id="timerBox" style="display:none;">
         <div class="timer-display" id="timerDisplay">00:00</div>
@@ -944,7 +976,7 @@
 
       <button class="log-btn" id="startBtn">开始</button>
       <button type="button" class="cancel-timer-btn" id="cancelTimerBtn" style="display:none;">取消计时</button>
-      <span class="manual-link" id="manualLink">手动补录</span>
+      <button type="button" class="manual-link" id="manualLink">手动补录</button>
 
       <div class="panel" id="insightPanel">
         <div class="insight-banner" id="insightBanner"></div>
@@ -1463,9 +1495,12 @@ function renderTimerUI(){
   const timerBox = document.getElementById('timerBox');
   const cancelTimerBtn = document.getElementById('cancelTimerBtn');
   const manualLink = document.getElementById('manualLink');
+  const mascot = document.getElementById('heroMascot');
   if(activeTimer){
+    mascot.dataset.face = 'focus';
+    mascot.setAttribute('aria-label', 'PutPut 角色，闭眼放松');
     timerBox.style.display = 'block';
-    startBtn.textContent = '结束';
+    startBtn.textContent = '结束计时';
     startBtn.classList.add('stop');
     if(cancelTimerBtn) cancelTimerBtn.style.display = 'block';
     manualLink.style.display = 'none';
@@ -1474,8 +1509,10 @@ function renderTimerUI(){
       timerInterval = setInterval(updateTimerDisplay, 1000);
     }
   } else {
+    mascot.dataset.face = 'calm';
+    mascot.setAttribute('aria-label', 'PutPut 角色，平静微笑');
     timerBox.style.display = 'none';
-    startBtn.textContent = '开始';
+    startBtn.textContent = '开始计时';
     startBtn.classList.remove('stop');
     if(cancelTimerBtn) cancelTimerBtn.style.display = 'none';
     manualLink.style.display = 'block';
@@ -1839,6 +1876,9 @@ function handleSaveLog(){
     renderAll();
     const analysis = analyzeRecord(newRec, priorRecords);
     showInsight(analysis);
+    const mascot = document.getElementById('heroMascot');
+    mascot.dataset.face = 'happy';
+    mascot.setAttribute('aria-label', 'PutPut 角色，开心微笑');
   }
 
   closeLogModal();
@@ -2020,6 +2060,7 @@ function showInsight(analysis){
 
 document.getElementById('insightDoneBtn').onclick = ()=>{
   document.getElementById('insightPanel').classList.remove('open');
+  renderTimerUI();
 };
 
 /* ---------- rendering: since / stats / history ---------- */
@@ -2029,7 +2070,7 @@ function renderSince(){
   const sinceTime = document.getElementById('sinceTime');
   if(records.length===0){
     sinceValue.textContent = '暂无记录';
-    sinceTime.textContent = '';
+    sinceTime.textContent = '每一次记录，都从这里开始';
     return;
   }
   const last = [...records].sort((a,b)=>b.ts-a.ts)[0];
