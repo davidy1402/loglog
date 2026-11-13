@@ -1,15 +1,15 @@
-const CACHE_NAME = 'putput-v21';
+const CACHE_NAME = 'putput-v22';
 
 const PRECACHE_ASSETS = [
   './',
   './index.html',
   './bm-tracker.html',
-  './manifest.json',
-  './icon-192.png',
-  './icon-512.png',
-  './icon-maskable-192.png',
-  './icon-maskable-512.png',
-  './apple-touch-icon.png'
+  './manifest.json?v=2',
+  './icon-v2-192.png',
+  './icon-v2-512.png',
+  './icon-v2-maskable-192.png',
+  './icon-v2-maskable-512.png',
+  './apple-touch-icon-v2.png'
 ];
 
 // Install Event: Precaching static assets
@@ -102,8 +102,8 @@ self.addEventListener('push', (event) => {
   const title = data.title || '规律排便提醒';
   const options = {
     body: data.body || '已超过 48 小时未记录排便。今天记得多喝水、多吃蔬果与膳食纤维 💧🥗',
-    icon: new URL('icon-192.png', self.registration.scope).href,
-    badge: new URL('icon-192.png', self.registration.scope).href,
+    icon: new URL('icon-v2-192.png', self.registration.scope).href,
+    badge: new URL('icon-v2-192.png', self.registration.scope).href,
     tag: 'putput-reminder',
     renotify: true,
     data: {

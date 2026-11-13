@@ -6,7 +6,8 @@
 <title>PutPut | 排便计时与健康追踪</title>
 
 <!-- PWA Manifest & Theme -->
-<link rel="manifest" href="manifest.json">
+<link rel="manifest" href="manifest.json?v=2">
+<link rel="icon" type="image/png" href="icon-v2-192.png">
 <meta name="theme-color" content="#fafafa" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
 <meta name="color-scheme" content="light dark">
@@ -16,7 +17,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="PutPut">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon-v2.png">
 
 <style>
   :root{
@@ -3124,16 +3125,16 @@ async function sendWebNotification(title, body){
     if(reg && 'showNotification' in reg){
       await reg.showNotification(title, {
         body,
-        icon: 'icon-192.png',
-        badge: 'icon-192.png',
+        icon: 'icon-v2-192.png',
+        badge: 'icon-v2-192.png',
         tag: 'putput-reminder',
         renotify: true
       });
     } else {
       new Notification(title, {
         body,
-        icon: 'icon-192.png',
-        badge: 'icon-192.png',
+        icon: 'icon-v2-192.png',
+        badge: 'icon-v2-192.png',
         tag: 'putput-reminder'
       });
     }
