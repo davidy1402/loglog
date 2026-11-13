@@ -925,6 +925,25 @@
   }
   @media(max-width:350px){body{padding-left:16px;padding-right:16px}.hero-mascot{width:76px;height:76px}.hero-card{padding:20px}}
 
+
+  /* Motion gives feedback to the action, and respects system preferences. */
+  .home-welcome p{margin-bottom:22px}
+  .sync-issue{display:block;margin:-8px 0 16px;padding:7px 10px;border:0;border-radius:10px;background:var(--banner-warn);color:var(--ink);font-size:12px;text-align:left;cursor:pointer}
+  .sync-issue[hidden]{display:none}
+  .bristol-card{text-align:left;color:var(--ink);font:inherit;width:100%}
+  .cal-cell{font-family:inherit;min-width:0}
+  .tabbar button{transition:background-color .2s ease,color .2s ease,transform .22s cubic-bezier(.2,.8,.2,1)}
+  .tabbar button:active{transform:scale(.94)}
+  .log-btn,.save-btn,.cancel-btn,.manual-link,.quick-log-btn,.chip,.bristol-card,.cal-cell:not(.blank){touch-action:manipulation}
+  .log-btn,.save-btn,.cancel-btn,.quick-log-btn,.chip,.bristol-card,.cal-cell{transition:transform .22s cubic-bezier(.2,.85,.25,1.18),background-color .18s ease,border-color .18s ease,box-shadow .18s ease}
+  .log-btn:active,.save-btn:active,.cancel-btn:active,.quick-log-btn:active{transform:scale(.97)}
+  .view.active{animation:view-enter .22s ease-out both}
+  @keyframes view-enter{from{opacity:.88;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+  .hero-mascot[data-face="focus"],.hero-mascot[data-face="happy"]{animation:mascot-settle .42s cubic-bezier(.2,.85,.25,1.18)}
+  @keyframes mascot-settle{0%{transform:scale(.94) translateY(3px)}65%{transform:scale(1.025) translateY(-2px)}100%{transform:scale(1) translateY(0)}}
+  .modal-sheet{transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+  @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important;scroll-behavior:auto !important}}
+
 </style>
 </head>
 <body>
@@ -934,13 +953,9 @@
   <div class="view active" id="viewHome">
     <div class="brand-header"><img src="icon-v2-192.png" alt=""><div><h1>PutPut</h1><div class="brand-tagline">给日常一点关心</div></div></div>
     <div class="home-welcome"><h2>今天也慢慢来。</h2><p>记录一下，了解自己的日常节奏。</p></div>
-    <div class="sub home-sync">
-      <span>排便计时与健康追踪</span>
-      <span class="sync-pill" id="cloudSyncStatusPill">
-        <span class="cloud-status-dot" id="cloudHeaderDot"></span>
-        <span id="cloudHeaderStatus">云同步就绪</span>
-      </span>
-    </div>
+    <button type="button" class="sync-issue" id="cloudSyncStatusPill" hidden aria-live="polite">
+      <span id="cloudHeaderDot" aria-hidden="true"></span><span id="cloudHeaderStatus">同步遇到问题 · 查看设置</span>
+    </button>
 
     <div class="health-alert-banner" id="healthAlertBanner" style="display:none;">
       <div class="alert-ico" id="healthAlertIco">
@@ -1269,7 +1284,7 @@
         <span>快捷记录 (Type 4 顺畅)</span>
       </button>
 
-      <span class="field-label" style="margin-top:0;">日期和时间</span>
+      <label class="field-label" style="margin-top:0;" for="timeInput">日期和时间</label>
       <div class="field-hint">支持补录过去的任意日期与时间</div>
       <input type="datetime-local" id="timeInput" class="dt-input">
 
@@ -1277,11 +1292,11 @@
       <div class="field-hint">计时完成会自动填入，也可手动输入分秒</div>
       <div class="duration-fields">
         <div class="duration-field">
-          <input type="number" id="durMinInput" min="0" step="1" inputmode="numeric" placeholder="0">
+          <input aria-label="用时：分钟" type="number" id="durMinInput" min="0" step="1" inputmode="numeric" placeholder="0">
           <span>分</span>
         </div>
         <div class="duration-field">
-          <input type="number" id="durSecInput" min="0" max="59" step="1" inputmode="numeric" placeholder="0">
+          <input aria-label="用时：秒" type="number" id="durSecInput" min="0" max="59" step="1" inputmode="numeric" placeholder="0">
           <span>秒</span>
         </div>
       </div>
@@ -1318,7 +1333,7 @@
       <div class="field-hint">观察不同环境或外出对排便规律的影响</div>
       <div class="chip-row" id="placeRow"></div>
 
-      <span class="field-label">备注</span>
+      <label class="field-label" for="noteInput">备注</label>
       <div class="field-hint">可补充当日饮水、饮食或特殊体感细节</div>
       <textarea id="noteInput" rows="2" placeholder="输入其他细节…"></textarea>
     </div>
@@ -1330,8 +1345,8 @@
 </div>
 
 <!-- ============ BOTTOM TAB BAR ============ -->
-<nav class="tabbar">
-  <button data-view="viewHome" class="active">
+<nav class="tabbar" aria-label="主导航">
+  <button data-view="viewHome" class="active" aria-current="page">
     <svg class="tab-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3.5l9 7"/><path d="M5.5 9.5V20h13V9.5"/><path d="M9.5 20v-5h5v5"/></svg>
     首页
   </button>
@@ -1606,6 +1621,7 @@ function unlockBodyScroll(){
   }
 }
 
+let modalReturnFocus = null;
 function openLogModal(autoOpenDetails = false){
   const isEdit = form._mode === 'edit';
   const titleEl = document.getElementById('modalSheetTitle');
@@ -1634,10 +1650,14 @@ function openLogModal(autoOpenDetails = false){
     sheet.style.transition = '';
   }
   if(overlay){
+    modalReturnFocus = document.activeElement;
+    overlay.setAttribute('aria-hidden', 'false');
     overlay.style.opacity = '';
     overlay.style.display = 'flex';
     requestAnimationFrame(()=>{
+      if(overlay.getAttribute('aria-hidden') === 'true') return;
       overlay.classList.add('open');
+      document.getElementById('sheetCloseBtn').focus({preventScroll:true});
     });
   }
   lockBodyScroll();
@@ -1648,6 +1668,9 @@ function closeLogModal(){
   const sheet = document.getElementById('logModalSheet');
   if(!overlay) return;
   overlay.classList.remove('open');
+  if(modalReturnFocus && modalReturnFocus.isConnected) modalReturnFocus.focus({preventScroll:true});
+  overlay.setAttribute('aria-hidden', 'true');
+  modalReturnFocus = null;
   if(sheet){
     sheet.style.transform = 'translate3d(0, 100%, 0)';
   }
@@ -1678,9 +1701,15 @@ if(logModalOverlay){
 }
 
 document.addEventListener('keydown', (e)=>{
-  if(e.key === 'Escape'){
-    const overlay = document.getElementById('logModalOverlay');
-    if(overlay && overlay.classList.contains('open')) closeLogModal();
+  const overlay = document.getElementById('logModalOverlay');
+  if(!overlay || !overlay.classList.contains('open')) return;
+  if(e.key === 'Escape'){ closeLogModal(); return; }
+  if(e.key === 'Tab'){
+    const items = [...overlay.querySelectorAll('button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), a[href]')].filter(el=>el.getClientRects().length);
+    if(!items.length) return;
+    const first = items[0], last = items[items.length-1];
+    if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+    else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
   }
 });
 
@@ -1755,13 +1784,16 @@ function makeChipRow(containerId, options, field, multi, warnList){
   const el = document.getElementById(containerId);
   if(!el) return;
   el.innerHTML = '';
-  options.forEach(opt=>{
-    const chip = document.createElement('div');
+  options.forEach((opt, index)=>{
+    const chip = document.createElement('button');
+    chip.type = 'button';
     const isSelected = multi ? (form[field]||[]).includes(opt) : form[field] === opt;
     const isWarn = warnList.includes(opt);
     chip.className = 'chip' + (isSelected?' selected':'') + (isWarn?' warn-chip':'');
     chip.textContent = opt;
+    chip.setAttribute('aria-pressed', String(isSelected));
     chip.onclick = ()=>{
+      const restoreFocus = document.activeElement === chip;
       if(multi){
         form[field] = form[field] || [];
         const idx = form[field].indexOf(opt);
@@ -1770,6 +1802,7 @@ function makeChipRow(containerId, options, field, multi, warnList){
         form[field] = (form[field]===opt) ? null : opt;
       }
       makeChipRow(containerId, options, field, multi, warnList);
+      if(restoreFocus) el.children[index].focus({preventScroll:true});
     };
     el.appendChild(chip);
   });
@@ -1779,8 +1812,10 @@ function renderBristolGrid(){
   const grid = document.getElementById('bristolGrid');
   if(!grid) return;
   grid.innerHTML = '';
-  BRISTOL.forEach(b=>{
-    const el = document.createElement('div');
+  BRISTOL.forEach((b, index)=>{
+    const el = document.createElement('button');
+    el.type = 'button';
+    el.setAttribute('aria-pressed', String(form.bristol===b.n));
     el.className = 'bristol-card' + (form.bristol===b.n ? ' selected':'');
     const levelClass = b.status || 'good';
     const tagText = b.tag || ('Type ' + b.n);
@@ -1795,8 +1830,10 @@ function renderBristolGrid(){
       </div>
     `;
     el.onclick = ()=>{
+      const restoreFocus = document.activeElement === el;
       form.bristol = (form.bristol===b.n) ? null : b.n;
       renderBristolGrid();
+      if(restoreFocus) grid.children[index].focus({preventScroll:true});
     };
     grid.appendChild(el);
   });
@@ -2214,7 +2251,11 @@ function renderAll(){
 /* ---------- view switching ---------- */
 function showView(name){
   document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active', v.id===name));
-  document.querySelectorAll('.tabbar button').forEach(b=>b.classList.toggle('active', b.dataset.view===name));
+  document.querySelectorAll('.tabbar button').forEach(b=>{
+    const selected = b.dataset.view===name;
+    b.classList.toggle('active', selected);
+    if(selected) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
+  });
   window.scrollTo({top:0, behavior:'auto'});
   if(name==='viewCalendar') renderCalendar();
   if(name==='viewStats') renderStatsView();
@@ -2223,6 +2264,7 @@ document.querySelectorAll('.tabbar button').forEach(btn=>{
   btn.onclick = ()=> showView(btn.dataset.view);
 });
 document.getElementById('homeViewAll').onclick = ()=> showView('viewCalendar');
+document.getElementById('cloudSyncStatusPill').onclick = ()=> showView('viewSettings');
 
 /* ---------- calendar ---------- */
 let calView = new Date();      // month currently shown
@@ -2258,7 +2300,10 @@ function renderCalendar(){
   for(let d=1; d<=daysInMonth; d++){
     const k = `${y}-${m+1}-${d}`;
     const dayRecs = byDay[k] || [];
-    const cell = document.createElement('div');
+    const cell = document.createElement('button');
+    cell.type = 'button';
+    cell.setAttribute('aria-label', `${y} 年 ${m+1} 月 ${d} 日，${dayRecs.length} 条记录`);
+    cell.setAttribute('aria-pressed', String(k===selectedDayKey));
     cell.className = 'cal-cell' + (dayRecs.length?' has':'') +
       (k===todayKey?' today':'') + (k===selectedDayKey?' sel':'');
     let marks = '';
@@ -2275,9 +2320,11 @@ function renderCalendar(){
       <span class="cal-marks">${marks}</span>
       ${dayRecs.length>1?`<span class="cal-count">${dayRecs.length}</span>`:''}
     `;
-    if(dayRecs.length || true){
-      cell.onclick = ()=>{ selectedDayKey = k; renderCalendar(); };
-    }
+    cell.onclick = ()=>{
+      const restoreFocus = document.activeElement === cell;
+      selectedDayKey = k; renderCalendar();
+      if(restoreFocus) grid.children[firstWeekday + d - 1].focus({preventScroll:true});
+    };
     grid.appendChild(cell);
   }
 
@@ -2906,13 +2953,10 @@ const CloudSync = {
       }
     }
     if(hDot && hText){
-      if(this.isSignedIn()){
-        hDot.className = 'cloud-status-dot active';
-        hText.textContent = (state==='syncing') ? '同步中…' : '云端实时同步';
-      } else {
-        hDot.className = 'cloud-status-dot';
-        hText.textContent = '本地存储';
-      }
+      const notice = document.getElementById('cloudSyncStatusPill');
+      const hasError = this.isSignedIn() && state === 'err';
+      if(notice) notice.hidden = !hasError;
+      hText.textContent = '同步遇到问题 · 查看设置';
     }
   }
 };
